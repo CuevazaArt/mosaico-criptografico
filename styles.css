@@ -1051,6 +1051,56 @@ input:checked + .slider:before {
   transform: translateY(-1px);
 }
 
+/* Badges de Validación XRPL */
+.xrpl-badge-registered {
+  font-size: 0.7rem !important;
+  font-weight: 700 !important;
+  color: #38bdf8 !important;
+  background: rgba(56, 189, 248, 0.12) !important;
+  border: 1px solid rgba(56, 189, 248, 0.4) !important;
+  padding: 2px 6px !important;
+  border-radius: 6px !important;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  box-shadow: 0 0 8px rgba(56, 189, 248, 0.2);
+}
+
+.xrpl-badge-unregistered {
+  font-size: 0.7rem !important;
+  font-weight: 500 !important;
+  color: #64748b !important;
+  background: rgba(255, 255, 255, 0.03) !important;
+  border: 1px solid rgba(255, 255, 255, 0.06) !important;
+  padding: 2px 6px !important;
+  border-radius: 6px !important;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+#xrpl-connection-status.connected {
+  color: #10b981 !important;
+  background: rgba(16, 185, 129, 0.1) !important;
+  border-color: rgba(16, 185, 129, 0.2) !important;
+}
+
+#xrpl-connection-status.connecting {
+  color: #fbbf24 !important;
+  background: rgba(251, 191, 36, 0.1) !important;
+  border-color: rgba(251, 191, 36, 0.2) !important;
+}
+
+#xrpl-connection-status.disconnected {
+  color: #f43f5e !important;
+  background: rgba(244, 63, 94, 0.1) !important;
+  border-color: rgba(244, 63, 94, 0.2) !important;
+}
+
 /* Botones Deshabilitados */
 .btn-block:disabled, .btn-tiny:disabled, button:disabled {
   opacity: 0.35 !important;

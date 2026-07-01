@@ -6,19 +6,25 @@ Una herramienta descentralizada, determinista e inmutable para generar identific
 
 ## 📖 Documentación Adicional
 
-Para profundizar en el diseño técnico y el uso seguro de la herramienta, consulta los siguientes documentos:
-* **[SECURITY.md](file:///c:/Users/Dell/Desktop/llavero%20mnemonico/SECURITY.md):** Justificación de Seguridad, Modelo de Entropía y análisis de resistencia a ataques avanzados (computación cuántica, fuerza bruta y spoofing de Inteligencia Artificial).
-* **[MANUAL.md](file:///c:/Users/Dell/Desktop/llavero%20mnemonico/MANUAL.md):** Manual de Usuario e instrucciones detalladas sobre el Protocolo de Verificación Manual de 3 pasos recomendado para evitar pérdidas de fondos.
+Para profundizar en el diseño técnico, la teoría y la integración de la herramienta, consulta los siguientes documentos:
+* **[SECURITY.md](file:///c:/Users/Dell/Desktop/llavero%20mnemonico/SECURITY.md):** Justificación de Seguridad, Modelo de Entropía y análisis de resistencia a ataques avanzados.
+* **[MANUAL.md](file:///c:/Users/Dell/Desktop/llavero%20mnemonico/MANUAL.md):** Manual de Usuario e instrucciones del Protocolo de Verificación Manual de 3 pasos.
+* **[AUDIO_PROPOSAL.md](file:///c:/Users/Dell/Desktop/llavero%20mnemonico/AUDIO_PROPOSAL.md):** Especificación de la capa sensorial acústica y mitigaciones en hardware.
+* **[CRITIQUE.md](file:///c:/Users/Dell/Desktop/llavero%20mnemonico/CRITIQUE.md):** Auditoría e informe de usabilidad cognitiva, calibración y ergonomía.
+* **[DISCUSSION.md](file:///c:/Users/Dell/Desktop/llavero%20mnemonico/DISCUSSION.md):** Modelado de amenazas e integración técnica en wallets y exchanges.
+* **[xrpl_make_waves_proposal.md](file:///C:/Users/Dell/.gemini/antigravity-ide/brain/ba674ce1-1c9f-4118-84c7-3ff57c2aa816/xrpl_make_waves_proposal.md):** Arquitectura técnica de registro inmutable XLS-20 y Plan de Acción de 90 días para el programa *Make Waves*.
 
 ---
 
 ## ✨ Características Principales
 
-* **Mosaico 3x3 Dinámico:** El mosaico se compone de 9 secciones con diferentes enfoques de diseño procedural (patrones geométricos, diagramas de Voronoi, fractales, truchet, píxeles, etc.).
-* **Barajado Fisher-Yates Determinista (Layout Shuffling):** Todas las celdas cambian de posición de forma aleatoria basada en el hash de la dirección. Si un solo carácter varía, la grilla entera se reorganiza, rompiendo por completo la simetría y facilitando la detección de duplicados maliciosos.
-* **Anclajes Topológicos:** Una sección del mosaico renderiza un glifo con un número contable de vértices y puntos satélite, facilitando que el cerebro humano memorice una firma única y discreta.
-* **Capa Overlay:** Superposición opcional de caracteres del inicio y fin de la dirección integrados directamente en la base de la imagen SVG.
-* **Simulador de Pruebas de Campo:** dApp interactiva incorporada para evaluar el rendimiento de usabilidad y velocidad de reacción del ojo humano frente a intentos de phishing.
+* **Mosaicos Escalables:** Soporte nativo para grillas de **3x3, 4x4 y 5x5** para aumentar la entropía visual a demanda.
+* **Barajado Fisher-Yates Determinista (Layout Shuffling):** Reorganización aleatoria completa basada en el hash de la dirección para romper simetrías visuales.
+* **Anclajes Topológicos:** Glifo con vértices contables y satélites para facilitar la memoria visual.
+* **Firma Acústica Abreviada (Snappy Signature):** Arpegios melódicos deterministas rápidos (4 notas de 160ms) para evitar la fatiga cognitiva del oído.
+* **Narrativa y Secuencias de Audio Orquestadas:** Secuencias de éxito armónico (campanas ascendentes de Do Mayor) o alarma disonante de doble oscilador sierra (alertas de phishing) para una clara diferenciación sonora.
+* **Registro Inmutable en XRPL Testnet (XLS-20):** Panel interactivo integrado en el Comparador que genera y fondea carteras de prueba en el ledger, permitiendo acuñar y validar identidades visuales inmutables de tipo **Soulbound (NFTs no transferibles)** en la blockchain de pruebas de XRP Ledger.
+* **Marcadores de Posición Simétricos (Placeholders):** Esquinas redondeadas de 16px y alineación vertical pixel-perfect en las tarjetas del comparador vacío.
 
 ---
 

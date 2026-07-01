@@ -2,6 +2,7 @@ import { sha256, bytesToHex } from './src/core/crypto.js';
 import { generateSvg } from './src/core/generator.js';
 import { playMnemonicAudio, stopMnemonicAudio, playMismatchSequence, playMatchSequence } from './src/core/audio.js';
 import { CognitiveTestSession, generateRandomAddress, generateSimilarAddress } from './src/web/testing.js';
+import { checkAddressRegistration, registerMnemonicNft, generateFaucetWallet } from './src/core/xrpl.js';
 
 // Instanciar la sesión global de pruebas
 const testSession = new CognitiveTestSession();
@@ -132,9 +133,28 @@ function initComparator() {
   const statusMsg = document.getElementById('comparison-msg');
   const comparisonGrid = document.querySelector('.comparison-grid');
 
+  // Elementos de la UI de XRPL
+  const xrplConnStatus = document.getElementById('xrpl-connection-status');
+  const xrplGenWalletBtn = document.getElementById('xrpl-generate-wallet-btn');
+  const xrplAddressOutput = document.getElementById('xrpl-address-output');
+  const xrplSecretOutput = document.getElementById('xrpl-secret-output');
+  const xrplRegisterMosaicoBtn = document.getElementById('xrpl-register-mosaico-btn');
+  const xrplConsoleLog = document.getElementById('xrpl-console-log');
+  const xrplBadgeA = document.getElementById('xrpl-badge-a');
+  const xrplBadgeB = document.getElementById('xrpl-badge-b');
+
   let currentHashA = null;
   let currentHashB = null;
   let isInitialLoad = true;
+  let generatedSecret = null;
+
+  // Consola de logs en UI
+  const logToXrplConsole = (msg) => {
+    const timestamp = new Date().toLocaleTimeString();
+    const cleanMsg = msg.replace(/\[red\]/g, '').replace(/\[info\]/g, '');
+    xrplConsoleLog.innerText += `\n[${timestamp}] ${cleanMsg}`;
+    xrplConsoleLog.scrollTop = xrplConsoleLog.scrollHeight;
+  };
 
   const updateComparison = async (userTriggered = false) => {
     // Parar audio activo al cambiar entradas
@@ -150,6 +170,17 @@ function initComparator() {
       currentHashA = hashA;
       previewA.innerHTML = generateSvg(hashA, valA, { chaoticMode: false, showOverlay: true, showAnchors: true, gridSize });
       playAudioABtn.disabled = false;
+      
+      // Consultar registro XRPL de forma asíncrona
+      checkAddressRegistration(valA, logToXrplConsole).then(isReg => {
+        if (isReg) {
+          xrplBadgeA.className = 'xrpl-badge-registered';
+          xrplBadgeA.innerHTML = '🛡️ Registrado (Testnet)';
+        } else {
+          xrplBadgeA.className = 'xrpl-badge-unregistered';
+          xrplBadgeA.innerHTML = '❓ No Registrado';
+        }
+      });
     } else {
       currentHashA = null;
       previewA.innerHTML = `
@@ -159,6 +190,8 @@ function initComparator() {
         </div>
       `;
       playAudioABtn.disabled = true;
+      xrplBadgeA.className = 'xrpl-badge-unregistered';
+      xrplBadgeA.innerHTML = '❓ No Registrado';
     }
 
     if (valB) {
@@ -166,6 +199,17 @@ function initComparator() {
       currentHashB = hashB;
       previewB.innerHTML = generateSvg(hashB, valB, { chaoticMode: false, showOverlay: true, showAnchors: true, gridSize });
       playAudioBBtn.disabled = false;
+
+      // Consultar registro XRPL de forma asíncrona
+      checkAddressRegistration(valB, logToXrplConsole).then(isReg => {
+        if (isReg) {
+          xrplBadgeB.className = 'xrpl-badge-registered';
+          xrplBadgeB.innerHTML = '🛡️ Registrado (Testnet)';
+        } else {
+          xrplBadgeB.className = 'xrpl-badge-unregistered';
+          xrplBadgeB.innerHTML = '❓ No Registrado';
+        }
+      });
     } else {
       currentHashB = null;
       previewB.innerHTML = `
@@ -175,6 +219,8 @@ function initComparator() {
         </div>
       `;
       playAudioBBtn.disabled = true;
+      xrplBadgeB.className = 'xrpl-badge-unregistered';
+      xrplBadgeB.innerHTML = '❓ No Registrado';
     }
 
     // Comparación y estado global
@@ -258,6 +304,52 @@ function initComparator() {
       // Forzar copia exacta perfecta
       compareB.value = compareA.value.trim();
       updateComparison(true);
+    }
+  });
+
+  // Event Listeners del Panel XRPL
+  xrplGenWalletBtn.addEventListener('click', async () => {
+    xrplGenWalletBtn.disabled = true;
+    xrplConnStatus.className = 'connecting';
+    xrplConnStatus.textContent = '🟡 Conectando...';
+    
+    try {
+      const walletData = await generateFaucetWallet(logToXrplConsole);
+      
+      xrplAddressOutput.value = walletData.address;
+      xrplSecretOutput.value = walletData.seed;
+      generatedSecret = walletData.seed;
+      
+      xrplConnStatus.className = 'connected';
+      xrplConnStatus.textContent = '🟢 XRPL Conectado';
+      xrplRegisterMosaicoBtn.disabled = false;
+    } catch (err) {
+      logToXrplConsole(`[error] Falla de conexión o faucet: ${err.message}`);
+      xrplConnStatus.className = 'disconnected';
+      xrplConnStatus.textContent = '🔴 Conexión Fallida';
+    } finally {
+      xrplGenWalletBtn.disabled = false;
+    }
+  });
+
+  xrplRegisterMosaicoBtn.addEventListener('click', async () => {
+    if (!generatedSecret) return;
+    
+    xrplRegisterMosaicoBtn.disabled = true;
+    
+    try {
+      logToXrplConsole("[info] Enviando minteo XLS-20 (Soulbound NFT)...");
+      const res = await registerMnemonicNft(generatedSecret, logToXrplConsole);
+      
+      if (res.success) {
+        logToXrplConsole("[info] ¡Registro inmutable en Testnet verificado!");
+        // Disparar re-evaluación en el comparador para actualizar badges
+        updateComparison(false);
+      }
+    } catch (err) {
+      logToXrplConsole(`[error] Error al registrar: ${err.message}`);
+    } finally {
+      xrplRegisterMosaicoBtn.disabled = false;
     }
   });
 
