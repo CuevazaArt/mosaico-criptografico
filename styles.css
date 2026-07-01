@@ -966,10 +966,11 @@ input:checked + .slider:before {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  width: 260px;
-  height: 260px; /* Tamaño idéntico al SVG canvas */
+  width: 100%;
+  height: 100%;
+  aspect-ratio: 1 / 1;
   border: 2px dashed rgba(99, 102, 241, 0.25);
-  border-radius: 20px;
+  border-radius: 16px; /* Idéntico al border-radius de los SVG */
   background: rgba(99, 102, 241, 0.03);
   box-shadow: inset 0 0 15px rgba(99, 102, 241, 0.05);
   color: var(--text-muted);
@@ -985,8 +986,8 @@ input:checked + .slider:before {
 }
 
 .empty-preview-placeholder span {
-  font-size: 2.5rem;
-  margin-bottom: 0.75rem;
+  font-size: 2rem;
+  margin-bottom: 0.4rem;
   display: block;
   animation: gentle-key-pulse 2s infinite ease-in-out;
 }
@@ -999,10 +1000,12 @@ input:checked + .slider:before {
 
 .empty-preview-placeholder p {
   margin: 0;
-  font-size: 0.85rem;
+  font-size: 0.72rem;
   font-weight: 600;
   color: #94a3b8;
   letter-spacing: 0.3px;
+  text-align: center;
+  padding: 0 0.5rem;
 }
 
 /* Énfasis de los botones Phishing y Perfecta */

@@ -164,12 +164,12 @@
           <div class="comparison-grid">
             <!-- Dirección A -->
             <div class="comparison-column">
-              <div class="form-group">
-                <label for="compare-a-input">Dirección A (Legítima / Esperada)</label>
-                <input type="text" id="compare-a-input" class="form-input" 
-                       placeholder="Pegar dirección de origen..." 
-                       value="0x71c81857e1519509f0750854d15f20a2b18b3a9">
+              <div class="form-group flex-row-align" style="display: flex; align-items: center; justify-content: space-between; min-height: 26px; margin-bottom: 0.5rem;">
+                <label for="compare-a-input" style="margin-bottom: 0;">Dirección A (Legítima / Esperada)</label>
               </div>
+              <input type="text" id="compare-a-input" class="form-input" 
+                     placeholder="Pegar dirección de origen..." 
+                     value="0x71c81857e1519509f0750854d15f20a2b18b3a9">
               <div id="compare-a-preview" class="identicon-medium-container">
                 <!-- SVG A -->
               </div>
@@ -190,8 +190,8 @@
 
             <!-- Dirección B -->
             <div class="comparison-column">
-              <div class="form-group flex-row-align">
-                <label for="compare-b-input">Dirección B (Destino / Copiada)</label>
+              <div class="form-group flex-row-align" style="display: flex; align-items: center; justify-content: space-between; min-height: 26px; margin-bottom: 0.5rem;">
+                <label for="compare-b-input" style="margin-bottom: 0;">Dirección B (Destino / Copiada)</label>
                 <div style="display: flex; gap: 0.35rem;">
                   <button id="simulate-phishing-btn" class="btn-tiny" title="Mutar ligeramente para simular phishing">Phishing ⚠️</button>
                   <button id="force-match-btn" class="btn-tiny" style="background: rgba(16, 185, 129, 0.2); border: 1px solid rgba(16, 185, 129, 0.35); color: #10b981;" title="Copiar Dirección A para comparación perfecta">Perfecta ✅</button>
