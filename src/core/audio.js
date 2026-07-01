@@ -69,11 +69,12 @@ export function playMnemonicAudio(hash, options = {}) {
     layout[j] = temp;
   }
 
-  // 4. Secuenciar las notas
+  // 4. Secuenciar las notas (firma acústica corta de 4 notas representativas)
   let startTime = audioCtx.currentTime + 0.05; // Margen de inicio
-  const stepDuration = 0.22; // Duración de cada nota en segundos
+  const stepDuration = 0.16; // Duración corta de nota en segundos (160ms)
+  const maxNotes = Math.min(numCells, 4);
 
-  for (let step = 0; step < numCells; step++) {
+  for (let step = 0; step < maxNotes; step++) {
     const logicalIndex = layout[step];
     const cellType = logicalIndex % 9;
     const cDataOffset = (logicalIndex * 3) % 26;
@@ -105,8 +106,8 @@ export function playMnemonicAudio(hash, options = {}) {
 
     // Envolvente de volumen (ADSR simplificado para evitar clics de audio)
     gain.gain.setValueAtTime(0, startTime);
-    gain.gain.linearRampToValueAtTime(0.2, startTime + 0.03); // Attack
-    gain.gain.exponentialRampToValueAtTime(0.001, startTime + stepDuration - 0.02); // Decay/Release
+    gain.gain.linearRampToValueAtTime(0.2, startTime + 0.02); // Attack
+    gain.gain.exponentialRampToValueAtTime(0.001, startTime + stepDuration - 0.01); // Decay/Release
 
     gain.connect(audioCtx.destination);
 

@@ -106,6 +106,10 @@ export function generateSvg(hash, textSource, options = {}) {
       l = Math.max(30, Math.min(75, globalLight + (cData[2] % 20) - 10));
     }
 
+    // Cuantizar el tono a una de las 12 familias cromáticas discretas (de 30 en 30 grados)
+    // Esto asegura consistencia frente a diferencias de calibración de hardware en visualización lado a lado.
+    h = (Math.round(h / 30) * 30) % 360;
+
     const baseColor = `hsl(${Math.round(h)}, ${Math.round(s)}%, ${Math.round(l)}%)`;
     const darkColor = `hsl(${Math.round(h)}, ${Math.round(s)}%, ${Math.max(10, Math.round(l) - 20)}%)`;
     const lightColor = `hsl(${Math.round(h)}, ${Math.round(s)}%, ${Math.min(95, Math.round(l) + 20)}%)`;
