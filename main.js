@@ -1,5 +1,6 @@
 import { sha256, bytesToHex } from './src/core/crypto.js';
 import { generateSvg } from './src/core/generator.js';
+import { playMnemonicAudio, stopMnemonicAudio } from './src/core/audio.js';
 import { CognitiveTestSession, generateRandomAddress, generateSimilarAddress } from './src/web/testing.js';
 
 // Instanciar la sesión global de pruebas
@@ -22,6 +23,9 @@ function initTabs() {
   navButtons.forEach(btn => {
     btn.addEventListener('click', () => {
       const targetTab = btn.getAttribute('data-tab');
+
+      // Parar cualquier audio corriendo al cambiar de pestaña
+      stopMnemonicAudio();
 
       // Alternar clases activas en botones
       navButtons.forEach(b => b.classList.remove('active'));
@@ -48,10 +52,14 @@ function initGenerator() {
   const overlayCheckbox = document.getElementById('toggle-overlay');
   const anchorsCheckbox = document.getElementById('toggle-anchors');
   const gridSizeSelect = document.getElementById('grid-size-select');
+  const playAudioBtn = document.getElementById('play-audio-btn');
   const previewContainer = document.getElementById('identicon-preview');
   const fullHashCode = document.getElementById('full-hash-code');
 
   const updateGenerator = async () => {
+    // Parar audio si hay uno corriendo
+    stopMnemonicAudio();
+
     const rawValue = addressInput.value.trim() || '0x0000000000000000000000000000000000000000';
     
     // 1. Obtener hash criptográfico
@@ -89,6 +97,17 @@ function initGenerator() {
   
   document.querySelectorAll('input[name="chroma-mode"]').forEach(radio => {
     radio.addEventListener('change', updateGenerator);
+  });
+
+  // Reproducir firma auditiva
+  playAudioBtn.addEventListener('click', async () => {
+    const rawValue = addressInput.value.trim() || '0x0000000000000000000000000000000000000000';
+    const hash = await sha256(rawValue);
+    const chromaMode = document.querySelector('input[name="chroma-mode"]:checked').value;
+    playMnemonicAudio(hash, {
+      gridSize: parseInt(gridSizeSelect.value) || 3,
+      chaoticMode: (chromaMode === 'chaotic')
+    });
   });
 
   // Ejecución inicial
