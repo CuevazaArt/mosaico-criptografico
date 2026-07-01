@@ -129,3 +129,28 @@ Aunque la propuesta acústica añade una capa inclusiva indispensable, el sistem
 * **Audio Spoofing:** Si la dApp del navegador está comprometida mediante XSS, el script malicioso puede simplemente reproducir un clip de audio legítimo previamente capturado mientras inyecta una dirección fraudulenta en la transacción.
 * *Mitigación:* El disparador del audio debe residir en el **Contexto Aislado de la Wallet** (el popup de MetaMask o la pantalla de Ledger). El usuario solo debe confiar en el sonido emitido por la interfaz nativa del monedero, nunca en el reproducido por la página web del exchange/dApp.
 
+---
+
+## 6. Evolución del Estándar: Capa Modular y Mitigaciones por Hardware Futuro
+
+Para evitar sobrecargar a la mayoría de los usuarios con ruido acústico o fatiga auditiva, y garantizar al mismo tiempo la inalienabilidad del sistema para quienes lo necesitan, la hoja de ruta evolutiva del estándar se define bajo los siguientes pilares de modularidad y aislamiento físico:
+
+### A. Apagado por Defecto (Off-by-Default)
+* **Nativo pero Silencioso:** Cada Mosaico Criptográfico y especificación de dirección en la blockchain calcula su hash y sus frecuencias acústicas de forma nativa e inmutable.
+* **Activación Bajo Demanda:** Por defecto, las billeteras no emiten ningún sonido. La funcionalidad se mantiene deshabilitada hasta que el usuario la active explícitamente en el panel de accesibilidad o configuración avanzada, respetando la sobriedad del entorno financiero digital.
+
+### B. Capa de App Modular sobre Demanda (Wallet Plugins / Snaps)
+* **MetaMask Snaps y Módulos Safe:** En lugar de aumentar el peso de la billetera núcleo con sintetizadores, la reproducción acústica se ofrece como un complemento o **Snap modular** instalable bajo demanda.
+* **Integración Limpia:** Solo los usuarios que requieran o se beneficien del soporte de audio (ciegos, débiles visuales o aquellos que manejen cuentas de altísima seguridad) instalan este módulo. La app modular se suscribe a los eventos de firma de la billetera para generar el arpegio procedimental en un entorno aislado del navegador.
+
+### C. Mitigaciones Mediante Hardware Dedicado y Wearables
+Para anular completamente el vector de ataque del malware en la computadora (suplantación de audio/audio spoofing), el procesamiento y emisión del sonido debe ocurrir en hardware de confianza aislado de la PC/móvil:
+
+1. **Hardware Wallets con Altavoz / Zumbador Piezoeléctrico:**
+   * La confirmación auditiva se genera dentro del procesador aislado de la billetera fría (ej. Ledger o Trezor de próxima generación).
+   * Al presionar "Firmar", el dispositivo físico emite la melodía o arpegio directamente desde su bocina interna protegida por hardware, lo que garantiza que lo que escucha el usuario proviene directamente de la clave privada real y no de la pantalla hackeada de la PC.
+2. **Audífonos de Conducción Ósea y Headsets de Firma Criptográfica (Crypto Headsets):**
+   * Dispositivos especializados del usuario (como audífonos Bluetooth con enclave criptográfico seguro o zumbadores discretos) vinculados directamente mediante un canal bluetooth encriptado localmente a la Hardware Wallet.
+   * El arpegio se transmite directamente al canal auditivo del usuario por conducción ósea sin pasar en ningún momento por la tarjeta de sonido de la computadora comprometida. Esto crea un **canal auditivo de confianza (Trusted Audio Path)** físicamente infranqueable para virus y ciberataques.
+
+
