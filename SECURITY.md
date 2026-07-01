@@ -26,10 +26,15 @@ Mosaico Criptográfico transforma una semilla de 256 bits (SHA-256 de la direcci
 - Saturación/Luminosidad            - Impide patrones repetitivos          - Parametrizadas por bytes
 ```
 
-### A. Barajado Geométrico Determinista (Fisher-Yates)
-A diferencia de los identicones estándar (como Jazzicons) donde la posición de los círculos es fija y solo varían ligeramente los colores, Mosaico Criptográfico implementa un algoritmo de barajado Fisher-Yates de las 9 secciones, utilizando bytes del hash (`hash[1]` al `hash[8]`) como semilla de permutación.
-* **Impacto en Seguridad:** Si una dirección se altera en un solo carácter, no solo cambian los colores o la orientación de las formas; **toda la distribución espacial de las 9 figuras se altera**. El patrón de ondas que antes estaba en la esquina superior izquierda ahora podría estar en la parte inferior derecha, y el glifo central puede saltar a una esquina.
-* **Fácil Detección:** Para el cerebro humano, el desplazamiento espacial de un patrón completo (ej. *"mi mosaico tenía la estrella en la esquina, no en el centro"*) es una señal de alerta inmediata que no requiere esfuerzo de lectura detallada.
+### A. Barajado Geométrico Determinista (Fisher-Yates) y Escalabilidad de Grilla
+A diferencia de los identicones estándar (como Jazzicons) donde la posición de los círculos es fija y solo varían ligeramente los colores, Mosaico Criptográfico implementa un algoritmo de barajado Fisher-Yates de las secciones en base a los bytes del hash criptográfico.
+* **Escalabilidad de Grilla:** El sistema viene configurado por defecto en una grilla de **3x3** (9 sectores), pero su arquitectura vectorial y matemática escala nativamente si se requiere a grillas de **4x4** (16 sectores) o **5x5** (25 sectores).
+* **Multiplicación de la Entropía Visual:** El número de ordenamientos únicos posibles de la cuadrícula crece de forma factorial con el tamaño de la grilla:
+  * **Grilla 3x3:** $9! = 362,880$ combinaciones espaciales posibles.
+  * **Grilla 4x4:** $16! \approx 2.09 \times 10^{13}$ combinaciones espaciales posibles.
+  * **Grilla 5x5:** $25! \approx 1.55 \times 10^{25}$ combinaciones espaciales posibles.
+* **Impacto en Seguridad:** Si una dirección se altera en un solo carácter, no solo cambian los colores o la orientación de las formas; **toda la distribución espacial de las figuras se altera**. El patrón de ondas que antes estaba en la esquina superior izquierda ahora podría estar en la parte inferior derecha, y el glifo central puede saltar a una esquina.
+* **Fácil Detección:** Para el cerebro humano, el desplazamiento espacial de un patrón completo (ej. *"mi mosaico tenía la estrella en la esquina, no en el centro"*) es una señal de alerta inmediata que no requiere esfuerzo de lectura detallada. En grillas de 4x4 y 5x5, la alteración espacial se vuelve exponencialmente más caótica para un clon malicioso, eliminando la posibilidad de ataques de colisión por fuerza bruta.
 
 ### B. Anclajes Topológicos Discretos
 La sección del anclaje topológico (Celda 4) utiliza propiedades geométricas que los humanos pueden contar rápidamente:
@@ -57,3 +62,23 @@ Una IA optimizadora podría intentar buscar direcciones cuya imagen generada sea
 ### C. Manipulación Gráfica de UI (Ataque de Interfaz Web)
 Si una dApp o sitio web es vulnerado, el atacante podría inyectar un identicon SVG estático para imitar el legítimo.
 * **Solución Sandbox/Extensión:** La validación segura reside en que el identicon debe generarse y renderizarse en el lado del cliente (en su extensión de billetera de confianza o sandbox local) leyendo la dirección directamente de la memoria de transacciones Web3, **nunca confiando en las imágenes que sirve la web**. Si la imagen del sitio web difiere de la mostrada por la extensión segura, la manipulación queda al descubierto.
+
+---
+
+## 4. Accesibilidad e Inclusión (Daltónicos, Débiles Visuales y Disléxicos)
+
+El diseño de Mosaico Criptográfico ha sido concebido bajo principios de diseño universal para mitigar barreras cognitivas o sensory-motoras en grupos vulnerables:
+
+### A. Mitigación para Daltónicos (Colorblindness)
+* **Independencia del Color:** El sistema no depende únicamente del tono cromático. Cada una de las 9 secciones implementa una **firma geométrica y de patrones estructurales discretos** (ondas, retículas rotadas, píxeles tipo Space Invader, tuberías Truchet). Incluso bajo una visión monocromática completa (acromatopsia), el barajado de las celdas y sus formas geométricas son 100% legibles y diferenciables.
+* **Anclajes de Alto Contraste:** El glifo de anclaje (estrella/polígono) utiliza bordes oscuros/claros de alto contraste y puntos satélite blancos que no requieren discriminación de color para ser contados o reconocidos.
+
+### B. Mitigación para Débiles Visuales (Low Vision)
+* **Escalabilidad Vectorial Infinita (SVG):** Al renderizarse como código SVG nativo en lugar de imágenes de mapa de bits (PNG/JPG), el mosaico se escala infinitamente sin pixelación ni desenfoque. Los usuarios con debilidad visual pueden ampliar la interfaz a un 400% manteniendo bordes matemáticamente perfectos.
+* **Grosor Geométrico Robusto:** El trazo de las líneas vectoriales (ej. tuberías Truchet de hasta 11px de grosor) y los tamaños de los bloques de píxeles (bloques de 16x16px por celda) están diseñados para ser perceptibles sin requerir una visión de alta agudeza.
+* **Futura Capa Auditiva (Audio-Iconos):** Como extensión del protocolo, los mismos 32 bytes del hash pueden alimentar un generador de síntesis de audio local que reproduzca una progresión armónica o melodía corta de 3 segundos (firma de audio). Esto permitiría a usuarios con ceguera total escuchar y validar la identidad de sus direcciones de confianza.
+
+### C. Mitigación para Disléxicos (Dyslexia)
+* **El Paradigma Visual como Solución Primaria:** La dislexia dificulta la lectura, transposición y decodificación de caracteres alfanuméricos (donde es común confundir `b` con `d`, o alterar el orden de números en un hash largo). Al traducir la cadena de texto a un **mosaico espacial geométrico**, el usuario disléxico salta por completo la vía de procesamiento alfanumérico y utiliza la vía de procesamiento espacial/visual del cerebro, la cual es inmune a las distorsiones de la dislexia clásica.
+* **Tipografía de Respaldo:** El overlay de texto utiliza fuentes monoespaciadas de alto espaciado y caracteres en mayúsculas fijas, minimizando la rotación o transposición de letras.
+

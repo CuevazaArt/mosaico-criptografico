@@ -17,6 +17,8 @@ export function generateSvg(hash, textSource, options = {}) {
   const chaoticMode = !!options.chaoticMode;
   const showOverlay = options.showOverlay !== false;
   const showAnchors = options.showAnchors !== false;
+  const gridSize = parseInt(options.gridSize) || 3;
+  const numCells = gridSize * gridSize;
 
   // Declarar h, s, l a nivel de función para evitar ReferenceError en sub-renderizadores
   let h, s, l;
@@ -28,28 +30,14 @@ export function generateSvg(hash, textSource, options = {}) {
   const globalSat = 65 + (hash[29] % 25); // 65% a 90%
   const globalLight = 40 + (hash[28] % 20); // 40% a 60%
 
-  // Agrupar los bytes para cada una de las 9 celdas
-  // Cada celda recibe 3 bytes específicos (excepto la celda de anclaje que recibe 6)
-  const cellsData = [
-    [hash[0], hash[1], hash[2]],     // Celda 0 (0,0)
-    [hash[3], hash[4], hash[5]],     // Celda 1 (1,0)
-    [hash[6], hash[7], hash[8]],     // Celda 2 (2,0)
-    [hash[9], hash[10], hash[11]],   // Celda 3 (0,1)
-    [hash[12], hash[13], hash[14], hash[15], hash[16], hash[17]], // Celda 4 (1,1) - Anclaje (6 bytes)
-    [hash[18], hash[19], hash[20]],  // Celda 5 (2,1)
-    [hash[21], hash[22], hash[23]],  // Celda 6 (0,2)
-    [hash[24], hash[25], hash[26]],  // Celda 7 (1,2)
-    [hash[27], hash[28], hash[29]]   // Celda 8 (2,2)
-  ];
-
   // Crear una distribución (layout) de celdas determinista basada en los bytes del hash.
-  // Iniciamos con el layout secuencial estándar.
-  const layout = [0, 1, 2, 3, 4, 5, 6, 7, 8];
+  // Iniciamos con el layout secuencial estándar de tamaño numCells.
+  const layout = Array.from({ length: numCells }, (_, idx) => idx);
   
   // Realizar un barajado Fisher-Yates determinista usando bytes del hash
-  // Esto reorganiza de forma única la posición física de TODOS los 9 patrones.
-  for (let k = 8; k > 0; k--) {
-    const j = hash[k] % (k + 1);
+  // Esto reorganiza de forma única la posición física de todos los patrones.
+  for (let k = numCells - 1; k > 0; k--) {
+    const j = hash[k % 32] % (k + 1);
     const temp = layout[k];
     layout[k] = layout[j];
     layout[j] = temp;
@@ -71,16 +59,40 @@ export function generateSvg(hash, textSource, options = {}) {
     <g clip-path="url(#svg-clip)">
   `;
 
-  // Renderizar cada una de las 9 celdas
-  for (let i = 0; i < 9; i++) {
-    const col = i % 3;
-    const row = Math.floor(i / 3);
-    const xOffset = col * 100;
-    const yOffset = row * 100;
+  // Renderizar las celdas de acuerdo a la grilla configurada
+  const cellSize = 300 / gridSize;
+  const scaleFactor = cellSize / 100;
 
-    // Obtener el tipo de celda lógica correspondiente a esta posición física a partir del layout mezclado
-    const cellType = layout[i];
-    const cData = cellsData[cellType];
+  for (let i = 0; i < numCells; i++) {
+    const col = i % gridSize;
+    const row = Math.floor(i / gridSize);
+    const xOffset = col * cellSize;
+    const yOffset = row * cellSize;
+
+    // Obtener el tipo de celda lógica correspondiente a esta posición física
+    const logicalIndex = layout[i];
+    const cellType = logicalIndex % 9; // Mapeo cíclico a los 9 tipos de celdas base
+
+    // Calcular offset dinámico de bytes para evitar que celdas repetidas usen los mismos colores
+    const cDataOffset = (logicalIndex * 3) % 26;
+    let cData;
+    if (cellType === 4) {
+      // El anclaje central requiere 6 bytes
+      cData = [
+        hash[cDataOffset],
+        hash[(cDataOffset + 1) % 32],
+        hash[(cDataOffset + 2) % 32],
+        hash[(cDataOffset + 3) % 32],
+        hash[(cDataOffset + 4) % 32],
+        hash[(cDataOffset + 5) % 32]
+      ];
+    } else {
+      cData = [
+        hash[cDataOffset],
+        hash[(cDataOffset + 1) % 32],
+        hash[(cDataOffset + 2) % 32]
+      ];
+    }
 
     // Calcular HSL para la celda
     if (chaoticMode) {
@@ -98,10 +110,10 @@ export function generateSvg(hash, textSource, options = {}) {
     const darkColor = `hsl(${Math.round(h)}, ${Math.round(s)}%, ${Math.max(10, Math.round(l) - 20)}%)`;
     const lightColor = `hsl(${Math.round(h)}, ${Math.round(s)}%, ${Math.min(95, Math.round(l) + 20)}%)`;
 
-    // Grupo de la celda con su transformación y clip local
-    svgContent += `<g transform="translate(${xOffset}, ${yOffset})" clip-path="url(#cell-clip)">`;
+    // Grupo de la celda con su transformación, escala y clip local
+    svgContent += `<g transform="translate(${xOffset}, ${yOffset}) scale(${scaleFactor})" clip-path="url(#cell-clip)">`;
 
-    // Renderizar según el tipo de celda (0 al 8)
+    // Renderizar según el tipo de celda lógica
     switch (cellType) {
       case 0: // Celda (0,0): Triángulos / Low Poly Crystal
         renderCell0(cData, baseColor, darkColor, lightColor);

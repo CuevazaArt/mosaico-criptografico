@@ -100,6 +100,18 @@
                   <span class="slider"></span>
                 </label>
               </div>
+
+              <div class="toggle-option">
+                <div class="option-info">
+                  <span class="option-title">Tamaño de Grilla</span>
+                  <span class="option-desc">Configura el número de sectores (3x3 por defecto, escalable a 4x4 o 5x5).</span>
+                </div>
+                <select id="grid-size-select" class="form-select">
+                  <option value="3" selected>3 x 3</option>
+                  <option value="4">4 x 4</option>
+                  <option value="5">5 x 5</option>
+                </select>
+              </div>
             </div>
           </div>
 
@@ -212,8 +224,13 @@
                     <!-- SVG Objetivo -->
                   </div>
                 </div>
-                <div class="target-instructions">
-                  <h4>Busca este mosaico exacto abajo</h4>
+                 <div class="target-instructions">
+                  <div class="flex-row-align" style="margin-bottom: 0.5rem; gap: 1rem; width: 100%;">
+                    <h4 style="margin: 0;">Busca este mosaico exacto abajo</h4>
+                    <div class="game-timer" style="font-family: var(--font-mono); font-size: 0.9rem; font-weight: 700; color: var(--primary); background: rgba(99, 102, 241, 0.1); padding: 0.25rem 0.6rem; border-radius: 6px; border: 1px solid rgba(99, 102, 241, 0.2); white-space: nowrap;">
+                      ⏱️ <span id="game-timer-ms">0.000</span>s
+                    </div>
+                  </div>
                   <p>Observa el patrón geométrico, el glifo central (anclaje) y los colores. Haz clic en la tarjeta correspondiente lo más rápido posible.</p>
                 </div>
               </div>

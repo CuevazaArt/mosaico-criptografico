@@ -47,6 +47,7 @@ function initGenerator() {
   const randomAddressBtn = document.getElementById('random-address-btn');
   const overlayCheckbox = document.getElementById('toggle-overlay');
   const anchorsCheckbox = document.getElementById('toggle-anchors');
+  const gridSizeSelect = document.getElementById('grid-size-select');
   const previewContainer = document.getElementById('identicon-preview');
   const fullHashCode = document.getElementById('full-hash-code');
 
@@ -66,7 +67,8 @@ function initGenerator() {
     const svgString = generateSvg(hash, rawValue, {
       chaoticMode: (chromaMode === 'chaotic'),
       showOverlay: overlayCheckbox.checked,
-      showAnchors: anchorsCheckbox.checked
+      showAnchors: anchorsCheckbox.checked,
+      gridSize: parseInt(gridSizeSelect.value) || 3
     });
 
     // 5. Inyectar SVG
@@ -83,6 +85,7 @@ function initGenerator() {
 
   overlayCheckbox.addEventListener('change', updateGenerator);
   anchorsCheckbox.addEventListener('change', updateGenerator);
+  gridSizeSelect.addEventListener('change', updateGenerator);
   
   document.querySelectorAll('input[name="chroma-mode"]').forEach(radio => {
     radio.addEventListener('change', updateGenerator);
@@ -173,6 +176,25 @@ function initTestingSuite() {
   const statsAnalysisText = document.getElementById('stats-analysis-text');
 
   let isLockingInput = false;
+  let timerIntervalId = null;
+  const timerElement = document.getElementById('game-timer-ms');
+
+  const startLiveTimer = () => {
+    if (timerIntervalId) clearInterval(timerIntervalId);
+    const startTime = performance.now();
+    timerElement.textContent = "0.000";
+    timerIntervalId = setInterval(() => {
+      const elapsed = performance.now() - startTime;
+      timerElement.textContent = (elapsed / 1000).toFixed(3);
+    }, 41); // ~24 FPS, ideal para animar milisegundos sin sobrecargar
+  };
+
+  const stopLiveTimer = () => {
+    if (timerIntervalId) {
+      clearInterval(timerIntervalId);
+      timerIntervalId = null;
+    }
+  };
 
   const updateStatsDisplay = () => {
     const stats = testSession.getStats();
@@ -265,9 +287,17 @@ function initTestingSuite() {
       card.addEventListener('click', () => {
         if (isLockingInput) return;
         isLockingInput = true; // Bloquear clicks repetidos
+        
+        // Detener el temporizador de inmediato
+        stopLiveTimer();
 
         // Enviar respuesta
         const result = testSession.submitAnswer(address);
+        
+        // Mostrar el tiempo final congelado exacto
+        if (result) {
+          timerElement.textContent = result.timeTakenSec.toFixed(3);
+        }
         
         if (result.isCorrect) {
           card.classList.add('correct-flash');
@@ -295,6 +325,9 @@ function initTestingSuite() {
 
       optionsContainer.appendChild(card);
     }
+    
+    // Iniciar temporizador visual en caliente
+    startLiveTimer();
   };
 
   // Event Listeners
@@ -305,6 +338,7 @@ function initTestingSuite() {
   });
 
   resetStatsBtn.addEventListener('click', () => {
+    stopLiveTimer();
     testSession.clearHistory();
     updateStatsDisplay();
     activeScreen.classList.remove('active');

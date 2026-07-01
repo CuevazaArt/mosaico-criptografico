@@ -14,7 +14,8 @@ Permite inspeccionar a fondo cómo se compone un mosaico a partir de cualquier t
 2. **Modo Cromático:**
    * **Armónico (Recomendado para uso diario):** Agrupa las celdas bajo una paleta de color complementaria. Reduce la fatiga cognitiva y facilita recordar la "identidad visual" de una dirección como un todo.
    * **Caótico (Recomendado para máxima seguridad):** Genera colores independientes en cada celda. Es estéticamente más ruidoso pero maximiza las diferencias visuales entre hashes parecidos.
-3. **Controles de Seguridad:**
+3. **Controles de Seguridad y Escalabilidad:**
+   * **Tamaño de Grilla:** Configura la cuadrícula en **3x3** (por defecto), **4x4** o **5x5** sectores. Las cuadrículas más grandes aumentan exponencialmente la complejidad espacial y se recomiendan para firmas de contratos de alto valor.
    * **Overlay de Texto:** Activa/desactiva la barra inferior con los caracteres legibles de la dirección.
    * **Anclajes Topológicos:** Muestra/oculta los puntos de conteo en los vértices del glifo principal.
 4. **Desglose de Semilla:** Al final de la página se muestra el hash SHA-256 en hexadecimal derivado de tu entrada.
