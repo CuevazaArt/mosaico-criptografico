@@ -71,6 +71,8 @@ export class CognitiveTestSession {
     this.currentMode = 'harmonious'; // 'harmonious' | 'chaotic'
     this.options = [];
     this.startTime = null;
+    this.currentStreak = 0;
+    this.streakTimes = [];
   }
 
   /**
@@ -119,11 +121,21 @@ export class CognitiveTestSession {
     const endTime = performance.now();
     const timeTakenMs = endTime - this.startTime;
     const isCorrect = (selectedAddress === this.targetAddress);
+    const timeTakenSec = timeTakenMs / 1000;
+
+    // Actualizar racha y tiempos de la racha actual
+    if (isCorrect) {
+      this.currentStreak++;
+      this.streakTimes.push(timeTakenSec);
+    } else {
+      this.currentStreak = 0;
+      this.streakTimes = [];
+    }
 
     // Guardar registro
     const trialRecord = {
       mode: this.currentMode,
-      time: timeTakenMs / 1000, // en segundos
+      time: timeTakenSec, // en segundos
       correct: isCorrect,
       timestamp: Date.now()
     };
@@ -133,7 +145,7 @@ export class CognitiveTestSession {
 
     return {
       isCorrect,
-      timeTakenSec: trialRecord.time
+      timeTakenSec
     };
   }
 
@@ -166,10 +178,19 @@ export class CognitiveTestSession {
       };
     };
 
+    // Calcular promedio de la racha perfecta si es >= 5
+    let avgStreakTime = null;
+    if (this.streakTimes.length >= 5) {
+      const sum = this.streakTimes.reduce((a, b) => a + b, 0);
+      avgStreakTime = parseFloat((sum / this.streakTimes.length).toFixed(3));
+    }
+
     return {
       harmonious: calculateAverages('harmonious'),
       chaotic: calculateAverages('chaotic'),
-      totalTrials: this.trials.length
+      totalTrials: this.trials.length,
+      currentStreak: this.currentStreak,
+      avgStreakTime: avgStreakTime
     };
   }
 
@@ -178,5 +199,7 @@ export class CognitiveTestSession {
    */
   clearHistory() {
     this.trials = [];
+    this.currentStreak = 0;
+    this.streakTimes = [];
   }
 }

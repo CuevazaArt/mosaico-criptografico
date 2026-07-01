@@ -102,6 +102,7 @@ function initComparator() {
   const compareA = document.getElementById('compare-a-input');
   const compareB = document.getElementById('compare-b-input');
   const simulatePhishingBtn = document.getElementById('simulate-phishing-btn');
+  const compareGridSizeSelect = document.getElementById('compare-grid-size-select');
   
   const previewA = document.getElementById('compare-a-preview');
   const previewB = document.getElementById('compare-b-preview');
@@ -111,14 +112,15 @@ function initComparator() {
   const updateComparison = async () => {
     const valA = compareA.value.trim();
     const valB = compareB.value.trim();
+    const gridSize = parseInt(compareGridSizeSelect.value) || 3;
 
     // Generar hashes
     const hashA = await sha256(valA || 'A');
     const hashB = await sha256(valB || 'B');
 
     // Renderizar SVGs (por seguridad se usa modo armónico y overlays activos en comparador)
-    previewA.innerHTML = generateSvg(hashA, valA, { chaoticMode: false, showOverlay: true, showAnchors: true });
-    previewB.innerHTML = generateSvg(hashB, valB, { chaoticMode: false, showOverlay: true, showAnchors: true });
+    previewA.innerHTML = generateSvg(hashA, valA, { chaoticMode: false, showOverlay: true, showAnchors: true, gridSize });
+    previewB.innerHTML = generateSvg(hashB, valB, { chaoticMode: false, showOverlay: true, showAnchors: true, gridSize });
 
     // Comparación directa de cadenas
     if (valA && valB && valA === valB) {
@@ -137,6 +139,7 @@ function initComparator() {
   // Event Listeners
   compareA.addEventListener('input', updateComparison);
   compareB.addEventListener('input', updateComparison);
+  compareGridSizeSelect.addEventListener('change', updateComparison);
 
   simulatePhishingBtn.addEventListener('click', () => {
     if (compareA.value) {
@@ -157,6 +160,7 @@ function initTestingSuite() {
   const startBtn = document.getElementById('start-game-btn');
   const resetStatsBtn = document.getElementById('reset-stats-btn');
   const modeSelect = document.getElementById('game-mode-select');
+  const gameGridSizeSelect = document.getElementById('game-grid-size-select');
   
   const startScreen = document.getElementById('game-start-screen');
   const activeScreen = document.getElementById('game-active-screen');
@@ -172,6 +176,9 @@ function initTestingSuite() {
   const statChaoCount = document.getElementById('stat-chao-count');
   const statChaoSuccess = document.getElementById('stat-chao-success');
   const statChaoTime = document.getElementById('stat-chao-time');
+  
+  const statCurrentStreak = document.getElementById('stat-current-streak');
+  const statStreakAvgTime = document.getElementById('stat-streak-avg-time');
   
   const statsAnalysisText = document.getElementById('stats-analysis-text');
 
@@ -209,6 +216,19 @@ function initTestingSuite() {
     statChaoSuccess.textContent = `${stats.chaotic.successRate}%`;
     statChaoTime.textContent = `${stats.chaotic.avgTime}s`;
 
+    // Render racha perfecta
+    statCurrentStreak.textContent = stats.currentStreak;
+    statStreakAvgTime.textContent = stats.avgStreakTime !== null ? `${stats.avgStreakTime}s` : 'N/A';
+    
+    // Añadir efecto visual si alcanzan racha de 5 o más
+    if (stats.currentStreak >= 5) {
+      statCurrentStreak.style.color = 'var(--secondary)';
+      statCurrentStreak.style.textShadow = '0 0 10px var(--secondary-glow)';
+    } else {
+      statCurrentStreak.style.color = '#fff';
+      statCurrentStreak.style.textShadow = 'none';
+    }
+
     // Análisis automatizado
     const h = stats.harmonious;
     const c = stats.chaotic;
@@ -240,6 +260,7 @@ function initTestingSuite() {
   const startNextRound = async () => {
     isLockingInput = false;
     const mode = modeSelect.value; // 'harmonious' | 'chaotic'
+    const gridSize = parseInt(gameGridSizeSelect.value) || 3;
     
     // Iniciar prueba en lógica
     const trialData = testSession.startNewTrial(mode);
@@ -252,7 +273,8 @@ function initTestingSuite() {
     targetPreview.innerHTML = generateSvg(targetHash, trialData.targetAddress, {
       chaoticMode: isChaotic,
       showOverlay: false,
-      showAnchors: true
+      showAnchors: true,
+      gridSize
     });
 
     // Limpiar contenedor de opciones
@@ -272,7 +294,8 @@ function initTestingSuite() {
       svgContainer.innerHTML = generateSvg(optHash, address, {
         chaoticMode: isChaotic,
         showOverlay: false,
-        showAnchors: true
+        showAnchors: true,
+        gridSize
       });
 
       const addrLabel = document.createElement('span');
@@ -347,6 +370,13 @@ function initTestingSuite() {
 
   modeSelect.addEventListener('change', () => {
     // Si la simulación está activa, reiniciar con el nuevo modo
+    if (activeScreen.classList.contains('active')) {
+      startNextRound();
+    }
+  });
+
+  gameGridSizeSelect.addEventListener('change', () => {
+    // Si la simulación está activa, reiniciar con la nueva grilla
     if (activeScreen.classList.contains('active')) {
       startNextRound();
     }

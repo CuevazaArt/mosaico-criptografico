@@ -142,6 +142,17 @@
           <h2 class="card-title text-center">Comparador de Direcciones</h2>
           <p class="card-desc text-center">Permite comparar dos direcciones criptográficas cara a cara. Ideal para verificar que una dirección copiada coincide visualmente con la original.</p>
 
+          <div style="display: flex; justify-content: center; margin-bottom: 1.5rem;">
+            <div class="form-group" style="max-width: 250px; margin-bottom: 0; text-align: center;">
+              <label for="compare-grid-size-select" style="margin-bottom: 0.25rem;">Tamaño de Grilla para Comparar</label>
+              <select id="compare-grid-size-select" class="form-select">
+                <option value="3" selected>3 x 3</option>
+                <option value="4">4 x 4</option>
+                <option value="5">5 x 5</option>
+              </select>
+            </div>
+          </div>
+
           <div class="comparison-grid">
             <!-- Dirección A -->
             <div class="comparison-column">
@@ -191,12 +202,22 @@
           <div class="card glass-panel" id="game-card">
             <div class="game-header">
               <h2 class="card-title">Simulador de Verificación Cognitiva</h2>
-              <div class="game-settings">
-                <label for="game-mode-select">Evaluar en modo:</label>
-                <select id="game-mode-select" class="form-select">
-                  <option value="harmonious">Modo Armónico (Recomendado)</option>
-                  <option value="chaotic">Modo Caótico</option>
-                </select>
+              <div class="game-settings" style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                  <label for="game-grid-size-select">Grilla:</label>
+                  <select id="game-grid-size-select" class="form-select">
+                    <option value="3" selected>3 x 3</option>
+                    <option value="4">4 x 4</option>
+                    <option value="5">5 x 5</option>
+                  </select>
+                </div>
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                  <label for="game-mode-select">Modo:</label>
+                  <select id="game-mode-select" class="form-select">
+                    <option value="harmonious">Modo Armónico (Recomendado)</option>
+                    <option value="chaotic">Modo Caótico</option>
+                  </select>
+                </div>
               </div>
             </div>
             
@@ -278,6 +299,20 @@
                 <div class="stat-row">
                   <span class="stat-label">Tiempo de Reacción:</span>
                   <span id="stat-chao-time" class="stat-value">0.0s</span>
+                </div>
+              </div>
+
+              <div class="divider"></div>
+
+              <div class="stat-group">
+                <h4>Rendimiento de Racha Perfecta</h4>
+                <div class="stat-row">
+                  <span class="stat-label">Racha de Aciertos:</span>
+                  <span id="stat-current-streak" class="stat-value">0</span>
+                </div>
+                <div class="stat-row">
+                  <span class="stat-label">Promedio Racha (5+):</span>
+                  <span id="stat-streak-avg-time" class="stat-value">N/A</span>
                 </div>
               </div>
             </div>
