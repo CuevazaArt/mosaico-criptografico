@@ -1,6 +1,6 @@
 import { sha256, bytesToHex } from './src/core/crypto.js';
 import { generateSvg } from './src/core/generator.js';
-import { playMnemonicAudio, stopMnemonicAudio } from './src/core/audio.js';
+import { playMnemonicAudio, stopMnemonicAudio, playMismatchSequence, playMatchSequence } from './src/core/audio.js';
 import { CognitiveTestSession, generateRandomAddress, generateSimilarAddress } from './src/web/testing.js';
 
 // Instanciar la sesión global de pruebas
@@ -121,55 +121,148 @@ function initComparator() {
   const compareA = document.getElementById('compare-a-input');
   const compareB = document.getElementById('compare-b-input');
   const simulatePhishingBtn = document.getElementById('simulate-phishing-btn');
+  const forceMatchBtn = document.getElementById('force-match-btn');
   const compareGridSizeSelect = document.getElementById('compare-grid-size-select');
+  const playAudioABtn = document.getElementById('play-audio-a-btn');
+  const playAudioBBtn = document.getElementById('play-audio-b-btn');
   
   const previewA = document.getElementById('compare-a-preview');
   const previewB = document.getElementById('compare-b-preview');
   const statusBadge = document.getElementById('comparison-badge');
   const statusMsg = document.getElementById('comparison-msg');
+  const comparisonGrid = document.querySelector('.comparison-grid');
 
-  const updateComparison = async () => {
+  let currentHashA = null;
+  let currentHashB = null;
+  let isInitialLoad = true;
+
+  const updateComparison = async (userTriggered = false) => {
+    // Parar audio activo al cambiar entradas
+    stopMnemonicAudio();
+
     const valA = compareA.value.trim();
     const valB = compareB.value.trim();
     const gridSize = parseInt(compareGridSizeSelect.value) || 3;
 
-    // Generar hashes
-    const hashA = await sha256(valA || 'A');
-    const hashB = await sha256(valB || 'B');
-
-    // Renderizar SVGs (por seguridad se usa modo armónico y overlays activos en comparador)
-    previewA.innerHTML = generateSvg(hashA, valA, { chaoticMode: false, showOverlay: true, showAnchors: true, gridSize });
-    previewB.innerHTML = generateSvg(hashB, valB, { chaoticMode: false, showOverlay: true, showAnchors: true, gridSize });
-
-    // Comparación directa de cadenas
-    if (valA && valB && valA === valB) {
-      statusBadge.className = 'badge match';
-      statusBadge.textContent = '✅';
-      statusMsg.className = 'status-msg match';
-      statusMsg.innerHTML = 'Coinciden Totalmente<br><span style="font-size:11px;color:#94a3b8;text-transform:none;">Direcciones idénticas</span>';
+    // Controlar vistas previas individuales
+    if (valA) {
+      const hashA = await sha256(valA);
+      currentHashA = hashA;
+      previewA.innerHTML = generateSvg(hashA, valA, { chaoticMode: false, showOverlay: true, showAnchors: true, gridSize });
+      playAudioABtn.disabled = false;
     } else {
-      statusBadge.className = 'badge mismatch';
-      statusBadge.textContent = '⚠️';
-      statusMsg.className = 'status-msg mismatch';
-      statusMsg.innerHTML = 'Discrepancia Detectada<br><span style="font-size:11px;color:#f43f5e;text-transform:none;">¡Alerta de phishing o error!</span>';
+      currentHashA = null;
+      previewA.innerHTML = `
+        <div class="empty-preview-placeholder">
+          <span>🔑</span>
+          <p>Esperando Dirección A...</p>
+        </div>
+      `;
+      playAudioABtn.disabled = true;
     }
+
+    if (valB) {
+      const hashB = await sha256(valB);
+      currentHashB = hashB;
+      previewB.innerHTML = generateSvg(hashB, valB, { chaoticMode: false, showOverlay: true, showAnchors: true, gridSize });
+      playAudioBBtn.disabled = false;
+    } else {
+      currentHashB = null;
+      previewB.innerHTML = `
+        <div class="empty-preview-placeholder">
+          <span>🔑</span>
+          <p>Esperando Dirección B...</p>
+        </div>
+      `;
+      playAudioBBtn.disabled = true;
+    }
+
+    // Comparación y estado global
+    if (!valA || !valB) {
+      // Estado de espera (placeholder)
+      statusBadge.className = 'badge';
+      statusBadge.style.background = 'rgba(255, 255, 255, 0.05)';
+      statusBadge.style.color = 'var(--text-muted)';
+      statusBadge.textContent = '🔍';
+      statusMsg.className = 'status-msg';
+      statusMsg.style.color = 'var(--text-muted)';
+      statusMsg.innerHTML = 'Esperando Direcciones<br><span style="font-size:11px;color:#64748b;text-transform:none;">Introduce ambas claves para comparar</span>';
+
+      comparisonGrid.classList.remove('match-active', 'mismatch-active');
+    } else {
+      // Ambas direcciones presentes -> comparar
+      const isMatched = (valA === valB);
+
+      // Limpiar estilos personalizados de espera
+      statusBadge.style.background = '';
+      statusBadge.style.color = '';
+      statusMsg.style.color = '';
+
+      if (isMatched) {
+        statusBadge.className = 'badge match';
+        statusMsg.className = 'status-msg match-text';
+        statusMsg.innerHTML = 'Coinciden Totalmente<br><span style="font-size:11px;color:#10b981;text-transform:none;">Direcciones idénticas</span>';
+        
+        comparisonGrid.classList.add('match-active');
+        comparisonGrid.classList.remove('mismatch-active');
+
+        if (userTriggered && !isInitialLoad) {
+          playMatchSequence(currentHashA, currentHashB, { gridSize });
+        }
+      } else {
+        statusBadge.className = 'badge mismatch';
+        statusMsg.className = 'status-msg mismatch-text';
+        statusMsg.innerHTML = 'Discrepancia Detectada<br><span style="font-size:11px;color:#f43f5e;text-transform:none;">¡Alerta de phishing o error!</span>';
+        
+        comparisonGrid.classList.add('mismatch-active');
+        comparisonGrid.classList.remove('match-active');
+
+        if (userTriggered && !isInitialLoad) {
+          playMismatchSequence(currentHashA, { gridSize });
+        }
+      }
+    }
+
+    isInitialLoad = false;
   };
 
   // Event Listeners
-  compareA.addEventListener('input', updateComparison);
-  compareB.addEventListener('input', updateComparison);
-  compareGridSizeSelect.addEventListener('change', updateComparison);
+  compareA.addEventListener('input', () => updateComparison(true));
+  compareB.addEventListener('input', () => updateComparison(true));
+  compareGridSizeSelect.addEventListener('change', () => updateComparison(false));
+
+  playAudioABtn.addEventListener('click', () => {
+    if (currentHashA) {
+      const gridSize = parseInt(compareGridSizeSelect.value) || 3;
+      playMnemonicAudio(currentHashA, { gridSize, chaoticMode: false });
+    }
+  });
+
+  playAudioBBtn.addEventListener('click', () => {
+    if (currentHashB) {
+      const gridSize = parseInt(compareGridSizeSelect.value) || 3;
+      playMnemonicAudio(currentHashB, { gridSize, chaoticMode: false });
+    }
+  });
 
   simulatePhishingBtn.addEventListener('click', () => {
     if (compareA.value) {
       // Simular ataque mutando 1 o 2 caracteres del medio
       compareB.value = generateSimilarAddress(compareA.value.trim(), 1);
-      updateComparison();
+      updateComparison(true);
+    }
+  });
+
+  forceMatchBtn.addEventListener('click', () => {
+    if (compareA.value) {
+      // Forzar copia exacta perfecta
+      compareB.value = compareA.value.trim();
+      updateComparison(true);
     }
   });
 
   // Ejecución inicial
-  updateComparison();
+  updateComparison(false);
 }
 
 /* ----------------------------------------------------
@@ -180,6 +273,7 @@ function initTestingSuite() {
   const resetStatsBtn = document.getElementById('reset-stats-btn');
   const modeSelect = document.getElementById('game-mode-select');
   const gameGridSizeSelect = document.getElementById('game-grid-size-select');
+  const playGameTargetAudioBtn = document.getElementById('play-game-target-audio-btn');
   
   const startScreen = document.getElementById('game-start-screen');
   const activeScreen = document.getElementById('game-active-screen');
@@ -204,6 +298,7 @@ function initTestingSuite() {
   let isLockingInput = false;
   let timerIntervalId = null;
   const timerElement = document.getElementById('game-timer-ms');
+  let currentTargetHash = null;
 
   const startLiveTimer = () => {
     if (timerIntervalId) clearInterval(timerIntervalId);
@@ -277,6 +372,9 @@ function initTestingSuite() {
   };
 
   const startNextRound = async () => {
+    // Parar cualquier audio activo al pasar de ronda
+    stopMnemonicAudio();
+
     isLockingInput = false;
     const mode = modeSelect.value; // 'harmonious' | 'chaotic'
     const gridSize = parseInt(gameGridSizeSelect.value) || 3;
@@ -287,6 +385,7 @@ function initTestingSuite() {
 
     // Obtener hash del objetivo para renderizarlo
     const targetHash = await sha256(trialData.targetAddress);
+    currentTargetHash = targetHash;
 
     // Pintar objetivo sin overlay de texto para forzar el reconocimiento del patrón puramente visual
     targetPreview.innerHTML = generateSvg(targetHash, trialData.targetAddress, {
@@ -322,8 +421,25 @@ function initTestingSuite() {
       // Truncar para mostrar
       addrLabel.textContent = `${address.substring(0, 7)}...${address.substring(address.length - 4)}`;
 
+      // Botón para reproducir la firma acústica de esta opción específica (para comparación por oído)
+      const playOptAudioBtn = document.createElement('button');
+      playOptAudioBtn.className = 'btn-tiny';
+      playOptAudioBtn.style.marginTop = '0.3rem';
+      playOptAudioBtn.style.padding = '2px 8px';
+      playOptAudioBtn.style.fontSize = '0.75rem';
+      playOptAudioBtn.style.display = 'flex';
+      playOptAudioBtn.style.alignItems = 'center';
+      playOptAudioBtn.style.gap = '0.25rem';
+      playOptAudioBtn.innerHTML = '<span>🔊</span> Oír';
+
+      playOptAudioBtn.addEventListener('click', (e) => {
+        e.stopPropagation(); // Prevenir que el click active la selección y termine el turno
+        playMnemonicAudio(optHash, { gridSize, chaoticMode: isChaotic });
+      });
+
       card.appendChild(svgContainer);
       card.appendChild(addrLabel);
+      card.appendChild(playOptAudioBtn);
 
       // Evento de clic en la tarjeta de opción
       card.addEventListener('click', () => {
@@ -332,6 +448,7 @@ function initTestingSuite() {
         
         // Detener el temporizador de inmediato
         stopLiveTimer();
+        stopMnemonicAudio();
 
         // Enviar respuesta
         const result = testSession.submitAnswer(address);
@@ -381,6 +498,7 @@ function initTestingSuite() {
 
   resetStatsBtn.addEventListener('click', () => {
     stopLiveTimer();
+    stopMnemonicAudio();
     testSession.clearHistory();
     updateStatsDisplay();
     activeScreen.classList.remove('active');
@@ -398,6 +516,17 @@ function initTestingSuite() {
     // Si la simulación está activa, reiniciar con la nueva grilla
     if (activeScreen.classList.contains('active')) {
       startNextRound();
+    }
+  });
+
+  playGameTargetAudioBtn.addEventListener('click', () => {
+    if (currentTargetHash) {
+      const mode = modeSelect.value;
+      const gridSize = parseInt(gameGridSizeSelect.value) || 3;
+      playMnemonicAudio(currentTargetHash, {
+        gridSize,
+        chaoticMode: (mode === 'chaotic')
+      });
     }
   });
 

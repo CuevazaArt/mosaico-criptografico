@@ -924,3 +924,136 @@ input:checked + .slider:before {
   padding-top: 1.5rem;
   line-height: 1.4;
 }
+
+/* Animaciones y Clases para Comparador y Alertas */
+@keyframes pulse-red-glow {
+  0% { box-shadow: 0 0 12px rgba(244, 63, 94, 0.35); border-color: rgba(244, 63, 94, 0.5); }
+  50% { box-shadow: 0 0 35px rgba(244, 63, 94, 0.95); border-color: rgb(244, 63, 94); }
+  100% { box-shadow: 0 0 12px rgba(244, 63, 94, 0.35); border-color: rgba(244, 63, 94, 0.5); }
+}
+
+@keyframes pulse-green-glow {
+  0% { box-shadow: 0 0 12px rgba(16, 185, 129, 0.35); border-color: rgba(16, 185, 129, 0.5); }
+  50% { box-shadow: 0 0 35px rgba(16, 185, 129, 0.95); border-color: rgb(16, 185, 129); }
+  100% { box-shadow: 0 0 12px rgba(16, 185, 129, 0.35); border-color: rgba(16, 185, 129, 0.5); }
+}
+
+.mismatch-active {
+  animation: pulse-red-glow 1.5s infinite ease-in-out;
+  background: rgba(244, 63, 94, 0.03) !important;
+}
+
+.match-active {
+  animation: pulse-green-glow 1.5s infinite ease-in-out;
+  background: rgba(16, 185, 129, 0.03) !important;
+}
+
+.mismatch-text {
+  color: #f43f5e !important;
+  text-shadow: 0 0 10px rgba(244, 63, 94, 0.4);
+  font-weight: 800;
+}
+
+.match-text {
+  color: #10b981 !important;
+  text-shadow: 0 0 10px rgba(16, 185, 129, 0.4);
+  font-weight: 800;
+}
+
+/* Placeholder para Vistas Vacías en Comparador */
+.empty-preview-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 260px;
+  height: 260px; /* Tamaño idéntico al SVG canvas */
+  border: 2px dashed rgba(99, 102, 241, 0.25);
+  border-radius: 20px;
+  background: rgba(99, 102, 241, 0.03);
+  box-shadow: inset 0 0 15px rgba(99, 102, 241, 0.05);
+  color: var(--text-muted);
+  box-sizing: border-box;
+  margin: 0 auto;
+  transition: all var(--transition-fast);
+}
+
+.empty-preview-placeholder:hover {
+  border-color: var(--primary);
+  background: rgba(99, 102, 241, 0.06);
+  box-shadow: inset 0 0 20px rgba(99, 102, 241, 0.1);
+}
+
+.empty-preview-placeholder span {
+  font-size: 2.5rem;
+  margin-bottom: 0.75rem;
+  display: block;
+  animation: gentle-key-pulse 2s infinite ease-in-out;
+}
+
+@keyframes gentle-key-pulse {
+  0% { transform: scale(1); opacity: 0.55; filter: drop-shadow(0 0 2px rgba(251, 191, 36, 0.1)); }
+  50% { transform: scale(1.1); opacity: 0.9; filter: drop-shadow(0 0 8px rgba(251, 191, 36, 0.4)); }
+  100% { transform: scale(1); opacity: 0.55; filter: drop-shadow(0 0 2px rgba(251, 191, 36, 0.1)); }
+}
+
+.empty-preview-placeholder p {
+  margin: 0;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #94a3b8;
+  letter-spacing: 0.3px;
+}
+
+/* Énfasis de los botones Phishing y Perfecta */
+#simulate-phishing-btn, #force-match-btn {
+  font-size: 0.75rem !important;
+  font-weight: 700 !important;
+  padding: 4px 10px !important;
+  border-radius: 8px !important;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+#simulate-phishing-btn {
+  background: rgba(244, 63, 94, 0.12) !important;
+  border: 1px solid rgba(244, 63, 94, 0.45) !important;
+  color: #f43f5e !important;
+  box-shadow: 0 2px 6px rgba(244, 63, 94, 0.15);
+}
+
+#simulate-phishing-btn:hover {
+  background: rgba(244, 63, 94, 0.25) !important;
+  border-color: #f43f5e !important;
+  box-shadow: 0 4px 15px rgba(244, 63, 94, 0.4) !important;
+  transform: translateY(-1px);
+}
+
+#force-match-btn {
+  background: rgba(16, 185, 129, 0.12) !important;
+  border: 1px solid rgba(16, 185, 129, 0.45) !important;
+  color: #10b981 !important;
+  box-shadow: 0 2px 6px rgba(16, 185, 129, 0.15);
+}
+
+#force-match-btn:hover {
+  background: rgba(16, 185, 129, 0.25) !important;
+  border-color: #10b981 !important;
+  box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4) !important;
+  transform: translateY(-1px);
+}
+
+/* Botones Deshabilitados */
+.btn-block:disabled, .btn-tiny:disabled, button:disabled {
+  opacity: 0.35 !important;
+  cursor: not-allowed !important;
+  pointer-events: none !important;
+  box-shadow: none !important;
+}
+
+

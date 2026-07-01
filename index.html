@@ -157,6 +157,10 @@
             </div>
           </div>
 
+          <div class="match-instructions-bar" style="margin: 0 auto 1.5rem auto; max-width: 650px; text-align: center; font-size: 0.85rem; color: #f59e0b; padding: 0.75rem 1.25rem; background: rgba(245, 158, 11, 0.08); border: 1px solid rgba(245, 158, 11, 0.35); border-radius: 12px; box-shadow: 0 0 15px rgba(245, 158, 11, 0.08);">
+            ⚠️ <strong>ACCIÓN OBLIGATORIA DEL USUARIO:</strong> Para garantizar la seguridad del envío, verifica que ambos llaveros sean <strong style="color: #fbbf24; text-shadow: 0 0 8px rgba(251, 191, 36, 0.4);">VISUAL Y SONORAMENTE IDÉNTICOS</strong>. Si notas cualquier diferencia cromática, de forma o melodía, no firmes la transacción.
+          </div>
+
           <div class="comparison-grid">
             <!-- Dirección A -->
             <div class="comparison-column">
@@ -169,6 +173,9 @@
               <div id="compare-a-preview" class="identicon-medium-container">
                 <!-- SVG A -->
               </div>
+              <button id="play-audio-a-btn" class="btn-tiny btn-block" style="margin-top: 0.5rem; display: flex; align-items: center; justify-content: center; gap: 0.25rem;">
+                <span>🔊</span> Escuchar Llavero A
+              </button>
             </div>
 
             <!-- Centro: Indicador de Estado -->
@@ -185,7 +192,10 @@
             <div class="comparison-column">
               <div class="form-group flex-row-align">
                 <label for="compare-b-input">Dirección B (Destino / Copiada)</label>
-                <button id="simulate-phishing-btn" class="btn-tiny" title="Mutar ligeramente para simular phishing">Simular Phishing ⚠️</button>
+                <div style="display: flex; gap: 0.35rem;">
+                  <button id="simulate-phishing-btn" class="btn-tiny" title="Mutar ligeramente para simular phishing">Phishing ⚠️</button>
+                  <button id="force-match-btn" class="btn-tiny" style="background: rgba(16, 185, 129, 0.2); border: 1px solid rgba(16, 185, 129, 0.35); color: #10b981;" title="Copiar Dirección A para comparación perfecta">Perfecta ✅</button>
+                </div>
               </div>
               <input type="text" id="compare-b-input" class="form-input" 
                      placeholder="Pegar dirección a verificar..." 
@@ -193,6 +203,9 @@
               <div id="compare-b-preview" class="identicon-medium-container">
                 <!-- SVG B -->
               </div>
+              <button id="play-audio-b-btn" class="btn-tiny btn-block" style="margin-top: 0.5rem; display: flex; align-items: center; justify-content: center; gap: 0.25rem;">
+                <span>🔊</span> Escuchar Llavero B
+              </button>
             </div>
           </div>
         </div>
@@ -256,7 +269,13 @@
                       ⏱️ <span id="game-timer-ms">0.000</span>s
                     </div>
                   </div>
-                  <p>Observa el patrón geométrico, el glifo central (anclaje) y los colores. Haz clic en la tarjeta correspondiente lo más rápido posible.</p>
+                  <p>Compara el patrón geométrico, el anclaje y escucha los audios de las opciones.</p>
+                  <p style="color: #fbbf24; background: rgba(245, 158, 11, 0.08); border: 1px solid rgba(245, 158, 11, 0.25); padding: 0.4rem 0.8rem; border-radius: 8px; font-size: 0.82rem; font-weight: 600; line-height: 1.4; margin-top: 0.4rem;">
+                    ⚠️ <strong>REGLA DE CONCORDANCIA:</strong> La opción correcta debe ser <span style="text-shadow: 0 0 6px rgba(251, 191, 36, 0.5); text-decoration: underline;">visual y sonoramente idéntica</span> al objetivo.
+                  </p>
+                  <button id="play-game-target-audio-btn" class="btn-tiny" style="margin-top: 0.5rem; display: flex; align-items: center; gap: 0.25rem; width: auto; max-width: 180px;">
+                    <span>🔊</span> Escuchar Objetivo
+                  </button>
                 </div>
               </div>
 
