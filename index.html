@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mosaico Criptográfico - Identificadores Visuales Descentralizados</title>
+  <!-- Google Fonts para tipografía premium -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- Fondo con degradados de luz ambiental -->
+  <div class="bg-glow bg-glow-1"></div>
+  <div class="bg-glow bg-glow-2"></div>
+
+  <div class="app-container">
+    <header class="app-header">
+      <div class="header-logo">
+        <span class="logo-icon">💠</span>
+        <h1>Mosaico Criptográfico</h1>
+      </div>
+      <p class="header-subtitle">
+        Identificadores visuales deterministicos de 3x3 para direcciones blockchain. Mitigando el phishing mediante reconocimiento visual de alta entropía.
+      </p>
+      
+      <!-- Navegación de pestañas -->
+      <nav class="tab-navigation">
+        <button class="nav-btn active" data-tab="generator-tab">
+          <span class="btn-icon">⚡</span> Generador
+        </button>
+        <button class="nav-btn" data-tab="comparator-tab">
+          <span class="btn-icon">⚖️</span> Comparador
+        </button>
+        <button class="nav-btn" data-tab="testing-tab">
+          <span class="btn-icon">🎯</span> Pruebas de Campo
+        </button>
+      </nav>
+    </header>
+
+    <main class="app-content">
+      
+      <!-- ================= PESTAÑA: GENERADOR ================= -->
+      <section id="generator-tab" class="tab-panel active">
+        <div class="grid-2col">
+          <!-- Columna Izquierda: Entradas y Opciones -->
+          <div class="card glass-panel">
+            <h2 class="card-title">Configuración de Entrada</h2>
+            <p class="card-desc">Ingresa cualquier dirección criptográfica, clave pública o frase semilla para generar su mosaico único.</p>
+            
+            <div class="form-group">
+              <label for="address-input">Dirección / Clave Criptográfica</label>
+              <div class="input-wrapper">
+                <input type="text" id="address-input" class="form-input" 
+                       placeholder="Ej: 0x71c81857e1519509f0750854d15f20a2b18b3a9" 
+                       value="0x71c81857e1519509f0750854d15f20a2b18b3a9">
+                <button id="random-address-btn" class="btn-secondary" title="Generar dirección aleatoria">🎲</button>
+              </div>
+            </div>
+
+            <div class="options-group">
+              <h3>Opciones Visuales</h3>
+              
+              <div class="toggle-option">
+                <div class="option-info">
+                  <span class="option-title">Modo Cromático</span>
+                  <span class="option-desc">Armónico (colores balanceados) vs Caótico (colores independientes).</span>
+                </div>
+                <div class="radio-toggle">
+                  <label class="radio-label">
+                    <input type="radio" name="chroma-mode" value="harmonious" checked>
+                    <span>Armónico</span>
+                  </label>
+                  <label class="radio-label">
+                    <input type="radio" name="chroma-mode" value="chaotic">
+                    <span>Caótico</span>
+                  </label>
+                </div>
+              </div>
+
+              <div class="toggle-option">
+                <div class="option-info">
+                  <span class="option-title">Superposición de Texto (Overlay)</span>
+                  <span class="option-desc">Muestra los caracteres iniciales/finales de la clave en la base del mosaico.</span>
+                </div>
+                <label class="switch">
+                  <input type="checkbox" id="toggle-overlay" checked>
+                  <span class="slider"></span>
+                </label>
+              </div>
+
+              <div class="toggle-option">
+                <div class="option-info">
+                  <span class="option-title">Anclajes Topológicos</span>
+                  <span class="option-desc">Añade marcas y guías visuales en el glifo central para facilitar el conteo.</span>
+                </div>
+                <label class="switch">
+                  <input type="checkbox" id="toggle-anchors" checked>
+                  <span class="slider"></span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <!-- Columna Derecha: Visualización y Desglose Técnico -->
+          <div class="card glass-panel flex-center">
+            <h2 class="card-title">Mosaico SVG Resultante</h2>
+            <div id="identicon-preview" class="identicon-large-container">
+              <!-- SVG inyectado por JS -->
+            </div>
+            
+            <div class="technical-details">
+              <h4>Desglose Criptográfico de Semilla</h4>
+              <div class="hash-display">
+                <span class="hash-label">SHA-256:</span>
+                <code id="full-hash-code">Cargando...</code>
+              </div>
+              <p class="tech-note">
+                El hash se divide en 9 partes de 3 bytes. Cada celda renderiza una geometría diferente (Voronoi, truchet, píxeles, etc.) parametrizada por sus respectivos bytes.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= PESTAÑA: COMPARADOR ================= -->
+      <section id="comparator-tab" class="tab-panel">
+        <div class="card glass-panel">
+          <h2 class="card-title text-center">Comparador de Direcciones</h2>
+          <p class="card-desc text-center">Permite comparar dos direcciones criptográficas cara a cara. Ideal para verificar que una dirección copiada coincide visualmente con la original.</p>
+
+          <div class="comparison-grid">
+            <!-- Dirección A -->
+            <div class="comparison-column">
+              <div class="form-group">
+                <label for="compare-a-input">Dirección A (Legítima / Esperada)</label>
+                <input type="text" id="compare-a-input" class="form-input" 
+                       placeholder="Pegar dirección de origen..." 
+                       value="0x71c81857e1519509f0750854d15f20a2b18b3a9">
+              </div>
+              <div id="compare-a-preview" class="identicon-medium-container">
+                <!-- SVG A -->
+              </div>
+            </div>
+
+            <!-- Centro: Indicador de Estado -->
+            <div class="comparison-status-container">
+              <div id="comparison-badge" class="badge">
+                <!-- Icono de estado -->
+              </div>
+              <div id="comparison-msg" class="status-msg">
+                Cargando...
+              </div>
+            </div>
+
+            <!-- Dirección B -->
+            <div class="comparison-column">
+              <div class="form-group flex-row-align">
+                <label for="compare-b-input">Dirección B (Destino / Copiada)</label>
+                <button id="simulate-phishing-btn" class="btn-tiny" title="Mutar ligeramente para simular phishing">Simular Phishing ⚠️</button>
+              </div>
+              <input type="text" id="compare-b-input" class="form-input" 
+                     placeholder="Pegar dirección a verificar..." 
+                     value="0x71c81857e1519509f0750854d15f20a2b18b3a8">
+              <div id="compare-b-preview" class="identicon-medium-container">
+                <!-- SVG B -->
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= PESTAÑA: PRUEBAS DE CAMPO ================= -->
+      <section id="testing-tab" class="tab-panel">
+        <div class="grid-2col-73">
+          
+          <!-- Lado Izquierdo: El Juego de Pruebas de Campo -->
+          <div class="card glass-panel" id="game-card">
+            <div class="game-header">
+              <h2 class="card-title">Simulador de Verificación Cognitiva</h2>
+              <div class="game-settings">
+                <label for="game-mode-select">Evaluar en modo:</label>
+                <select id="game-mode-select" class="form-select">
+                  <option value="harmonious">Modo Armónico (Recomendado)</option>
+                  <option value="chaotic">Modo Caótico</option>
+                </select>
+              </div>
+            </div>
+            
+            <p class="card-desc">
+              Prueba de campo interactiva. Se te presentará un <strong>Mosaico Objetivo</strong> y abajo verás 6 opciones de direcciones y sus identicones. 5 de ellas han sido sutilmente mutadas en su parte media para simular ataques de phishing. 
+              <strong>¿Puedes identificar la correcta al instante?</strong>
+            </p>
+
+            <!-- Pantalla de Inicio del Juego -->
+            <div id="game-start-screen" class="game-screen active">
+              <div class="start-content">
+                <span class="start-icon">🎯</span>
+                <h3>Prueba de Velocidad y Precisión Visual</h3>
+                <p>Mide cuánto tiempo te toma detectar una dirección mutada (ataque de phishing) utilizando la ayuda visual de los mosaicos 3x3 en comparación con ambos modos cromáticos.</p>
+                <button id="start-game-btn" class="btn-primary">Iniciar Simulación</button>
+              </div>
+            </div>
+
+            <!-- Pantalla del Juego Activo -->
+            <div id="game-active-screen" class="game-screen">
+              <div class="target-container">
+                <div class="target-card">
+                  <span class="badge-target">OBJETIVO</span>
+                  <div id="game-target-preview" class="identicon-target-container">
+                    <!-- SVG Objetivo -->
+                  </div>
+                </div>
+                <div class="target-instructions">
+                  <h4>Busca este mosaico exacto abajo</h4>
+                  <p>Observa el patrón geométrico, el glifo central (anclaje) y los colores. Haz clic en la tarjeta correspondiente lo más rápido posible.</p>
+                </div>
+              </div>
+
+              <div class="options-grid" id="game-options-container">
+                <!-- 6 Tarjetas de opción inyectadas por JS -->
+              </div>
+            </div>
+          </div>
+
+          <!-- Lado Derecho: Estadísticas del Estudio de Campo -->
+          <div class="card glass-panel">
+            <h2 class="card-title">Panel de Resultados</h2>
+            <p class="card-desc">Métricas y datos locales agregados del estudio de usabilidad.</p>
+
+            <div class="stats-box">
+              <div class="stat-group">
+                <h4>Modo Armónico (Colores balanceados)</h4>
+                <div class="stat-row">
+                  <span class="stat-label">Pruebas Totales:</span>
+                  <span id="stat-harm-count" class="stat-value">0</span>
+                </div>
+                <div class="stat-row">
+                  <span class="stat-label">Tasa de Acierto:</span>
+                  <span id="stat-harm-success" class="stat-value">0%</span>
+                </div>
+                <div class="stat-row">
+                  <span class="stat-label">Tiempo de Reacción:</span>
+                  <span id="stat-harm-time" class="stat-value">0.0s</span>
+                </div>
+              </div>
+
+              <div class="divider"></div>
+
+              <div class="stat-group">
+                <h4>Modo Caótico (Máxima entropía)</h4>
+                <div class="stat-row">
+                  <span class="stat-label">Pruebas Totales:</span>
+                  <span id="stat-chao-count" class="stat-value">0</span>
+                </div>
+                <div class="stat-row">
+                  <span class="stat-label">Tasa de Acierto:</span>
+                  <span id="stat-chao-success" class="stat-value">0%</span>
+                </div>
+                <div class="stat-row">
+                  <span class="stat-label">Tiempo de Reacción:</span>
+                  <span id="stat-chao-time" class="stat-value">0.0s</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="stats-actions">
+              <button id="reset-stats-btn" class="btn-danger btn-block">Reiniciar Estadísticas</button>
+            </div>
+
+            <div class="conclusions-box">
+              <h5>Análisis de Diseño</h5>
+              <p id="stats-analysis-text">
+                Realiza al menos 3 pruebas en cada modo para ver el análisis de rendimiento cognitivo y verificar cuál de las propuestas resulta más efectiva frente a la fatiga visual humana.
+              </p>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+    </main>
+
+    <footer class="app-footer-info">
+      <p>Mosaico Criptográfico es un estándar de código abierto, determinista e inmutable. Desarrollado localmente de forma descentralizada y Zero-Server.</p>
+    </footer>
+  </div>
+
+  <!-- Inyección de módulos JavaScript -->
+  <script type="module" src="main.js"></script>
+</body>
+</html>
