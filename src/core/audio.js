@@ -1,40 +1,33 @@
 /**
- * Motor de Síntesis Auditiva Mnemónica (Llavero Sonoro) para Accesibilidad.
- * Genera melodías procedimentales y deterministas basadas en hashes SHA-256 usando Web Audio API.
+ * Mnemonic Acoustic Synthesis Engine (Acoustic Key) for Accessibility.
+ * Generates procedural and deterministic melodies based on SHA-256 hashes using the Web Audio API.
  */
 
 let activeOscillators = [];
 let audioCtx = null;
 
 /**
- * Detiene cualquier audio en reproducción activa.
+ * Stops any actively playing audio.
  */
 export function stopMnemonicAudio() {
   activeOscillators.forEach(osc => {
     try {
       osc.stop();
     } catch (e) {
-      // Ignorar si ya se había detenido
+      // Ignore if already stopped
     }
   });
   activeOscillators = [];
 }
 
 /**
- * Genera y reproduce un arpegio determinista basado en el hash.
- * @param {Uint8Array} hash - El hash SHA-256 de 32 bytes.
- * @param {Object} options - Configuración.
- * @param {number} options.gridSize - Tamaño de la grilla (3, 4 o 5).
- * @param {boolean} options.chaoticMode - Si es verdadero, usa intervalos disonantes.
- */
-/**
- * Programa la reproducción de un arpegio determinista basado en el hash a partir de un tiempo específico.
- * @param {Uint8Array} hash - El hash SHA-256 de 32 bytes.
- * @param {Object} options - Configuración.
- * @param {number} options.gridSize - Tamaño de la grilla.
- * @param {boolean} options.chaoticMode - Si es verdadero, usa escala disonante.
- * @param {number} startTime - Tiempo de inicio en el AudioContext.
- * @returns {number} El tiempo final en segundos al terminar el arpegio.
+ * Schedules the playback of a deterministic arpeggio based on the hash starting at a specific time.
+ * @param {Uint8Array} hash - The 32-byte SHA-256 hash.
+ * @param {Object} options - Configuration options.
+ * @param {number} options.gridSize - Grid size.
+ * @param {boolean} options.chaoticMode - If true, uses a dissonant scale.
+ * @param {number} startTime - Start time in the AudioContext.
+ * @returns {number} The ending time in seconds when the arpeggio finishes.
  */
 export function scheduleMnemonicAudio(hash, options = {}, startTime) {
   if (!audioCtx) return startTime;
@@ -43,10 +36,10 @@ export function scheduleMnemonicAudio(hash, options = {}, startTime) {
   const numCells = gridSize * gridSize;
   const chaoticMode = !!options.chaoticMode;
 
-  // 1. Definir frecuencia fundamental (F0) a partir de los bytes finales
+  // 1. Define fundamental frequency (F0) from the final bytes
   const baseFreq = 160 + (hash[31] % 120);
 
-  // 2. Definir escalas de intervalos
+  // 2. Define scale intervals
   const pentatonicIntervals = [0, 2, 4, 7, 9, 12, 14, 16, 19, 21];
   const chaoticIntervals = [0, 1, 6, 7, 10, 11, 13, 16, 18, 22];
   const intervals = chaoticMode ? chaoticIntervals : pentatonicIntervals;
@@ -55,7 +48,7 @@ export function scheduleMnemonicAudio(hash, options = {}, startTime) {
     return baseFreq * Math.pow(2, semitones / 12);
   });
 
-  // 3. Obtener el layout Fisher-Yates determinista
+  // 3. Get the deterministic Fisher-Yates layout
   const layout = Array.from({ length: numCells }, (_, idx) => idx);
   for (let k = numCells - 1; k > 0; k--) {
     const j = hash[k % 32] % (k + 1);
@@ -64,8 +57,8 @@ export function scheduleMnemonicAudio(hash, options = {}, startTime) {
     layout[j] = temp;
   }
 
-  // 4. Secuenciar las notas (firma acústica de 4 notas)
-  const stepDuration = 0.16; // 160ms por nota
+  // 4. Sequence the notes (4-note snappy signature)
+  const stepDuration = 0.16; // 160ms per note
   const maxNotes = Math.min(numCells, 4);
   let currentPlayTime = startTime;
 
@@ -94,7 +87,7 @@ export function scheduleMnemonicAudio(hash, options = {}, startTime) {
 
     osc.frequency.setValueAtTime(frequency, currentPlayTime);
 
-    // Envolvente de volumen (ADSR suave para evitar clics)
+    // Volume Envelope (Smooth ADSR to avoid clicks)
     gain.gain.setValueAtTime(0, currentPlayTime);
     gain.gain.linearRampToValueAtTime(0.2, currentPlayTime + 0.02);
     gain.gain.exponentialRampToValueAtTime(0.001, currentPlayTime + stepDuration - 0.01);
@@ -105,7 +98,7 @@ export function scheduleMnemonicAudio(hash, options = {}, startTime) {
       osc.start(currentPlayTime);
       osc.stop(currentPlayTime + stepDuration);
     } catch (e) {
-      console.warn("Advertencia de Web Audio API al iniciar/parar oscilador:", e);
+      console.warn("Web Audio API warning on starting/stopping oscillator:", e);
     }
 
     activeOscillators.push(osc);
@@ -116,7 +109,7 @@ export function scheduleMnemonicAudio(hash, options = {}, startTime) {
 }
 
 /**
- * Reproduce un arpegio mnemónico determinista de inicio directo.
+ * Plays a deterministic mnemonic arpeggio instantly.
  */
 export function playMnemonicAudio(hash, options = {}) {
   stopMnemonicAudio();
@@ -130,15 +123,15 @@ export function playMnemonicAudio(hash, options = {}) {
 }
 
 /**
- * Programa el sonido de alerta de discrepancia intermedia (barrido descendente corto).
+ * Schedules the intermediate comparison failure sound (short pitch slide down).
  */
 function scheduleComparisonFailureSound(startTime) {
   const osc = audioCtx.createOscillator();
   const gain = audioCtx.createGain();
   
   osc.type = 'triangle';
-  osc.frequency.setValueAtTime(330, startTime); // Mi4
-  osc.frequency.exponentialRampToValueAtTime(147, startTime + 0.22); // Re3 (caída de tono)
+  osc.frequency.setValueAtTime(330, startTime); // E4
+  osc.frequency.exponentialRampToValueAtTime(147, startTime + 0.22); // D3 (pitch fall)
   
   gain.gain.setValueAtTime(0, startTime);
   gain.gain.linearRampToValueAtTime(0.2, startTime + 0.02);
@@ -153,11 +146,11 @@ function scheduleComparisonFailureSound(startTime) {
   } catch (e) {}
   
   activeOscillators.push(osc);
-  return startTime + 0.3; // Tiempo de término
+  return startTime + 0.3; // End time
 }
 
 /**
- * Programa el sonido final de alarma/error de wallet (buzzer disonante grave).
+ * Schedules the final alarm/error sound for wallets (low pitch dissonant buzzer).
  */
 function scheduleAlarmSound(startTime) {
   const osc1 = audioCtx.createOscillator();
@@ -165,9 +158,9 @@ function scheduleAlarmSound(startTime) {
   const gain = audioCtx.createGain();
   
   osc1.type = 'sawtooth';
-  osc1.frequency.setValueAtTime(110, startTime); // La2
+  osc1.frequency.setValueAtTime(110, startTime); // A2
   osc2.type = 'sawtooth';
-  osc2.frequency.setValueAtTime(115, startTime); // Batido disonante
+  osc2.frequency.setValueAtTime(115, startTime); // Dissonant beating
   
   gain.gain.setValueAtTime(0, startTime);
   gain.gain.linearRampToValueAtTime(0.25, startTime + 0.04);
@@ -189,10 +182,10 @@ function scheduleAlarmSound(startTime) {
 }
 
 /**
- * Programa el sonido de concordancia intermedia (acorde mayor ascendente corto y dulce).
+ * Schedules the intermediate comparison success sound (short, sweet ascending major chord).
  */
 function scheduleComparisonSuccessSound(startTime) {
-  const notes = [392.00, 523.25, 659.25]; // Sol4, Do5, Mi5
+  const notes = [392.00, 523.25, 659.25]; // G4, C5, E5
   let maxTime = startTime;
   
   notes.forEach((freq, idx) => {
@@ -223,10 +216,10 @@ function scheduleComparisonSuccessSound(startTime) {
 }
 
 /**
- * Secuencia Completa de Fallo / Discrepancia:
- * 1. Llavero Propio (Address A)
- * 2. Sonido Falla Comparación (descendente)
- * 3. Sonido Wallet Error / Fraude (alarma disonante)
+ * Complete Mismatch / Failure Sequence:
+ * 1. Own Key (Address A)
+ * 2. Comparison Failure Sound (pitch fall)
+ * 3. Wallet Error / Fraud Sound (dissonant alarm)
  */
 export function playMismatchSequence(hashA, options = {}) {
   stopMnemonicAudio();
@@ -238,23 +231,23 @@ export function playMismatchSequence(hashA, options = {}) {
   }
   
   let time = audioCtx.currentTime + 0.02;
-  // 1. Sonido llavero propio
+  // 1. Own key sound
   time = scheduleMnemonicAudio(hashA, options, time);
-  time += 0.08; // Pausa corta
+  time += 0.08; // Short pause
   
-  // 2. Sonido de falla de comparación
+  // 2. Comparison failure sound
   time = scheduleComparisonFailureSound(time);
-  time += 0.08; // Pausa corta
+  time += 0.08; // Short pause
   
-  // 3. Sonido de error de wallet / fraude
+  // 3. Wallet error / fraud sound
   scheduleAlarmSound(time);
 }
 
 /**
- * Secuencia Completa de Éxito / Concordancia:
- * 1. Llavero Propio (Address A)
- * 2. Sonido Bueno (chime campana)
- * 3. Llavero Destino Bueno (Address B)
+ * Complete Match / Success Sequence:
+ * 1. Own Key (Address A)
+ * 2. Good Sound (bell chime)
+ * 3. Destination Key (Address B)
  */
 export function playMatchSequence(hashA, hashB, options = {}) {
   stopMnemonicAudio();
@@ -266,14 +259,14 @@ export function playMatchSequence(hashA, hashB, options = {}) {
   }
   
   let time = audioCtx.currentTime + 0.02;
-  // 1. Sonido llavero propio
+  // 1. Own key sound
   time = scheduleMnemonicAudio(hashA, options, time);
-  time += 0.08; // Pausa corta
+  time += 0.08; // Short pause
   
-  // 2. Sonido de comparación exitosa
+  // 2. Successful comparison sound
   time = scheduleComparisonSuccessSound(time);
-  time += 0.08; // Pausa corta
+  time += 0.08; // Short pause
   
-  // 3. Sonido de llavero destino bueno
+  // 3. Destination key sound
   scheduleMnemonicAudio(hashB, options, time);
 }

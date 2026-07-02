@@ -1,84 +1,83 @@
-# Justificación de Seguridad y Modelo de Entropía
+# Security Justification and Entropy Model
 
-Este documento detalla la justificación teórica, el análisis criptográfico y la mitigación de riesgos de **Mosaico Criptográfico** como una capa de seguridad cognitiva y mnemónica aplicada a la validación de direcciones y hashes.
-
----
-
-## 1. El Problema: El Factor Humano en Web3
-
-En los sistemas descentralizados, las identidades y los contratos se representan mediante hashes hexadecimales largos (ej. direcciones EVM de 40 caracteres hexadecimales como `0x71c81857e1519509f0750854d15f20a2b18b3a9`).
-* **Carga Cognitiva:** La memoria de trabajo humana solo puede retener entre 4 y 7 elementos de información a la vez (Ley de Miller). Comparar dos cadenas de 40 caracteres excede este límite.
-* **El Ataque de "Vanity Address" (Phishing):** Los estafadores utilizan clústeres de GPU para generar direcciones que coincidan en los primeros 6 y últimos 4 caracteres con una dirección legítima conocida (ej. un contrato de USDT o la billetera de un exchange). Dado que los humanos típicamente solo verifican los extremos, estas direcciones maliciosas son aceptadas por error, resultando en pérdidas de fondos.
-* **Saturación y Fatiga Visual:** Leer texto plano hexadecimal de forma recurrente fatiga el ojo, incrementando la probabilidad de ignorar discrepancias de caracteres en transacciones repetitivas.
+This document details the theoretical justification, cryptographic analysis, and risk mitigation of the **Cryptographic Mosaic** as a cognitive and mnemonic security layer applied to the validation of addresses and hashes.
 
 ---
 
-## 2. La Solución: Entropía Visual y Cognitiva en Mosaico 3x3
+## 1. The Problem: The Human Factor in Web3
 
-Mosaico Criptográfico transforma una semilla de 256 bits (SHA-256 de la dirección) en una representación gráfica de alta resolución SVG estructurada en una cuadrícula de 3x3. Su seguridad y robustez mnemónica se basan en cuatro pilares:
+In decentralized systems, identities and contracts are represented by long hexadecimal hashes (e.g., 40-character EVM addresses like `0x71c81857e1519509f0750854d15f20a2b18b3a9`).
+* **Cognitive Load:** Human working memory can only hold between 4 and 7 chunks of information at a time (Miller's Law). Comparing two 40-character strings exceeds this limit.
+* **The "Vanity Address" Phishing Attack:** Scammers use GPU clusters to generate malicious addresses that match the first 6 and last 4 characters of a known legitimate address (e.g., a USDT contract or an exchange wallet). Since humans typically only check the ends, these malicious addresses are accepted by mistake, resulting in loss of funds.
+* **Visual Saturation and Fatigue:** Repeatedly reading hexadecimal plain text fatigues the eyes, increasing the probability of ignoring character discrepancies in repetitive transactions.
+
+---
+
+## 2. The Solution: Visual and Cognitive Entropy in a 3x3 Mosaic
+
+The Cryptographic Mosaic transforms a 256-bit seed (the SHA-256 of the address) into a high-resolution SVG graphical representation structured in a 3x3 grid. Its security and mnemonic robustness are based on four pillars:
 
 ```
-[ Dirección Cripto ] ──► [ SHA-256 (32 Bytes) ] ──► [ Barajado Fisher-Yates ]
+[ Crypto Address ] ──► [ SHA-256 (32 Bytes) ] ──► [ Fisher-Yates Shuffle ]
                                                             │
-   ┌────────────────────────────────────────────────────────┴────────────────────────────────────────┐
-   ▼ (Configuración Global)            ▼ (Posicionamiento Dinámico)           ▼ (Celdas Geométricas)
-- Tono Base HSL                     - Mezcla de las 9 Celdas               - Voronoi, fractales, truchet
-- Saturación/Luminosidad            - Impide patrones repetitivos          - Parametrizadas por bytes
+    ┌───────────────────────────────────────────────────────┴───────────────────────────────────────┐
+    ▼ (Global Configuration)           ▼ (Dynamic Positioning)           ▼ (Geometric Cells)
+- Base HSL Hue                      - Mix of the 9 Cells              - Voronoi, fractales, truchet
+- Saturation/Lightness              - Prevents repetitive patterns    - Parameterized by bytes
 ```
 
-### A. Barajado Geométrico Determinista (Fisher-Yates) y Escalabilidad de Grilla
-A diferencia de los identicones estándar (como Jazzicons) donde la posición de los círculos es fija y solo varían ligeramente los colores, Mosaico Criptográfico implementa un algoritmo de barajado Fisher-Yates de las secciones en base a los bytes del hash criptográfico.
-* **Escalabilidad de Grilla:** El sistema viene configurado por defecto en una grilla de **3x3** (9 sectores), pero su arquitectura vectorial y matemática escala nativamente si se requiere a grillas de **4x4** (16 sectores) o **5x5** (25 sectores).
-* **Multiplicación de la Entropía Visual:** El número de ordenamientos únicos posibles de la cuadrícula crece de forma factorial con el tamaño de la grilla:
-  * **Grilla 3x3:** $9! = 362,880$ combinaciones espaciales posibles.
-  * **Grilla 4x4:** $16! \approx 2.09 \times 10^{13}$ combinaciones espaciales posibles.
-  * **Grilla 5x5:** $25! \approx 1.55 \times 10^{25}$ combinaciones espaciales posibles.
-* **Impacto en Seguridad:** Si una dirección se altera en un solo carácter, no solo cambian los colores o la orientación de las formas; **toda la distribución espacial de las figuras se altera**. El patrón de ondas que antes estaba en la esquina superior izquierda ahora podría estar en la parte inferior derecha, y el glifo central puede saltar a una esquina.
-* **Fácil Detección:** Para el cerebro humano, el desplazamiento espacial de un patrón completo (ej. *"mi mosaico tenía la estrella en la esquina, no en el centro"*) es una señal de alerta inmediata que no requiere esfuerzo de lectura detallada. En grillas de 4x4 y 5x5, la alteración espacial se vuelve exponencialmente más caótica para un clon malicioso, eliminando la posibilidad de ataques de colisión por fuerza bruta.
+### A. Deterministic Geometric Shuffling (Fisher-Yates) and Grid Scalability
+Unlike standard identicons (like Jazzicons) where the position of circles is fixed and only colors vary slightly, the Cryptographic Mosaic implements a Fisher-Yates shuffling algorithm of the sections based on the bytes of the cryptographic hash.
+* **Grid Scalability:** The system is configured by default in a **3x3** grid (9 sectors), but its vector and mathematical architecture scales natively if required to **4x4** (16 sectors) or **5x5** (25 sectors) grids.
+* **Multiplication of Visual Entropy:** The number of possible unique grid arrangements grows factorially with the grid size:
+  * **3x3 Grid:** $9! = 362,880$ possible spatial combinations.
+  * **4x4 Grid:** $16! \approx 2.09 \times 10^{13}$ possible spatial combinations.
+  * **5x5 Grid:** $25! \approx 1.55 \times 10^{25}$ possible spatial combinations.
+* **Security Impact:** If a single character in an address is altered, not only do the colors or shapes' orientation change; **the entire spatial distribution of the shapes is altered**. A wave pattern that was previously in the top-left corner might now be in the bottom-right, and the central glyph can jump to a corner.
+* **Easy Detection:** For the human brain, the spatial displacement of an entire pattern (e.g., *"my mosaic had the star in the corner, not the center"*) is an immediate warning signal requiring no detailed reading effort. In 4x4 and 5x5 grids, the spatial alteration becomes exponentially more chaotic for a malicious clone, eliminating the possibility of brute-force collision attacks.
 
-### B. Anclajes Topológicos Discretos
-La sección del anclaje topológico (Celda 4) utiliza propiedades geométricas que los humanos pueden contar rápidamente:
-* **Número de Vértices:** El polígono central tiene un número de puntas/vértices determinista entre 3 y 9.
-* **Puntos Satélites:** En los vértices del anclaje se renderizan pequeños círculos de alto contraste.
-* **Propósito:** El cerebro humano procesa cantidades pequeñas de objetos discretos de forma instantánea (subitización). El usuario puede memorizar su anclaje como *"mi mosaico es el que tiene la estrella de 5 puntas en el centro-izquierdo"*. Si un clon malicioso produce una estrella de 6 puntas, la diferencia se detecta de inmediato.
+### B. Discrete Topological Anchors
+The topological anchor section (Cell 4) uses geometric properties that humans can count quickly:
+* **Number of Vertices:** The central polygon has a deterministic number of points/vertices between 3 and 9.
+* **Satellite Dots:** Small high-contrast circles are rendered at the vertices of the anchor.
+* **Purpose:** The human brain processes small quantities of discrete objects instantly (subitizing). The user can memorize their anchor as *"my mosaic has a 5-pointed star in the center-left"*. If a malicious clone produces a 6-pointed star, the difference is detected immediately.
 
-### C. Superposición del Borde de Seguridad (Overlay)
-Como última capa de validación para evitar colisiones totales generadas por Inteligencia Artificial, el mosaico integra en su base una barra opaca con los primeros 6 y últimos 4 caracteres del hash original. Esto ancla la imagen al texto correspondiente, eliminando la posibilidad de que una imagen correcta sea mostrada junto a una dirección falsa bajo manipulación gráfica simple del HTML.
-
----
-
-## 3. Resistencia ante Amenazas Avanzadas
-
-### A. Ataques de Fuerza Bruta y Computación Cuántica
-* El punto de entrada es el hash SHA-256 nativo de la Web Crypto API. SHA-256 es resistente a ataques de colisión cuántica (Grover) manteniendo 128 bits de seguridad cuántica, lo que requiere $2^{128}$ operaciones para forzar una preimagen.
-* Incluso si un atacante pudiera generar $10^{15}$ direcciones por segundo buscando imitar un identicon, la enorme entropía combinatoria de:
-  $$\text{Entropía} = 9! \text{ (permutaciones del layout)} \times (\text{Variaciones cromáticas por celda}) \times (\text{Geometrías por celda})$$
-  hace que las colisiones visuales completas sean computacionalmente inviables.
-
-### B. Spoofing por Inteligencia Artificial (IA)
-Una IA optimizadora podría intentar buscar direcciones cuya imagen generada sea lo más similar posible a la original para engañar al ojo humano. 
-* El diseño de celdas geométricas de Mosaico Criptográfico (como los píxeles simétricos de 5x5, las líneas angulares del Truchet, y el número de vértices de la estrella) produce **diferencias visuales de alta frecuencia y de tipo discreto/topológico**. Las IAs generativas típicamente fallan en imitar topologías discretas idénticas sin cambiar la estructura matemática, facilitando que el ojo humano note la distorsión del patrón.
-
-### C. Manipulación Gráfica de UI (Ataque de Interfaz Web)
-Si una dApp o sitio web es vulnerado, el atacante podría inyectar un identicon SVG estático para imitar el legítimo.
-* **Solución Sandbox/Extensión:** La validación segura reside en que el identicon debe generarse y renderizarse en el lado del cliente (en su extensión de billetera de confianza o sandbox local) leyendo la dirección directamente de la memoria de transacciones Web3, **nunca confiando en las imágenes que sirve la web**. Si la imagen del sitio web difiere de la mostrada por la extensión segura, la manipulación queda al descubierto.
+### C. Security Edge Overlay
+As a final validation layer to prevent total collisions generated by Artificial Intelligence, the mosaic integrates an opaque bar at its base containing the first 6 and last 4 characters of the original hash. This anchors the image to the corresponding text, eliminating the possibility of a correct image being displayed next to a fake address under simple HTML graphic manipulation.
 
 ---
 
-## 4. Accesibilidad e Inclusión (Daltónicos, Débiles Visuales y Disléxicos)
+## 3. Resistance Against Advanced Threats
 
-El diseño de Mosaico Criptográfico ha sido concebido bajo principios de diseño universal para mitigar barreras cognitivas o sensory-motoras en grupos vulnerables:
+### A. Brute-Force and Quantum Computing Attacks
+* The entry point is the native SHA-256 hash from the Web Crypto API. SHA-256 is resistant to quantum collision attacks (Grover) maintaining 128 bits of quantum security, which requires $2^{128}$ operations to force a preimage.
+* Even if an attacker could generate $10^{15}$ addresses per second looking to mimic an identicon, the massive combinatorial entropy of:
+  $$\text{Entropy} = 9! \text{ (layout permutations)} \times (\text{Chromatic variations per cell}) \times (\text{Geometries per cell})$$
+  makes full visual collisions computationally unfeasible.
 
-### A. Mitigación para Daltónicos (Colorblindness)
-* **Independencia del Color:** El sistema no depende únicamente del tono cromático. Cada una de las 9 secciones implementa una **firma geométrica y de patrones estructurales discretos** (ondas, retículas rotadas, píxeles tipo Space Invader, tuberías Truchet). Incluso bajo una visión monocromática completa (acromatopsia), el barajado de las celdas y sus formas geométricas son 100% legibles y diferenciables.
-* **Anclajes de Alto Contraste:** El glifo de anclaje (estrella/polígono) utiliza bordes oscuros/claros de alto contraste y puntos satélite blancos que no requieren discriminación de color para ser contados o reconocidos.
+### B. Artificial Intelligence (AI) Spoofing
+An optimizing AI could try to find addresses whose generated image is as similar as possible to the original to deceive the human eye.
+* The design of geometric cells in the Cryptographic Mosaic (such as symmetric 5x5 pixels, angular Truchet lines, and the star's vertex count) produces **high-frequency, discrete/topological visual differences**. Generative AIs typically fail to mimic identical discrete topologies without changing the mathematical structure, making it easy for the human eye to notice pattern distortion.
 
-### B. Mitigación para Débiles Visuales (Low Vision)
-* **Escalabilidad Vectorial Infinita (SVG):** Al renderizarse como código SVG nativo en lugar de imágenes de mapa de bits (PNG/JPG), el mosaico se escala infinitamente sin pixelación ni desenfoque. Los usuarios con debilidad visual pueden ampliar la interfaz a un 400% manteniendo bordes matemáticamente perfectos.
-* **Grosor Geométrico Robusto:** El trazo de las líneas vectoriales (ej. tuberías Truchet de hasta 11px de grosor) y los tamaños de los bloques de píxeles (bloques de 16x16px por celda) están diseñados para ser perceptibles sin requerir una visión de alta agudeza.
-* **Futura Capa Auditiva (Audio-Iconos):** Como extensión del protocolo, los mismos 32 bytes del hash pueden alimentar un generador de síntesis de audio local que reproduzca una progresión armónica o melodía corta de 3 segundos (firma de audio). Esto permitiría a usuarios con ceguera total escuchar y validar la identidad de sus direcciones de confianza.
+### C. UI Graphical Hijacking (Web Interface Attack)
+If a dApp or website is compromised, the attacker could inject a static SVG identicon to mimic the legitimate one.
+* **Sandbox/Extension Solution:** Secure validation relies on the identicon being generated and rendered on the client side (in their trusted wallet extension or local sandbox) reading the address directly from Web3 transaction memory, **never trusting the images served by the website**. If the website's image differs from that shown by the secure extension, the tampering is exposed.
 
-### C. Mitigación para Disléxicos (Dyslexia)
-* **El Paradigma Visual como Solución Primaria:** La dislexia dificulta la lectura, transposición y decodificación de caracteres alfanuméricos (donde es común confundir `b` con `d`, o alterar el orden de números en un hash largo). Al traducir la cadena de texto a un **mosaico espacial geométrico**, el usuario disléxico salta por completo la vía de procesamiento alfanumérico y utiliza la vía de procesamiento espacial/visual del cerebro, la cual es inmune a las distorsiones de la dislexia clásica.
-* **Tipografía de Respaldo:** El overlay de texto utiliza fuentes monoespaciadas de alto espaciado y caracteres en mayúsculas fijas, minimizando la rotación o transposición de letras.
+---
 
+## 4. Accessibility and Inclusion (Colorblind, Low-Vision, and Dyslexic Users)
+
+The design of the Cryptographic Mosaic has been conceived under universal design principles to mitigate cognitive or sensory-motor barriers in vulnerable groups:
+
+### A. Mitigation for Colorblindness
+* **Color Independence:** The system does not rely solely on chromatic hue. Each of the 9 sections implements a **discrete geometric signature and structural patterns** (waves, rotated grids, Space Invader-like pixels, Truchet pipes). Even under complete monochromatic vision (achromatopsia), the shuffling of the cells and their geometric shapes are 100% readable and distinguishable.
+* **High-Contrast Anchors:** The anchor glyph (star/polygon) uses high-contrast dark/light borders and white satellite dots that do not require color discrimination to be counted or recognized.
+
+### B. Mitigation for Low-Vision
+* **Infinite Vector Scalability (SVG):** Since it is rendered as native SVG code instead of bitmap images (PNG/JPG), the mosaic scales infinitely without pixelation or blur. Users with low vision can zoom the interface to 400% while maintaining mathematically perfect edges.
+* **Robust Geometric Thickness:** The stroke width of vector lines (e.g., Truchet pipes up to 11px thick) and pixel block sizes (16x16px blocks per cell) are designed to be perceptible without requiring high-acuity vision.
+* **Acoustic Layer (Audio-Icons):** As an extension of the protocol, the same 32 bytes of the hash feed a local audio synthesis generator that plays a harmonic progression or a short 3-second melody (audio signature). This allows users with complete blindness to hear and validate the identity of their trusted addresses.
+
+### C. Mitigation for Dyslexia
+* **The Visual Paradigm as a Primary Solution:** Dyslexia makes reading, transposing, and decoding alphanumeric characters difficult (where confusing `b` with `d` or altering the order of numbers in a long hash is common). By translating the text string into a **spatial geometric mosaic**, the dyslexic user completely bypasses the alphanumeric processing pathway and uses the brain's spatial/visual processing pathway, which is immune to the distortions of classic dyslexia.
+* **Backup Typography:** The text overlay uses high-spacing monospaced fonts and fixed uppercase characters, minimizing letter rotation or transposition.

@@ -1,68 +1,68 @@
-# Manual de Usuario y Protocolo de Verificación
+# User Manual and Verification Protocol
 
-Este manual describe el funcionamiento de la dApp interactiva de **Mosaico Criptográfico** y establece el protocolo paso a paso para realizar verificaciones manuales seguras de direcciones y hashes en entornos Web3.
-
----
-
-## 1. Guía de Uso de la Interfaz
-
-La aplicación se divide en tres secciones accesibles desde la barra de pestañas en la cabecera:
-
-### A. Panel del Generador (Visualización Individual)
-Permite inspeccionar a fondo cómo se compone un mosaico a partir de cualquier texto.
-1. **Entrada de Dirección:** Escribe o pega cualquier clave pública, privada o dirección de contrato en el campo de texto. Puedes usar el botón del dado (🎲) para generar direcciones aleatorias de prueba.
-2. **Modo Cromático:**
-   * **Armónico (Recomendado para uso diario):** Agrupa las celdas bajo una paleta de color complementaria. Reduce la fatiga cognitiva y facilita recordar la "identidad visual" de una dirección como un todo.
-   * **Caótico (Recomendado para máxima seguridad):** Genera colores independientes en cada celda. Es estéticamente más ruidoso pero maximiza las diferencias visuales entre hashes parecidos.
-3. **Controles de Seguridad y Escalabilidad:**
-   * **Tamaño de Grilla:** Configura la cuadrícula en **3x3** (por defecto), **4x4** o **5x5** sectores. Las cuadrículas más grandes aumentan exponencialmente la complejidad espacial y se recomiendan para firmas de contratos de alto valor.
-   * **Overlay de Texto:** Activa/desactiva la barra inferior con los caracteres legibles de la dirección.
-   * **Anclajes Topológicos:** Muestra/oculta los puntos de conteo en los vértices del glifo principal.
-4. **Desglose de Semilla:** Al final de la página se muestra el hash SHA-256 en hexadecimal derivado de tu entrada.
-
-### B. Panel del Comparador (Verificación Cara a Cara)
-Diseñado para la comparación visual inmediata de dos direcciones antes de realizar envíos de fondos o firmas de contratos.
-1. Pega la dirección esperada (Dirección A) en el cuadro izquierdo.
-2. Pega la dirección copiada o la que figura en tu interfaz de transacción (Dirección B) en el cuadro derecho.
-3. Observa los mosaicos generados:
-   * **Badge Verde (✅):** Las direcciones y sus identicones coinciden al 100%. Es seguro proceder.
-   * **Badge Rojo (⚠️):** Existe una discrepancia. Los mosaicos se verán marcadamente diferentes en colores y disposición de formas. **¡Detén la transacción de inmediato!**
-4. Puedes hacer clic en **"Simular Phishing"** para ver cómo un cambio de un solo carácter en la Dirección B altera por completo el orden y formas de la grilla de Dirección B.
-
-### C. Panel del Simulador (Pruebas de Campo Cognitivas)
-Un entorno interactivo para entrenar y evaluar la capacidad del ojo humano para reconocer patrones criptográficos.
-1. Selecciona el modo de visualización a evaluar (Armónico o Caótico).
-2. Haz clic en **"Iniciar Simulación"**.
-3. Se te presentará un **Mosaico Objetivo** en la parte superior y 6 opciones de tarjetas abajo.
-4. 5 de las tarjetas contienen direcciones falsas que imitan el inicio y fin de la dirección objetivo (phishing). Solo 1 es idéntica.
-5. Haz clic en el mosaico que consideres idéntico al objetivo.
-6. El panel de la derecha registrará tu tasa de aciertos y tiempo de reacción promedio en segundos. Puedes presionar **"Reiniciar Estadísticas"** para limpiar el historial.
+This manual describes the operation of the interactive **Cryptographic Mosaic** dApp and establishes the step-by-step protocol for secure manual verification of addresses and hashes in Web3 environments.
 
 ---
 
-## 2. Protocolo de Verificación Manual de Direcciones (Paso a Paso)
+## 1. Interface User Guide
 
-Para integrar esta capa de seguridad en tus operaciones Web3 del día a día, implementa este protocolo de 3 pasos:
+The application is split into three main sections accessible from the tab navigation bar in the header:
+
+### A. Generator Panel (Individual Visualization)
+Allows you to inspect in detail how a mosaic is composed from any text input.
+1. **Address Input:** Type or paste any public key, private key, or contract address into the text field. You can use the die button (🎲) to generate random mock addresses.
+2. **Chroma Mode:**
+   * **Harmonious (Recommended for daily use):** Groups cells under a complementary color palette. This reduces cognitive fatigue and makes it easy to remember the "visual identity" of an address as a whole.
+   * **Chaotic (Recommended for maximum entropy):** Generates independent colors in each cell. It is visually louder but maximizes visual differences between similar hashes.
+3. **Security and Scalability Controls:**
+   * **Grid Size:** Set the grid to **3x3** (default), **4x4**, or **5x5** sectors. Larger grids exponentially increase spatial complexity and are recommended for signing high-value contracts.
+   * **Text Overlay:** Toggle the bottom bar displaying the readable characters of the address.
+   * **Topological Anchors:** Show/hide countable vertices on the central glyph.
+4. **Seed Breakdown:** The bottom of the page displays the derived SHA-256 hexadecimal hash of your input.
+
+### B. Comparator Panel (Face-to-Face Verification)
+Designed for immediate visual comparison of two addresses before sending funds or signing transactions.
+1. Paste the expected address (Address A) into the left box.
+2. Paste the copied address or the one displayed in your transaction interface (Address B) into the right box.
+3. Observe the generated mosaics:
+   * **Green Badge (✅):** The addresses and their identicons match 100%. It is safe to proceed.
+   * **Red Badge (⚠️):** There is a discrepancy. The mosaics will look markedly different in colors and shape arrangement. **Stop the transaction immediately!**
+4. Click **"Phishing"** to see how a single-character change in Address B completely alters the layout and colors of its mosaic.
+
+### C. Simulator Panel (Cognitive Field Testing)
+An interactive environment to train and evaluate the human eye's capacity to recognize cryptographic patterns.
+1. Select the visual mode to evaluate (Harmonious or Chaotic).
+2. Click **"Start Simulation"**.
+3. A **Target Mosaic** will be presented at the top, along with 6 option cards below.
+4. 5 of the cards contain fake addresses mimicking the start and end of the target address (phishing). Only 1 is identical.
+5. Click the mosaic you believe matches the target.
+6. The right panel will record your success rate and average reaction time in seconds. Click **"Reset"** to clear the history.
+
+---
+
+## 2. Manual Address Verification Protocol (Step-by-Step)
+
+To integrate this security layer into your daily Web3 operations, implement this 3-step protocol:
 
 ```
-[ PASO 1: Generar ] ──► [ PASO 2: Comparar ] ──► [ PASO 3: Confirmar ]
-   Pegar dirección         Observar el Mosaico       Verificar Anclajes
-   en el comparador        (¿Colores en posición?)   (¿Coincide nº de puntas?)
+[ STEP 1: Generate ] ──► [ STEP 2: Compare ] ──► [ STEP 3: Confirm ]
+   Paste address            Observe the Mosaic       Verify Anchors
+   in the comparator        (Colors in position?)    (Match number of points?)
 ```
 
-### Paso 1: Generación y Copia Segura
-Antes de enviar fondos a un contrato o billetera:
-1. Copia la dirección del destinatario desde una fuente de confianza (ej. el sitio oficial del token o tu agenda de direcciones guardadas).
-2. Pégala en tu dApp o monedero que integre el renderizador de Mosaico Criptográfico. Memoriza visualmente el mosaico resultante.
+### Step 1: Secure Copy and Generation
+Before sending funds to a contract or wallet:
+1. Copy the recipient's address from a trusted source (e.g., the official token site or your saved address book).
+2. Paste it into your dApp or wallet integrating the Cryptographic Mosaic renderer. Memorize the resulting mosaic.
 
-### Paso 2: Comparación del Layout y Color
-Al momento de confirmar la transacción en la interfaz del monedero (ej. la ventana emergente de confirmación):
-1. Mira el mosaico renderizado por el monedero y compáralo con el que memorizaste en el Paso 1.
-2. Verifica la **distribución general de las celdas**: ¿Está la estrella en la misma celda? ¿Los patrones de truchet (tuberías) y de ondas (ondas sinusoidales) ocupan las mismas posiciones físicas en el mosaico 3x3?
-3. Si los colores generales no coinciden o una celda tiene un patrón diferente, aborta.
+### Step 2: Layout and Color Comparison
+When confirming the transaction in the wallet interface (e.g., the signing confirmation popup):
+1. Look at the mosaic rendered by the wallet and compare it with the one you memorized in Step 1.
+2. Verify the **general distribution of the cells**: Is the star in the same cell? Do the truchet (labyrinth) and wave patterns occupy the same physical positions in the 3x3 grid?
+3. If the colors do not match or a cell has a different pattern, abort.
 
-### Paso 3: Validación del Anclaje y Overlay
-Como última comprobación fina:
-1. Localiza la celda del anclaje geométrico. Cuenta mentalmente el número de vértices o puntos blancos (ej. *"es un pentágono de 5 vértices"*).
-2. Lee los caracteres impresos en el overlay inferior de la imagen. Verifica que correspondan al inicio y fin de tu dirección de destino.
-3. Si todos los pasos coinciden, puedes firmar la transacción con absoluta tranquilidad de que no has sido víctima de un secuestro del portapapeles (clipboard hijacking) o de una vanity address maliciosa.
+### Step 3: Anchor and Overlay Validation
+As a final check:
+1. Locate the geometric anchor cell in the center. Count the number of vertices or white dots (e.g., *"it is a pentagon with 5 vertices"*).
+2. Read the printed characters in the bottom overlay of the image. Verify that they correspond to the start and end of your destination address.
+3. If all checks match, you can sign the transaction with peace of mind, knowing you are not a victim of clipboard hijacking or a malicious vanity address.

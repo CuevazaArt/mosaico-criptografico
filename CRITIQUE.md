@@ -1,72 +1,72 @@
-# Auditoría de Diseño y Crítica de Implementación: Mosaico Criptográfico
+# Design Audit and Implementation Critique: Cryptographic Mosaic
 
-Este documento presenta una revisión crítica a fondo del estado actual del proyecto **Mosaico Criptográfico (Identicons 3x3/4x4/5x5 y Llavero Sonoro)**. Identifica las debilidades estructurales, las paradojas cognitivas de usabilidad, los conflictos técnicos de portabilidad y concluye con una recomendación de arquitectura para el futuro.
-
----
-
-## 1. Debilidades Estructurales y de Seguridad
-
-### A. Ataque de Semejanza Parcial Cognitiva (Visual Phishing)
-* **La Amenaza:** Un atacante que genera direcciones de phishing mediante fuerza bruta (vanity addresses) no busca una colisión del 100% de la imagen (lo cual es computacionalmente inviable). Solo requiere encontrar una clave que genere un mosaico con:
-  * El mismo color global predominante (tono general).
-  * El anclaje topológico ubicado en la misma celda física.
-* **El Riesgo:** Si el usuario realiza una validación rápida ("vistazo de un segundo") y ve que el color general coincide y la estrella está en el mismo lugar, podría firmar la transacción sin notar que las líneas de Truchet o las curvas fractales de las otras celdas variaron ligeramente.
-
-### B. El Dilema de la Complejidad del Layout (Fisher-Yates)
-* Al barajar las 9, 16 o 25 celdas de forma aleatoria a partir del hash, la celda de **Anclaje Topológico** (el punto de referencia visual más fuerte y fácil de recordar) pierde una ubicación física fija.
-* **Confusión del Usuario:** Si el anclaje aparece a veces en el centro, a veces en una esquina y a veces en los bordes, el cerebro del usuario no puede automatizar su búsqueda. Se le obliga a escanear visualmente todo el mosaico en cada transacción para "encontrar" el anclaje primero, aumentando la fatiga cognitiva y el tiempo de respuesta.
+This document presents an in-depth critical review of the current state of the **Cryptographic Mosaic (3x3/4x4/5x5 Identicons and Acoustic Key)** project. It identifies structural weaknesses, cognitive usability paradoxes, technical portability conflicts, and concludes with a recommended architectural path for the future.
 
 ---
 
-## 2. Paradojas de Usabilidad y Carga Cognitiva
+## 1. Structural and Security Weaknesses
 
-### A. La Paradoja de la Carga de Trabajo
-El proyecto nace con el fin de evitar que los humanos tengan que leer hashes alfanuméricos aburridos y complejos. Sin embargo:
-* Si el usuario ahora debe:
-  1. Identificar el color global.
-  2. Buscar y contar las puntas del anclaje topológico (ej. 5 puntas vs 6 puntas).
-  3. Contar el número de círculos satélite.
-  4. Escuchar un arpegio sonoro de 3 segundos en silencio.
-* **El Conflicto:** La suma de estos pasos visuales y auditivos genera **más carga de trabajo mental** que simplemente comparar los primeros y últimos 4 caracteres del texto (`0x71c8...3a9`). El usuario podría terminar ignorando la herramienta debido a la fricción de uso.
+### A. Cognitive Partial Similarity Attack (Visual Phishing)
+* **The Threat:** A vanity address phishing attacker does not seek a 100% collision of the image (which is computationally infeasible). They only need to find a key that generates a mosaic with:
+  * The same dominant global color (general hue).
+  * The topological anchor located in the same physical cell.
+* **The Risk:** If the user performs a quick validation ("one-second glance") and sees that the general color matches and the star is in the same place, they might sign the transaction without noticing that the Truchet lines or fractal curves in the other cells changed slightly.
 
-### B. Incompatibilidad de Entornos para la Firma Sonora
-* El llavero sonoro es ideal para la accesibilidad de personas ciegas, pero es **inútil en la vida cotidiana móvil**: transaccionar en el metro, la calle o una cafetería ruidosa inhabilita el canal de audio a menos que el usuario use auriculares.
-* La dependencia de altavoces expone la privacidad del usuario (otros pueden escuchar la melodía asociada a su billetera).
+### B. The Layout Complexity Dilemma (Fisher-Yates)
+* Shuffling the 9, 16, or 25 cells randomly based on the hash causes the **Topological Anchor** (the strongest and easiest visual reference to remember) to lose a fixed physical location.
+* **User Confusion:** If the anchor appears sometimes in the center, sometimes in a corner, and sometimes on the edges, the user's brain cannot automate its search. They are forced to visually scan the entire mosaic in every transaction to "find" the anchor first, increasing cognitive fatigue and response time.
 
 ---
 
-## 3. Conflictos Técnicos de Portabilidad y Renderizado
+## 2. Usability Paradoxes and Cognitive Load
 
-### A. El Problema de Consistencia de Color y Brillo (Device-Dependent Rendering)
-El color del mosaico se genera dinámicamente usando variables HSL en el navegador.
-* **La Pantalla:** El mismo color HSL se verá drásticamente diferente en una pantalla OLED de gama alta con alto contraste frente a una pantalla LCD barata u opaca de un teléfono móvil.
-* **El Filtro de Luz Azul:** Si el usuario activa el modo nocturno (Warm Light / Night Shift) en su sistema operativo, toda la paleta de colores del mosaico se desplazará hacia los tonos cálidos (amarillos/rojos). Esto alterará la "firma cromática" que el usuario recuerda de memoria, provocando falsas alarmas de phishing y desconfianza en la herramienta.
+### A. The Workload Paradox
+The project was born to prevent humans from having to read boring and complex alphanumeric hashes. However:
+* If the user now has to:
+  1. Identify the global color.
+  2. Locate and count the points of the topological anchor (e.g., 5-pointed vs. 6-pointed star).
+  3. Count the number of satellite dots.
+  4. Listen to a 3-second acoustic arpeggio in silence.
+* **The Conflict:** The sum of these visual and auditory steps generates **more mental workload** than simply comparing the first and last 4 characters of the text (`0x71c8...3a9`). The user might end up ignoring the tool due to usage friction.
 
-### B. Diferencias de Motores de Audio y SVG
-* **Audio:** Las implementaciones de Web Audio API (curvas de atenuación de volumen y osciladores) difieren ligeramente entre navegadores (WebKit en Safari/iOS vs Blink en Chrome/Android). La misma dirección podría sonar con timbres sutilmente diferentes según el sistema operativo.
-* **SVG:** Ciertos navegadores antiguos o visualizadores internos de wallets no procesan filtros CSS complejos (`box-shadow`, transparencias, gradientes avanzados) del mismo modo, destruyendo la coherencia visual necesaria para la verificación cruzada.
+### B. Environment Incompatibility for Audio Signatures
+* The acoustic key is ideal for blind accessibility, but is **useless in daily mobile life**: transacting in the subway, on the street, or in a noisy coffee shop disables the audio channel unless the user is wearing headphones.
+* Relying on speakers exposes the user's privacy (others can hear the melody associated with their wallet).
 
 ---
 
-## 4. Conclusiones y Recomendaciones de Diseño Futuro
+## 3. Technical Portability and Rendering Conflicts
 
-Mosaico Criptográfico es una capa de usabilidad y seguridad revolucionaria frente a los identicones tradicionales de baja entropía (como Jazzicons). No obstante, para llevarlo a una fase de producción robusta, recomendamos la siguiente evolución:
+### A. Color and Brightness Consistency (Device-Dependent Rendering)
+The mosaic color is generated dynamically using HSL variables in the browser.
+* **The Screen:** The same HSL color will look drastically different on a high-end OLED display with high contrast compared to a cheap, dim LCD screen on a budget mobile phone.
+* **Blue Light Filter:** If the user activates night mode (Warm Light / Night Shift) on their operating system, the entire color palette of the mosaic shifts towards warm tones (yellows/reds). This alters the "chromatic signature" that the user remembers, triggering false phishing alarms and distrust in the tool.
+
+### B. Audio and SVG Engine Discrepancies
+* **Audio:** Web Audio API implementations (volume roll-off curves and oscillators) differ slightly between browsers (WebKit on Safari/iOS vs. Blink on Chrome/Android). The same address might sound with subtly different timbres depending on the OS.
+* **SVG:** Certain older browsers or built-in wallet webviews do not process complex CSS filters (`box-shadow`, transparency, advanced gradients) in the same way, destroying the visual coherence necessary for cross-verification.
+
+---
+
+## 4. Conclusions and Recommendations for Future Design
+
+The Cryptographic Mosaic is a revolutionary usability and security layer compared to traditional low-entropy identicons (like Jazzicons). However, to transition it to a robust production phase, we recommend the following evolution:
 
 ```
                             ┌────────────────────────────────┐
-                            │      Evolución Recomendada     │
+                            │      Recommended Evolution     │
                             └───────────────┬────────────────┘
                                             │
            ┌────────────────────────────────┼────────────────────────────────┐
            ▼                                ▼                                ▼
-  [ Posición Semianclada ]        [ Reducción de Ruido ]         [ Firmas Acústicas Discretas ]
-  - Anclaje siempre en centro.   - Paletas restringidas.        - Sonidos tipo timbre, no
-  - Solo barajar el borde.       - Evitar degradados sensibles.   arpegios largos.
+  [ Semi-Anchored Layout ]        [ Color Noise Reduction ]       [ Discrete Acoustic Signatures ]
+  - Anchor always in center.     - Restricted palettes.          - Chime-like sounds instead of
+  - Only shuffle the borders.    - Avoid sensitive gradients.      long arpeggios.
 ```
 
-1. **Estructura Semianclada (Layout Híbrido):**
-   * **Recomendación:** Mantener la celda de anclaje topológico **fija en el centro** (o en una posición predecible) y aplicar el barajado Fisher-Yates únicamente a las celdas periféricas. Esto proporciona al usuario una "ancla visual" constante inmediata, reduciendo el tiempo de escaneo visual.
-2. **Restricción de Paleta de Color (Cromática Discreta):**
-   * En lugar de permitir 360 tonos continuos HSL, mapear los tonos a **12 familias de colores altamente contrastadas y diferenciables** (como una rueda de color de 12 notas). Esto mitiga el impacto de los cambios de pantalla, el brillo y los filtros de luz azul nocturna.
-3. **Firmas de Audio Simplificadas:**
-   * Sustituir arpegios secuenciales largos por un **acorde trino simultáneo** de 1 segundo de duración máxima, complementado con vibración háptica en dispositivos móviles. Es mucho más fácil memorizar un "acorde característico" que una secuencia melódica temporal compleja.
+1. **Semi-Anchored Structure (Hybrid Layout):**
+   * **Recommendation:** Keep the topological anchor cell **fixed in the center** (or in a predictable location) and apply the Fisher-Yates shuffle only to the peripheral cells. This provides the user with an immediate, constant visual anchor, reducing visual scan time.
+2. **Color Palette Restriction (Discrete Chromatics):**
+   * Instead of allowing 360 continuous HSL hues, map the hues to **12 highly contrasted and distinguishable color families** (similar to a 12-note color wheel). This mitigates the impact of screen variations, brightness, and night-shift blue-light filters.
+3. **Simplified Audio Signatures:**
+   * Replace long sequential arpeggios with a **simultaneous 3-note chord** of 1 second maximum duration, complemented by haptic vibration on mobile devices. It is much easier to memorize a "characteristic chord" than a complex temporal melodic sequence.

@@ -1,12 +1,12 @@
 /**
- * Módulo Criptográfico Autónomo
- * Proporciona utilidades de hashing determinista usando la Web Crypto API nativa.
+ * Autonomous Cryptographic Module.
+ * Provides deterministic hashing utilities using the native Web Crypto API.
  */
 
 /**
- * Calcula el hash SHA-256 de una cadena de texto.
- * @param {string} text - La cadena a hashear.
- * @returns {Promise<Uint8Array>} Un array de 32 bytes representando el hash.
+ * Computes the SHA-256 hash of a string.
+ * @param {string} text - The string to hash.
+ * @returns {Promise<Uint8Array>} A 32-byte array representing the hash.
  */
 export async function sha256(text) {
   const encoder = new TextEncoder();
@@ -16,9 +16,9 @@ export async function sha256(text) {
 }
 
 /**
- * Convierte un Uint8Array de bytes a su representación en cadena Hexadecimal.
- * @param {Uint8Array} bytes - El array de bytes.
- * @returns {string} La cadena hexadecimal.
+ * Converts a Uint8Array of bytes into its Hexadecimal string representation.
+ * @param {Uint8Array} bytes - The byte array.
+ * @returns {string} The hexadecimal string.
  */
 export function bytesToHex(bytes) {
   return Array.from(bytes)
@@ -27,9 +27,9 @@ export function bytesToHex(bytes) {
 }
 
 /**
- * Convierte una cadena Hexadecimal a un Uint8Array de bytes.
- * @param {string} hex - La cadena hexadecimal (opcionalmente con prefijo 0x).
- * @returns {Uint8Array} El array de bytes.
+ * Converts a Hexadecimal string into a Uint8Array of bytes.
+ * @param {string} hex - The hexadecimal string (optionally starting with 0x).
+ * @returns {Uint8Array} The byte array.
  */
 export function hexToBytes(hex) {
   let cleanHex = hex.toLowerCase();

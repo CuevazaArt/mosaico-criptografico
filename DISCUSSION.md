@@ -1,88 +1,88 @@
-# Análisis de Seguridad, Integración y Vectores de Ataque
+# Security Analysis, Integration, and Attack Vectors
 
-Este documento aborda las preguntas clave sobre cómo desplegar **Mosaico Criptográfico** de manera nativa en el ecosistema Web3, asegurar su inalienabilidad frente a hacks del frontend y analizar rigurosamente su modelo de amenazas.
-
----
-
-## 1. Integración en Exchanges (CEX y DEX) para Proyectos y Tokens
-
-### El Problema en Exchanges
-En un DEX (ej. Uniswap, PancakeSwap) o CEX (ej. Binance, Coinbase), el listado de tokens se basa en nombres y símbolos (`USDT`, `PEPE`, `ETH`). Un estafador puede desplegar un contrato de token malicioso con el símbolo `USDT` e idéntica imagen PNG de logo. El usuario, buscando en la lista, no puede diferenciar el USDT legítimo del falso sin inspeccionar manualmente el hash del contrato, lo cual genera estafas diarias.
-
-### La Solución con Mosaicos Criptográficos
-1. **Visual Hash en el Token List (Registry):**
-   Las listas oficiales de tokens (Token Lists firmadas por CoinGecko, Uniswap o consorcios de gobernanza) deben incluir la representación del Mosaico Criptográfico derivado del contrato del token de forma obligatoria.
-2. **Swap Box Verification (Caja de Intercambio):**
-   Cuando el usuario ingresa un token personalizado o lo selecciona de la lista:
-   * El DEX calcula en caliente el mosaico del contrato inteligente activo.
-   * Muestra el mosaico al lado de la información del swap.
-   * Si es un token verificado, el mosaico coincidirá con el registrado oficialmente en el Consenso Visual. Un `USDT` falso producirá un mosaico caóticamente diferente en colores y distribución que alertará al usuario al instante.
-3. **Páginas de Info y Analíticas:**
-   Tanto en Etherscan como en portales de analíticas, el perfil de cada token debe tener su "Firma de Mosaico" oficial en la cabecera. El usuario aprende a identificar visualmente el proyecto legítimo como si fuera su logo dinámico.
+This document addresses key questions on how to deploy the **Cryptographic Mosaic** natively in the Web3 ecosystem, secure its integrity against frontend hacks, and rigorously analyze its threat model.
 
 ---
 
-## 2. Integración en Billeteras (Wallets) para Identidad Propia
+## 1. Integration in Exchanges (CEX and DEX) for Projects and Tokens
 
-Las wallets (ej. MetaMask, Phantom, Rainbow, Ledger) son la **última línea de defensa** de los fondos del usuario. Su integración debe estructurarse en dos áreas:
+### The Problem in Exchanges
+In a DEX (e.g., Uniswap, PancakeSwap) or CEX (e.g., Binance, Coinbase), token listings are based on names and symbols (`USDT`, `PEPE`, `ETH`). A scammer can deploy a malicious token contract with the symbol `USDT` and an identical PNG logo image. The user, searching the list, cannot differentiate the legitimate USDT from the fake without manually inspecting the contract hash, resulting in daily scams.
 
-### A. Reconocimiento de Identidades Propias (Mis Cuentas)
-* **Avatares de Cuenta:** En lugar de avatares pseudo-aleatorios estáticos (como Blockies o Jazzicons de posición fija), la wallet muestra el Mosaico Criptográfico de cada cuenta del usuario (Cuenta 1, Cuenta 2).
-* **Libreta de Contactos:** Al registrar una dirección conocida (ej. "Buzón de Binance", "Billetera Fría"), la wallet guarda el mosaico. 
-* **Prevención de Envenenamiento de Direcciones (Address Poisoning):** Los atacantes envían transferencias de 0 tokens desde direcciones que inician y terminan igual a la del usuario para que este la copie de su historial de transacciones. Con Mosaico Criptográfico, el historial mostraría una imagen visualmente dispar, delatando el ataque.
-
-### B. Flujo de Confirmación de Firma (Tx Signing)
-Cuando el usuario va a firmar una transacción o mensaje, el popup de la wallet debe renderizar de forma prominente:
-1. El **Mosaico de Origen** (su cuenta).
-2. Un indicador de flujo (flecha de envío).
-3. El **Mosaico de Destino** (derivado de la dirección a transferir).
-Si el destino coincide con un contacto registrado, se muestra el mosaico oficial guardado. Si el destino ha sido alterado por un virus de portapapeles, el usuario notará que el mosaico en pantalla no coincide con el de su contacto conocido.
-
----
-
-## 3. Integración Nativa de Forma Robusta e Inalienable
-
-Un hack XSS o una inyección de código malicioso en el sitio web de la dApp podría alterar el HTML para mostrar el mosaico del token legítimo mientras por debajo pasa la dirección del contrato del estafador en la transacción. Para evitar esto de forma inalienable:
-
-### 1. Validación en el Proceso de la Extensión (Aislamiento de Contexto)
-El renderizado del mosaico de confirmación final **nunca debe depender únicamente del sitio web**. 
-* La extensión de la billetera se ejecuta en un proceso de sandbox aislado del navegador.
-* El popup físico de la wallet o la pantalla física de una Hardware Wallet (ej. Ledger Stax) es el **único canal seguro inalterable** (What You See Is What You Sign). 
-* El usuario debe entrenar su hábito para contrastar que el mosaico mostrado por la dApp en la web coincide exactamente con el mosaico renderizado por su wallet segura antes de presionar "Firmar".
-
-### 2. Mosaicos SVG On-Chain (Blockchain Native)
-Para dApps y contratos inteligentes de gobernanza:
-* El contrato del proyecto puede incorporar un método de solo lectura `visualHash()` o almacenar el SVG del mosaico directamente en la blockchain (On-Chain Metadata).
-* El explorador de bloques y la wallet leen el SVG directamente desde los nodos RPC del validador de red, evitando depender de servidores web o bases de datos centralizadas propensas a manipulación DNS o hacks de frontend.
+### The Solution with Cryptographic Mosaics
+1. **Visual Hash in the Token List (Registry):**
+   Official token lists (Token Lists signed by CoinGecko, Uniswap, or governance consortia) must include the Cryptographic Mosaic representation derived from the token contract as a mandatory field.
+2. **Swap Box Verification:**
+   When the user enters a custom token or selects it from the list:
+   * The DEX calculates the mosaic of the active smart contract in real-time.
+   * It displays the mosaic next to the swap information box.
+   * If it is a verified token, the mosaic will match the officially registered one in the Visual Consensus. A fake `USDT` will produce a chaotically different mosaic in colors and distribution, alerting the user instantly.
+3. **Info and Analytics Pages:**
+   In both Etherscan and analytics portals, the profile of each token should feature its official "Mosaic Signature" in the header. The user learns to visually identify the legitimate project as if it were its dynamic logo.
 
 ---
 
-## 4. Vectores de Ataque y Análisis de Vulnerabilidades (Threat Model)
+## 2. Integration in Wallets for Self-Identity
 
-A continuación evaluamos los límites del método y cómo mitigamos los posibles vectores de ataque:
+Wallets (e.g., MetaMask, Phantom, Rainbow, Ledger) are the **last line of defense** for user funds. Their integration must be structured in two areas:
+
+### A. Recognition of Self-Identities (My Accounts)
+* **Account Avatars:** Instead of static pseudo-random avatars (like Blockies or fixed-position Jazzicons), the wallet displays the Cryptographic Mosaic of each user account (Account 1, Account 2).
+* **Contact Book:** When registering a known address (e.g., "Binance Deposit", "Cold Wallet"), the wallet saves the mosaic.
+* **Address Poisoning Prevention:** Attackers send transfers of 0 tokens from addresses that start and end identically to the user's address so that the user copies it from their transaction history by mistake. With the Cryptographic Mosaic, the history displays a visually disparate image, exposing the attack.
+
+### B. Transaction Signing Confirmation Flow
+When the user is about to sign a transaction or message, the wallet popup must prominently render:
+1. The **Source Mosaic** (their account).
+2. A flow indicator (send arrow).
+3. The **Destination Mosaic** (derived from the address to receive funds).
+If the destination matches a registered contact, the saved official mosaic is shown. If the destination has been altered by a clipboard virus, the user will notice that the mosaic on screen does not match their known contact.
+
+---
+
+## 3. Robust and Inalienable Native Integration
+
+An XSS hack or malicious code injection on the dApp website could alter the HTML to show the mosaic of the legitimate token while passing the scammer's contract address under the hood in the transaction. To prevent this inalienably:
+
+### 1. Validation in the Extension Process (Context Isolation)
+The rendering of the final confirmation mosaic **must never rely solely on the website**.
+* The wallet extension runs in a sandbox process isolated from the browser.
+* The physical popup of the wallet or the physical screen of a Hardware Wallet (e.g., Ledger Stax) is the **only secure, unalterable channel** (What You See Is What You Sign).
+* The user must train their habit to verify that the mosaic shown by the dApp on the webpage matches exactly the mosaic rendered by their secure wallet before clicking "Sign".
+
+### 2. On-Chain SVG Mosaics (Blockchain Native)
+For governance dApps and smart contracts:
+* The project's contract can incorporate a read-only `visualHash()` method or store the mosaic SVG directly on the blockchain (On-Chain Metadata).
+* The block explorer and wallet read the SVG directly from the network validator RPC nodes, avoiding reliance on web servers or centralized databases prone to DNS hijacking or frontend hacks.
+
+---
+
+## 4. Attack Vectors and Threat Model Analysis
+
+Below we evaluate the limits of the method and how we mitigate potential attack vectors:
 
 ```
 ┌─────────────────────────────────┬────────────────────────────────────────────────────────┐
-│ Vector de Ataque                │ Mitigación / Contramedida                              │
+│ Attack Vector                   │ Mitigation / Countermeasure                            │
 ├─────────────────────────────────┼────────────────────────────────────────────────────────┤
-│ 1. Colisión por Fuerza Bruta    │ Entropía masiva ($2^{160}$+ combinaciones cromáticas,    │
-│    (Vanity Address generation)  │ ordenamientos $9! \dots 25!$ y glifos geométricos).    │
+│ 1. Brute-Force Collision        │ Massive entropy ($2^{160}$+ chromatic combinations,     │
+│    (Vanity Address generation)  │ $9! \dots 25!$ layout orderings, and geometric glyphs). │
 ├─────────────────────────────────┼────────────────────────────────────────────────────────┤
-│ 2. Phishing Visual Subjetivo    │ Diseño por anclajes topológicos y subitización.        │
-│    (Semejanza visual limitada)  │ El cerebro detecta de inmediato el cambio de posición  │
-│                                 │ de una celda y el número de vértices discretos.        │
+│ 2. Subjective Visual Phishing   │ Design via topological anchors and subitizing.         │
+│    (Limited visual similarity)  │ The brain instantly detects the change in position of │
+│                                 │ a cell and the number of discrete vertices.            │
 ├─────────────────────────────────┼────────────────────────────────────────────────────────┤
-│ 3. Manipulación del DOM (XSS)   │ Contraste redundante con el popup aislado de la wallet  │
-│    en la dApp                   │ o confirmación en Hardware Wallet segura.              │
+│ 3. DOM Manipulation (XSS)       │ Redundant contrast with the isolated wallet popup      │
+│    in the dApp                  │ or confirmation on a secure Hardware Wallet.           │
 ├─────────────────────────────────┼────────────────────────────────────────────────────────┤
-│ 4. Ataque al Algoritmo Hash     │ Uso de SHA-256 estándar de la Web Crypto API nativa    │
-│    (Preimagen)                  │ con resistencia cuántica contra ataques de Grover.      │
+│ 4. Hash Algorithm Attack        │ Use of standard SHA-256 from the native Web Crypto API │
+│    (Preimage)                   │ with quantum resistance against Grover's attacks.      │
 └─────────────────────────────────┴────────────────────────────────────────────────────────┘
 ```
 
-### Detalle de Vulnerabilidad 2: Phishing Visual Subjetivo
-* **La Amenaza:** Un atacante astuto genera una dirección que comparte un tono de color similar y posiciona la estrella en la misma celda que el original, esperando que el usuario con fatiga visual o prisa no note las variaciones internas más pequeñas (como la orientación de las líneas de Truchet o el tipo de espiral).
-* **La Mitigación:** 
-  1. **Anclaje Topológico:** El conteo discreto de vértices (de 3 a 9) y puntos de satélite en la celda del anclaje son matemáticamente rígidos y no difuminables por variaciones de tono.
-  2. **Overlay Criptográfico:** La inclusión de la barra inferior con texto legible (`0x71c8...3a9`) actúa como confirmación redundante.
-  3. **Escalado de Grilla:** Toggling de grillas a 4x4 o 5x5. En estas configuraciones, el barajado coloca la celda de anclaje en una de 16 o 25 posiciones posibles, haciendo que una similitud estructural accidental sea matemáticamente inviable de lograr para el atacante.
+### Detail of Vulnerability 2: Subjective Visual Phishing
+* **The Threat:** A clever attacker generates an address that shares a similar color tone and positions the star in the same cell as the original, expecting that a user with visual fatigue or in a hurry will not notice smaller internal variations (like the orientation of Truchet lines or the spiral type).
+* **The Mitigation:**
+  1. **Topological Anchor:** The discrete vertex count (3 to 9) and satellite dots in the anchor cell are mathematically rigid and cannot be blurred by tone variations.
+  2. **Cryptographic Overlay:** The inclusion of the bottom bar with readable text (`0x71c8...3a9`) acts as a redundant confirmation.
+  3. **Grid Scaling:** Toggling grids to 4x4 or 5x5. In these configurations, shuffling places the anchor cell in one of 16 or 25 possible positions, making accidental structural similarity mathematically infeasible for the attacker to achieve.

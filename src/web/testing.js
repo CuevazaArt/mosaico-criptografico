@@ -1,11 +1,11 @@
 /**
- * Módulo de Pruebas Cognitivas
- * Gestiona la simulación de ataques de suplantación (phishing) y mide el rendimiento visual humano.
+ * Cognitive Testing Module.
+ * Manages the spoofing (phishing) simulation and measures human visual performance.
  */
 
 /**
- * Genera una dirección criptográfica falsa (tipo Ethereum/EVM) de forma aleatoria.
- * @returns {string} Dirección hexadecimal ficticia de 42 caracteres.
+ * Generates a mock cryptographic address (Ethereum/EVM style) randomly.
+ * @returns {string} Fictional 42-character hexadecimal address.
  */
 export function generateRandomAddress() {
   const chars = '0123456789abcdef';
@@ -17,15 +17,15 @@ export function generateRandomAddress() {
 }
 
 /**
- * Muta una dirección existente para simular un ataque de phishing (suplantación).
- * Mantiene intactos el prefijo 0x y los primeros/últimos caracteres, variando la parte intermedia.
- * @param {string} address - La dirección original a clonar.
- * @param {number} level - Nivel de dificultad (cuántos caracteres cambian en el medio).
- * @returns {string} Dirección mutada.
+ * Mutates an existing address to simulate a phishing (spoofing) attack.
+ * Keeps the '0x' prefix and the first/last characters intact, varying the middle section.
+ * @param {string} address - The original address to clone.
+ * @param {number} level - Difficulty level (how many characters change in the middle).
+ * @returns {string} Mutated address.
  */
 export function generateSimilarAddress(address, level = 2) {
   if (!address.startsWith('0x') || address.length < 15) {
-    // Si no es dirección estándar, mutar texto de forma genérica
+    // If not standard address, mutate text generically
     const arr = address.split('');
     const pos = Math.floor(Math.random() * (arr.length - 2)) + 1;
     arr[pos] = String.fromCharCode(arr[pos].charCodeAt(0) + 1);
@@ -33,11 +33,11 @@ export function generateSimilarAddress(address, level = 2) {
   }
 
   const hexChars = '0123456789abcdef';
-  const prefix = address.substring(0, 7); // Mantiene "0x" y 5 caracteres
-  const suffix = address.substring(address.length - 4); // Mantiene los últimos 4
+  const prefix = address.substring(0, 7); // Keeps "0x" and 5 characters
+  const suffix = address.substring(address.length - 4); // Keeps the last 4 characters
   const middle = address.substring(7, address.length - 4).split('');
 
-  // Mutar 'level' cantidad de caracteres aleatorios en la parte media
+  // Mutate 'level' amount of random characters in the middle section
   for (let i = 0; i < level; i++) {
     const idxToMutate = Math.floor(Math.random() * middle.length);
     let newChar;
@@ -51,7 +51,7 @@ export function generateSimilarAddress(address, level = 2) {
 }
 
 /**
- * Mezcla (shuffle) un array en su lugar (algoritmo Fisher-Yates).
+ * Shuffles an array in place (Fisher-Yates algorithm).
  */
 function shuffleArray(array) {
   for (let i = array.length - 1; i > 0; i--) {
@@ -62,7 +62,7 @@ function shuffleArray(array) {
 }
 
 /**
- * Clase que controla una sesión de juego/prueba cognitiva local.
+ * Class controlling a local cognitive test/game session.
  */
 export class CognitiveTestSession {
   constructor() {
@@ -87,7 +87,7 @@ export class CognitiveTestSession {
         this.currentStreak = parseInt(storedStreak) || 0;
       }
     } catch (e) {
-      console.warn("No se pudo cargar historial de localStorage:", e);
+      console.warn("Could not load history from localStorage:", e);
     }
   }
 
@@ -96,33 +96,33 @@ export class CognitiveTestSession {
       localStorage.setItem('mosaico_game_trials', JSON.stringify(this.trials));
       localStorage.setItem('mosaico_game_streak', this.currentStreak.toString());
     } catch (e) {
-      console.warn("No se pudo guardar historial en localStorage:", e);
+      console.warn("Could not save history to localStorage:", e);
     }
   }
 
   /**
-   * Inicia una nueva ronda de prueba.
-   * @param {string} mode - El modo de renderizado visual ('harmonious' | 'chaotic').
-   * @returns {Object} Datos de la prueba para pintar en el frontend.
+   * Starts a new test round.
+   * @param {string} mode - The visual rendering mode ('harmonious' | 'chaotic').
+   * @returns {Object} Test data to render in the frontend.
    */
   startNewTrial(mode) {
     this.currentMode = mode === 'chaotic' ? 'chaotic' : 'harmonious';
     this.targetAddress = generateRandomAddress();
     
-    // Generar 5 direcciones maliciosas similares
+    // Generate 5 similar malicious addresses
     const fakeAddresses = [];
     for (let i = 0; i < 5; i++) {
-      // Dificultades variadas (mutaciones de 1 a 3 caracteres)
+      // Varied difficulty (mutations of 1 to 3 characters)
       const diffLevel = 1 + (i % 3); 
       let fakeAddr;
-      // Asegurarse de que no sea idéntica a la real u otra falsa
+      // Ensure it is not identical to the real or other fake addresses
       do {
         fakeAddr = generateSimilarAddress(this.targetAddress, diffLevel);
       } while (fakeAddr === this.targetAddress || fakeAddresses.includes(fakeAddr));
       fakeAddresses.push(fakeAddr);
     }
 
-    // Unir la real con las falsas y mezclarlas
+    // Join real with fake addresses and shuffle them
     this.options = [this.targetAddress, ...fakeAddresses];
     shuffleArray(this.options);
     
@@ -136,9 +136,9 @@ export class CognitiveTestSession {
   }
 
   /**
-   * Envía la respuesta del usuario para validación.
-   * @param {string} selectedAddress - La dirección seleccionada por el usuario.
-   * @returns {Object} Resultado de la ronda.
+   * Submits the user's answer for validation.
+   * @param {string} selectedAddress - The address selected by the user.
+   * @returns {Object} Round result.
    */
   submitAnswer(selectedAddress) {
     if (!this.startTime) return null;
@@ -148,7 +148,7 @@ export class CognitiveTestSession {
     const isCorrect = (selectedAddress === this.targetAddress);
     const timeTakenSec = timeTakenMs / 1000;
 
-    // Actualizar racha y tiempos de la racha actual
+    // Update streak and current streak times
     if (isCorrect) {
       this.currentStreak++;
       this.streakTimes.push(timeTakenSec);
@@ -157,16 +157,16 @@ export class CognitiveTestSession {
       this.streakTimes = [];
     }
 
-    // Guardar registro
+    // Save record
     const trialRecord = {
       mode: this.currentMode,
-      time: timeTakenSec, // en segundos
+      time: timeTakenSec, // in seconds
       correct: isCorrect,
       timestamp: Date.now()
     };
     
     this.trials.push(trialRecord);
-    this.startTime = null; // Reiniciar timer
+    this.startTime = null; // Reset timer
     this.saveToStorage();
 
     return {
@@ -176,7 +176,7 @@ export class CognitiveTestSession {
   }
 
   /**
-   * Calcula y devuelve las estadísticas agregadas por modo.
+   * Calculates and returns aggregated statistics by mode.
    */
   getStats() {
     const stats = {
@@ -204,7 +204,7 @@ export class CognitiveTestSession {
       };
     };
 
-    // Calcular promedio de la racha perfecta si es >= 5
+    // Calculate perfect streak average if >= 5
     let avgStreakTime = null;
     if (this.streakTimes.length >= 5) {
       const sum = this.streakTimes.reduce((a, b) => a + b, 0);
@@ -221,7 +221,7 @@ export class CognitiveTestSession {
   }
 
   /**
-   * Borra el historial de pruebas.
+   * Clears the test history.
    */
   clearHistory() {
     this.trials = [];
@@ -231,7 +231,7 @@ export class CognitiveTestSession {
       localStorage.removeItem('mosaico_game_trials');
       localStorage.removeItem('mosaico_game_streak');
     } catch (e) {
-      console.warn("No se pudo limpiar localStorage:", e);
+      console.warn("Could not clear localStorage:", e);
     }
   }
 }

@@ -1,17 +1,17 @@
-# Guía de Integración y Propuesta de Estándar: "Llavero Mnemónico"
+# Integration Guide and Standards Proposal: "Mnemonic Keyring"
 
-Este documento explica cómo integrar **Mosaico Criptográfico** en proyectos existentes (dApps, billeteras, extensiones) y detalla la propuesta para establecerlo como un estándar nativo de la industria para la validación de claves y firmas.
+This document explains how to integrate the **Cryptographic Mosaic** into existing projects (dApps, wallets, extensions) and details the proposal to establish it as an industry-standard native validation protocol for keys and signatures.
 
 ---
 
-## 1. Integración en Proyectos Existentes
+## 1. Integration in Existing Projects
 
-Mosaico Criptográfico es una librería pura de JavaScript, libre de dependencias externas (Zero-Dependency) y autónoma (Client-Side). Esto hace que su integración en plataformas actuales sea sumamente sencilla.
+The Cryptographic Mosaic is a pure JavaScript library, free of external dependencies (Zero-Dependency) and entirely client-side (Client-Side). This makes its integration into existing platforms extremely simple.
 
-### A. Aplicaciones Web (React, Vue, Svelte, Angular)
-Puedes integrar el motor de renderizado como un componente reutilizable. 
+### A. Web Applications (React, Vue, Svelte, Angular)
+You can integrate the rendering engine as a reusable component.
 
-#### Ejemplo de Componente en React:
+#### React Component Example:
 ```jsx
 import React, { useEffect, useState } from 'react';
 import { sha256 } from './core/crypto.js';
@@ -27,7 +27,7 @@ export function MnemonicBadge({ address, gridSize = 3, chaoticMode = false }) {
       const svg = generateSvg(hash, address, {
         gridSize,
         chaoticMode,
-        showOverlay: false, // Ocultar overlay en avatares pequeños
+        showOverlay: false, // Hide overlay on small avatars
         showAnchors: true
       });
       setSvgMarkup(svg);
@@ -45,52 +45,52 @@ export function MnemonicBadge({ address, gridSize = 3, chaoticMode = false }) {
 }
 ```
 
-### B. Extensiones de Navegador (Brave, Chrome, Firefox)
-Una extensión de navegador puede actuar como una **capa intermedia de validación segura (Zero-Trust Overlay)**:
-1. **Inyección en el DOM:** Un *Content Script* escanea las páginas Web3 comunes (Uniswap, Etherscan) en busca de strings con patrones hexadecimales de claves públicas o contratos.
-2. **Overlay Visual:** Inserta el componente `MnemonicBadge` justo al lado de la dirección de forma flotante.
-3. **Seguridad contra Webs Hackeadas:** Al ser inyectado directamente por la extensión segura del usuario, el atacante de la web no puede alterar la imagen del mosaico sin que la extensión muestre la discrepancia con el hash real.
+### B. Browser Extensions (Brave, Chrome, Firefox)
+A browser extension can act as an **isolated, secure validation layer (Zero-Trust Overlay)**:
+1. **DOM Injection:** A *Content Script* scans common Web3 pages (Uniswap, Etherscan) searching for hexadecimal string patterns matching public keys or contract addresses.
+2. **Visual Overlay:** Inserts the `MnemonicBadge` component right next to the address in a floating banner.
+3. **Defense Against Hacked Websites:** Since it is injected directly by the user's secure browser extension, a malicious website cannot alter the mosaic image without the extension revealing the discrepancy with the actual transaction hash.
 
-### C. Aplicaciones Móviles (React Native, Flutter, Swift, Kotlin)
-* **React Native:** Se integra renderizando el string SVG usando la biblioteca `react-native-svg` (`<SvgXml xml={svgMarkup} />`).
-* **Flutter o Código Nativo:** Al ser una especificación matemática abierta, las fórmulas y coordenadas de generación en `generator.js` pueden ser fácilmente traducidas a lienzos nativos (Canvas en Android/SwiftUI en iOS) en menos de 400 líneas de código, garantizando un renderizado de alto rendimiento sin Webviews.
+### C. Mobile Applications (React Native, Flutter, Swift, Kotlin)
+* **React Native:** Integrates by rendering the SVG string using the `react-native-svg` library (`<SvgXml xml={svgMarkup} />`).
+* **Flutter or Native Code:** As an open mathematical specification, the drawing formulas and coordinate systems in `generator.js` can be easily translated to native canvas primitives (Canvas in Android/SwiftUI in iOS) in under 400 lines of code, ensuring high-performance native rendering without Webviews.
 
 ---
 
-## 2. Propuesta de Estándar Futuro: "Llavero Mnemónico Nativo"
+## 2. Standards Proposal: "Native Mnemonic Keyring"
 
-Para que esta herramienta sea verdaderamente universal y confiable, no debe depender de una sola dApp. Debe promoverse como un **Estándar de Mejora (como un EIP en Ethereum o BIP en Bitcoin)**.
+For this tool to become universally trusted and consistent, it should not rely on a single dApp. It should be promoted as an **Improvement Proposal (similar to an EIP on Ethereum or BIP on Bitcoin)**.
 
 ```
                   ┌──────────────────────────────────────────────┐
-                  │   Propuesta ERC: Visual Hash Specification   │
+                  │   ERC Proposal: Visual Hash Specification    │
                   └──────────────────────┬───────────────────────┘
                                          │
                  ┌───────────────────────┴───────────────────────┐
                  ▼                                               ▼
-   [ Billeteras (Wallets) ]                         [ Exploradores de Bloques ]
- - Mosaico en pantallas de firma                  - Mosaico al lado del contrato
- - Mosaico en el seed backup                      - Validación visual de tokens
+     [ Wallets Integration ]                         [ Block Explorers ]
+  - Mosaic on signature screens                    - Mosaic next to contract address
+  - Mosaic on seed backups                         - Visual token validation
 ```
 
-### 1. Creación de una Propuesta EIP/ERC (Visual Hash Standard)
-Proponemos registrar un ERC bajo el título: **"Especificación de Hash Visual para Direcciones Blockchain"**.
-* **Objetivo:** Definir matemáticamente el algoritmo del mosaico: cómo se dividen los bytes del hash, cómo se ejecuta el barajado Fisher-Yates, y las coordenadas exactas de dibujo de los 9 tipos de celdas.
-* **Resultado:** Al ser un estándar, **cualquier** billetera (MetaMask, Ledger, Trezor) o explorador de bloques (Etherscan, Solscan) que implemente la especificación mostrará **exactamente la misma imagen** para una dirección dada, creando un lenguaje visual universal para las identidades criptográficas.
+### 1. Creation of an EIP/ERC Proposal (Visual Hash Standard)
+We propose registering an ERC titled: **"Visual Hash Specification for Blockchain Addresses"**.
+* **Goal:** Mathematically define the mosaic algorithm: how the hash bytes are split, how the Fisher-Yates shuffle is executed, and the exact drawing coordinates for the 9 cell types.
+* **Outcome:** As a standard, **any** wallet (MetaMask, Ledger, Trezor) or block explorer (Etherscan, Solscan) implementing the specification will render **exactly the same image** for any given address, creating a universal visual language for cryptographic identities.
 
-### 2. El Mosaico como "Seed Backup" Visual
-Actualmente, las billeteras obligan a los usuarios a escribir 12 o 24 palabras en papel para respaldar sus claves privadas.
-* **El Problema:** El usuario puede transponer palabras o cometer errores ortográficos sin darse cuenta hasta que intenta recuperar la cuenta.
-* **Propuesta "Llavero Mnemónico":** Al crear la cuenta, el monedero muestra un Mosaico 5x5 dinámico e inmutable derivado de la clave privada/semilla.
-* **Comprobación Mnemónica:** Cuando el usuario reintroduce las palabras para verificar el backup, el monedero renderiza el mosaico en tiempo real. Si el usuario cometió un solo error de palabra, **el mosaico resultante será drásticamente diferente**, alertándolo de forma inmediata visualmente antes de dar por válido el papel de respaldo.
+### 2. The Mosaic as a Visual "Seed Backup"
+Currently, wallets force users to write down 12 or 24 words on paper to back up their private keys.
+* **The Problem:** Users can transpose words or make spelling errors without noticing until they attempt to restore the account.
+* **Mnemonic Keyring Proposal:** Upon account creation, the wallet displays a dynamic and immutable 5x5 mosaic derived from the private key/seed.
+* **Mnemonic Verification:** When the user re-enters the words to verify the backup, the wallet renders the mosaic in real-time. If the user made a single word spelling error, **the resulting mosaic will be drastically different**, alerting them visually and immediately before validating the backup copy.
 
-### 3. API Web3 Nativa (`window.ethereum`)
-Proponer que el proveedor Web3 inyectado en el navegador exponga nativamente la representación visual del usuario:
+### 3. Native Web3 API (`window.ethereum`)
+We propose that the Web3 provider injected into the browser natively exposes the user's visual identity representation:
 ```javascript
-// Obtener el mosaico oficial de la cuenta activa del usuario directamente de la wallet
+// Retrieve the official mosaic of the user's active account directly from the secure wallet
 const userVisualHash = await window.ethereum.request({
   method: 'eth_getMnemonicVisual',
   params: [address, { gridSize: 3 }]
 });
 ```
-Esto permite que cualquier sitio web consuma y renderice el mosaico oficial del usuario directamente desde la billetera segura, reforzando la confianza y consistencia visual en todo el ecosistema.
+This enables any website to consume and render the user's official mosaic directly from the secure wallet, reinforcing visual trust and consistency across the ecosystem.

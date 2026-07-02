@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert';
 import crypto from 'node:crypto';
 
-// Asegurar compatibilidad de la Web Crypto API en entornos de Node.js donde globalThis.crypto no esté expuesto
+// Ensure Web Crypto API compatibility in Node.js environments where globalThis.crypto is not exposed
 if (typeof globalThis.crypto === 'undefined' || !globalThis.crypto.subtle) {
   globalThis.crypto = crypto;
 }
@@ -10,7 +10,7 @@ if (typeof globalThis.crypto === 'undefined' || !globalThis.crypto.subtle) {
 import { sha256, bytesToHex, hexToBytes } from '../src/core/crypto.js';
 import { generateSvg } from '../src/core/generator.js';
 
-test('Módulo Criptográfico - bytesToHex y hexToBytes', () => {
+test('Cryptographic Module - bytesToHex and hexToBytes', () => {
   const bytes = new Uint8Array([0, 15, 255, 128]);
   const hex = bytesToHex(bytes);
   assert.strictEqual(hex, '000fff80');
@@ -19,14 +19,14 @@ test('Módulo Criptográfico - bytesToHex y hexToBytes', () => {
   assert.deepStrictEqual(parsedBytes, bytes);
 });
 
-test('Módulo Criptográfico - hexToBytes soporta prefijo 0x y case-insensitivity', () => {
+test('Cryptographic Module - hexToBytes supports 0x prefix and case-insensitivity', () => {
   const bytes1 = hexToBytes('0xABcdEF');
   const bytes2 = hexToBytes('abcdef');
   assert.deepStrictEqual(bytes1, bytes2);
   assert.deepStrictEqual(bytes1, new Uint8Array([171, 205, 239]));
 });
 
-test('Módulo Criptográfico - sha256 calcula hash de 32 bytes de forma determinista', async () => {
+test('Cryptographic Module - sha256 computes a 32-byte hash deterministically', async () => {
   const text = 'rP1p...g2y';
   const hash1 = await sha256(text);
   const hash2 = await sha256(text);
@@ -35,16 +35,16 @@ test('Módulo Criptográfico - sha256 calcula hash de 32 bytes de forma determin
   assert.deepStrictEqual(hash1, hash2);
   
   const hexHash = bytesToHex(hash1);
-  // Hash SHA-256 de 'rP1p...g2y'
+  // SHA-256 hash of 'rP1p...g2y'
   assert.strictEqual(typeof hexHash, 'string');
   assert.strictEqual(hexHash.length, 64);
 });
 
-test('Motor de Renderizado SVG - Generación de mosaico deterministicamente', async () => {
+test('SVG Rendering Engine - Generates mosaic deterministically', async () => {
   const address = 'rP1p3p23jW2s12as3k';
   const hash = await sha256(address);
   
-  // Generar SVG con opciones por defecto (gridSize 3)
+  // Generate SVG with default options (gridSize 3)
   const svgDefault = generateSvg(hash, address);
   assert.ok(svgDefault.startsWith('<svg'));
   assert.ok(svgDefault.endsWith('</svg>'));
@@ -52,15 +52,15 @@ test('Motor de Renderizado SVG - Generación de mosaico deterministicamente', as
   assert.ok(svgDefault.includes(address.substring(0, 6).toUpperCase()));
   assert.ok(svgDefault.includes(address.substring(address.length - 4).toUpperCase()));
 
-  // Comprobar determinismo: el mismo hash debe producir el mismo SVG
+  // Test determinism: the same hash must produce the identical SVG
   const svgSame = generateSvg(hash, address);
   assert.strictEqual(svgDefault, svgSame);
 
-  // Generar SVG con gridSize 4
+  // Generate SVG with gridSize 4
   const svg4x4 = generateSvg(hash, address, { gridSize: 4 });
-  assert.ok(svg4x4.includes('scale(0.75)')); // Factor de escala para 4x4 es 75 / 100
+  assert.ok(svg4x4.includes('scale(0.75)')); // Scale factor for 4x4 is 75 / 100
 
-  // Generar SVG en modo caótico
+  // Generate SVG in chaotic mode
   const svgChaotic = generateSvg(hash, address, { chaoticMode: true });
   assert.ok(svgChaotic.includes('<svg'));
 });

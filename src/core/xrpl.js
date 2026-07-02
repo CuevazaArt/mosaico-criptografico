@@ -1,7 +1,7 @@
 /**
- * Módulo de integración con XRP Ledger.
- * Proporciona métodos para registrar y verificar llaveros mosaico on-chain
- * mediante el estándar XLS-20 (NFTs), con redundancia de red y soporte no custodio.
+ * XRP Ledger integration module.
+ * Provides methods to register and verify mosaic keys on-chain
+ * using the XLS-20 standard (NFTs), with network redundancy and non-custodial support.
  */
 
 const NETWORKS = {
@@ -18,13 +18,13 @@ const NETWORKS = {
   ]
 };
 
-const NFT_TAXON_MOSAICO = 1001; // Taxón oficial reservado para identidades Mosaico Criptográfico
+const NFT_TAXON_MOSAICO = 1001; // Official taxon reserved for Cryptographic Mosaic identities
 
 let clientInstance = null;
 let currentNetwork = 'testnet'; // 'testnet' | 'mainnet'
 
 /**
- * Configurar la red activa para las operaciones de XRPL.
+ * Configure the active network for XRPL operations.
  */
 export function setXrplNetwork(network) {
   if (network === 'mainnet' || network === 'testnet') {
@@ -36,19 +36,19 @@ export function setXrplNetwork(network) {
 }
 
 /**
- * Obtener la red activa.
+ * Get the active network.
  */
 export function getXrplNetwork() {
   return currentNetwork;
 }
 
 /**
- * Obtener o inicializar la instancia conectada del cliente de XRPL con tolerancia a fallos.
- * Intenta conectar a los nodos configurados en orden secuencial en caso de error.
+ * Get or initialize the connected XRPL client instance with fault tolerance.
+ * Tries connecting to the configured nodes in sequential order in case of error.
  */
 export async function getXrplClient(logger = console.log) {
   if (typeof window.xrpl === 'undefined') {
-    throw new Error("El SDK de XRPL no se ha cargado correctamente en la ventana.");
+    throw new Error("XRPL SDK has not loaded correctly in the window.");
   }
 
   if (clientInstance && clientInstance.isConnected()) {
@@ -60,57 +60,57 @@ export async function getXrplClient(logger = console.log) {
   
   for (const node of nodes) {
     try {
-      logger(`[red] Conectando con nodo ${netName} (${node})...`);
+      logger(`[red] Connecting to node ${netName} (${node})...`);
       clientInstance = new window.xrpl.Client(node);
       
-      // Manejar desconexiones inesperadas para limpiar el cliente
+      // Handle unexpected disconnections to clean up the client
       clientInstance.on('disconnected', (code) => {
-        logger(`[red] Conexión cerrada con nodo XRPL. Código: ${code}`);
+        logger(`[red] Closed connection with XRPL node. Code: ${code}`);
         clientInstance = null;
       });
 
       await clientInstance.connect();
-      logger(`[red] ¡Conexión establecida con XRPL ${netName}!`);
+      logger(`[red] Connection established with XRPL ${netName}!`);
       return clientInstance;
     } catch (err) {
-      logger(`[red] Error de conexión en ${node}: ${err.message}. Probando siguiente nodo...`);
+      logger(`[red] Connection error on ${node}: ${err.message}. Trying next node...`);
       clientInstance = null;
     }
   }
 
-  throw new Error(`No se pudo conectar a ningún nodo de la red ${netName}.`);
+  throw new Error(`Could not connect to any node on the ${netName} network.`);
 }
 
 /**
- * Desconectar la conexión activa de XRPL si existe.
+ * Disconnect the active XRPL connection if it exists.
  */
 export async function disconnectXrpl() {
   if (clientInstance && clientInstance.isConnected()) {
     try {
       await clientInstance.disconnect();
     } catch (e) {
-      // Ignorar fallas al cerrar
+      // Ignore failures on close
     }
   }
   clientInstance = null;
 }
 
 /**
- * Genera y fondea una nueva cuenta (billetera) de prueba usando el Faucet oficial de XRPL Testnet.
+ * Generates and funds a new test account (wallet) using the official XRPL Testnet Faucet.
  */
 export async function generateFaucetWallet(logger = console.log) {
   if (currentNetwork === 'mainnet') {
-    throw new Error("La generación automática de billeteras con Faucet no está disponible en Mainnet. Debes importar una billetera con saldo existente.");
+    throw new Error("Automatic wallet generation with Faucet is not available on Mainnet. You must import an existing wallet with balance.");
   }
 
   const client = await getXrplClient(logger);
-  logger("[red] Solicitando fondos del Faucet de XRPL Testnet...");
+  logger("[red] Requesting funds from XRPL Testnet Faucet...");
   
-  // fundWallet genera y fondea automáticamente con ~400 XRP en Testnet
+  // fundWallet automatically generates and funds with ~400 XRP in Testnet
   const { wallet, balance } = await client.fundWallet();
   
-  logger(`[red] ¡Cuenta creada! Dirección: ${wallet.address}`);
-  logger(`[red] Saldo inicial: ${balance} XRP`);
+  logger(`[red] Account created! Address: ${wallet.address}`);
+  logger(`[red] Initial balance: ${balance} XRP`);
   return {
     address: wallet.address,
     seed: wallet.seed,
@@ -119,65 +119,65 @@ export async function generateFaucetWallet(logger = console.log) {
 }
 
 /**
- * Conecta una billetera no custodia externa del usuario y devuelve su dirección pública.
+ * Connects an external non-custodial wallet of the user and returns its public address.
  */
 export async function connectWallet(walletType, logger = console.log) {
   if (walletType === 'gem') {
     if (typeof window.GemWallet === 'undefined') {
-      throw new Error("Gem Wallet no está instalada o no es accesible en este navegador.");
+      throw new Error("Gem Wallet is not installed or not accessible in this browser.");
     }
-    logger("[red] Conectando con Gem Wallet...");
+    logger("[red] Connecting to Gem Wallet...");
     const response = await window.GemWallet.getAddress();
     if (!response || !response.result || !response.result.address) {
-      throw new Error("El usuario rechazó la conexión o no se obtuvo dirección.");
+      throw new Error("User rejected connection or no address was returned.");
     }
-    logger(`[red] Gem Wallet conectada: ${response.result.address}`);
+    logger(`[red] Gem Wallet connected: ${response.result.address}`);
     return response.result.address;
   } else if (walletType === 'crossmark') {
     if (typeof window.crossmark === 'undefined') {
-      throw new Error("Crossmark no está instalada o no es accesible en este navegador.");
+      throw new Error("Crossmark is not installed or not accessible in this browser.");
     }
-    logger("[red] Conectando con Crossmark...");
+    logger("[red] Connecting to Crossmark...");
     let address = window.crossmark.address;
     if (!address) {
       const response = await window.crossmark.signIn();
       address = response.address;
     }
     if (!address) {
-      throw new Error("El usuario rechazó la conexión o no se obtuvo dirección.");
+      throw new Error("User rejected connection or no address was returned.");
     }
-    logger(`[red] Crossmark conectada: ${address}`);
+    logger(`[red] Crossmark connected: ${address}`);
     return address;
   } else if (walletType === 'xaman') {
-    logger("[red] Conectando con Xaman (Xumm)...");
+    logger("[red] Connecting to Xaman (Xumm)...");
     
-    // Si la librería cliente Xumm está disponible e inicializada
+    // If the Xumm client library is available and initialized
     if (window.xumm && typeof window.xumm.authorize === 'function') {
       const state = await window.xumm.authorize();
       if (state && state.me && state.me.account) {
-        logger(`[red] Xaman conectada: ${state.me.account}`);
+        logger(`[red] Xaman connected: ${state.me.account}`);
         return state.me.account;
       }
     }
     
-    // Simulación del SDK de Xaman para la dApp si no hay API Key activa en local
+    // Xaman SDK simulation for local dApp demo if no active API Key
     const mockAddress = "rMOCKxamanAddressMainnetActive123";
-    logger(`[red] [Demo Xaman] Conectada dirección simulada: ${mockAddress}`);
+    logger(`[red] [Xaman Demo] Connected mocked address: ${mockAddress}`);
     return mockAddress;
   }
-  throw new Error("Tipo de billetera no soportado.");
+  throw new Error("Unsupported wallet type.");
 }
 
 /**
- * Acuña (mints) un Soulbound NFT (no transferible) XLS-20 en la blockchain de XRPL.
- * Esto valida la dirección como poseedora de su propio llavero mosaico oficial.
+ * Mints an XLS-20 Soulbound NFT (non-transferable) on the XRPL blockchain.
+ * This validates the address as owning its official mosaic key.
  */
 export async function registerMnemonicNft(seed, logger = console.log) {
   const client = await getXrplClient(logger);
   const wallet = window.xrpl.Wallet.fromSeed(seed);
   
-  logger(`[red] Preparando registro para: ${wallet.address}`);
-  logger("[red] Creando transacción NFTokenMint...");
+  logger(`[red] Preparing registration for: ${wallet.address}`);
+  logger("[red] Creating NFTokenMint transaction...");
 
   const uriHex = window.xrpl.convertStringToHex(`mosaico://identity/${wallet.address}`);
 
@@ -189,22 +189,22 @@ export async function registerMnemonicNft(seed, logger = console.log) {
     URI: uriHex
   };
 
-  logger("[red] Enviando transacción al ledger y esperando validación...");
+  logger("[red] Submitting transaction to the ledger and waiting for validation...");
   const response = await client.submitAndWait(txJson, { wallet });
   
   if (response.result.meta.TransactionResult === "tesSUCCESS") {
-    logger(`[red] ¡Llavero registrado con éxito! Hash de Tx: ${response.result.hash}`);
+    logger(`[red] Mosaic key successfully registered! Tx Hash: ${response.result.hash}`);
     return {
       success: true,
       hash: response.result.hash
     };
   } else {
-    throw new Error(`Error en el ledger: ${response.result.meta.TransactionResult}`);
+    throw new Error(`Ledger error: ${response.result.meta.TransactionResult}`);
   }
 }
 
 /**
- * Acuña un Soulbound NFT de identidad mediante una billetera no custodia conectada.
+ * Mints an identity Soulbound NFT using a connected non-custodial wallet.
  */
 export async function registerMnemonicNftNonCustodial(address, walletType, logger = console.log) {
   const client = await getXrplClient(logger);
@@ -218,53 +218,53 @@ export async function registerMnemonicNftNonCustodial(address, walletType, logge
     URI: uriHex
   };
 
-  logger(`[red] Preparando registro para: ${address} usando ${walletType}...`);
-  logger("[red] Enviando transacción a tu billetera para firmar...");
+  logger(`[red] Preparing registration for: ${address} using ${walletType}...`);
+  logger("[red] Sending transaction to your wallet to sign...");
 
   if (walletType === 'gem') {
     const response = await window.GemWallet.signAndSubmitTransaction({ transaction: txJson });
     if (response && response.result && response.result.hash) {
-      logger(`[red] ¡Llavero registrado con Gem Wallet! Hash de Tx: ${response.result.hash}`);
+      logger(`[red] Mosaic key registered with Gem Wallet! Tx Hash: ${response.result.hash}`);
       return { success: true, hash: response.result.hash };
     } else {
-      throw new Error("Transacción cancelada o fallida en Gem Wallet.");
+      throw new Error("Transaction cancelled or failed in Gem Wallet.");
     }
   } else if (walletType === 'crossmark') {
     const response = await window.crossmark.signAndSubmitAndWait(txJson);
     const hash = response.result?.hash || response.hash;
     if (hash) {
-      logger(`[red] ¡Llavero registrado con Crossmark! Hash de Tx: ${hash}`);
+      logger(`[red] Mosaic key registered with Crossmark! Tx Hash: ${hash}`);
       return { success: true, hash: hash };
     } else {
-      throw new Error("Transacción cancelada o fallida en Crossmark.");
+      throw new Error("Transaction cancelled or failed in Crossmark.");
     }
   } else if (walletType === 'xaman') {
-    logger("[red] Creando solicitud de firma en Xaman (Xumm)...");
+    logger("[red] Creating signing request in Xaman (Xumm)...");
     
-    // Si la librería cliente Xumm está disponible e inicializada
+    // If the Xumm client library is available and initialized
     if (window.xumm && typeof window.xumm.payload === 'object') {
       const payload = await window.xumm.payload.create({
         txjson: txJson
       });
       if (payload && payload.next && payload.next.always) {
-        logger(`[red] Payload de firma creado. Redirigiendo a Xaman: ${payload.next.always}`);
+        logger(`[red] Signing payload created. Redirecting to Xaman: ${payload.next.always}`);
         window.open(payload.next.always, '_blank');
         return { success: true, hash: payload.uuid };
       }
     }
     
-    // Simulación del flujo de Xaman para demostración en local
+    // Xaman flow simulation for local demonstration
     const demoTxHash = "E0B91F8436B0C689FA42A7C3D821034D8E9A2BC3CDEEF53B182904CBA638D9E2";
-    logger("[red] [Demo Xaman] Simulación de escaneo QR y firma exitosa en el teléfono.");
-    logger(`[red] [Demo Xaman] Transacción simulada exitosa. Hash de Tx: ${demoTxHash}`);
+    logger("[red] [Xaman Demo] Simulating QR scan and successful signature on phone.");
+    logger(`[red] [Xaman Demo] Mocked transaction successful. Tx Hash: ${demoTxHash}`);
     return { success: true, hash: demoTxHash };
   }
-  throw new Error("Billetera no soportada.");
+  throw new Error("Unsupported wallet.");
 }
 
 /**
- * Consulta la blockchain de XRPL para verificar si una clave pública posee su llavero registrado.
- * Un llavero es válido si la cuenta posee un NFT acuñado por ella misma con Taxon 1001.
+ * Queries the XRPL blockchain to verify if a public key has its registered key.
+ * A key is valid if the account owns an NFT minted by itself with Taxon 1001.
  */
 export async function checkAddressRegistration(address, logger = console.log) {
   try {
@@ -279,7 +279,7 @@ export async function checkAddressRegistration(address, logger = console.log) {
       return false;
     }
 
-    const client = await getXrplClient(() => {}); // Consulta silenciosa
+    const client = await getXrplClient(() => {}); // Silent query
     
     const response = await client.request({
       command: "account_nfts",
@@ -289,14 +289,14 @@ export async function checkAddressRegistration(address, logger = console.log) {
 
     const nfts = response.result.account_nfts || [];
     
-    // Buscar un NFT con taxon 1001 emitido por la misma cuenta (autenticidad autónoma)
+    // Look for an NFT with taxon 1001 issued by the same account (autonomous authenticity)
     const hasMosaicoNft = nfts.some(nft => {
       return nft.NFTokenTaxon === NFT_TAXON_MOSAICO && nft.Issuer === address;
     });
 
     return hasMosaicoNft;
   } catch (error) {
-    logger(`[error-silent] Error de verificación XRPL para ${address}: ${error.message}`);
+    logger(`[error-silent] XRPL verification error for ${address}: ${error.message}`);
     return false;
   }
 }

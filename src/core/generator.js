@@ -1,17 +1,18 @@
 /**
- * Motor de Generación del Mosaico SVG 3x3
- * Genera un SVG vectorial determinista a partir de un hash de 32 bytes (SHA-256).
+ * SVG 3x3 Mosaic Generation Engine.
+ * Generates a deterministic vector SVG from a 32-byte hash (SHA-256).
  */
 
 /**
- * Genera el código SVG de un identicon en mosaico 3x3.
- * @param {Uint8Array} hash - Array de 32 bytes del hash.
- * @param {string} textSource - La dirección o texto original (para el overlay).
- * @param {Object} options - Configuración de renderizado.
- * @param {boolean} options.chaoticMode - Si es verdadero, usa colores independientes por celda.
- * @param {boolean} options.showOverlay - Si es verdadero, superpone el texto de la dirección.
- * @param {boolean} options.showAnchors - Si es verdadero, añade detalles del anclaje central.
- * @returns {string} El string SVG generado.
+ * Generates the SVG string of a 3x3 mosaic identicon.
+ * @param {Uint8Array} hash - 32-byte array representing the hash.
+ * @param {string} textSource - The original address or text (for text overlay).
+ * @param {Object} options - Rendering options.
+ * @param {boolean} options.chaoticMode - If true, uses independent colors per cell.
+ * @param {boolean} options.showOverlay - If true, overlays the address text at the bottom.
+ * @param {boolean} options.showAnchors - If true, adds detailing to the central anchor glyph.
+ * @param {number} options.gridSize - Grid size (3, 4, or 5).
+ * @returns {string} The generated SVG markup.
  */
 export function generateSvg(hash, textSource, options = {}) {
   const chaoticMode = !!options.chaoticMode;
@@ -20,22 +21,22 @@ export function generateSvg(hash, textSource, options = {}) {
   const gridSize = parseInt(options.gridSize) || 3;
   const numCells = gridSize * gridSize;
 
-  // Declarar h, s, l a nivel de función para evitar ReferenceError en sub-renderizadores
+  // Declare h, s, l at function scope to avoid ReferenceError in sub-renderers
   let h, s, l;
 
-  // Extraer bytes generales de configuración
+  // Extract general configuration bytes
   const configByte1 = hash[30];
   const configByte2 = hash[31];
   const globalHue = (configByte1 * 256 + configByte2) % 360;
-  const globalSat = 65 + (hash[29] % 25); // 65% a 90%
-  const globalLight = 40 + (hash[28] % 20); // 40% a 60%
+  const globalSat = 65 + (hash[29] % 25); // 65% to 90%
+  const globalLight = 40 + (hash[28] % 20); // 40% to 60%
 
-  // Crear una distribución (layout) de celdas determinista basada en los bytes del hash.
-  // Iniciamos con el layout secuencial estándar de tamaño numCells.
+  // Create a deterministic cell layout based on hash bytes.
+  // Start with a standard sequential layout.
   const layout = Array.from({ length: numCells }, (_, idx) => idx);
   
-  // Realizar un barajado Fisher-Yates determinista usando bytes del hash
-  // Esto reorganiza de forma única la posición física de todos los patrones.
+  // Perform a deterministic Fisher-Yates shuffle using hash bytes.
+  // This uniquely reorganizes the physical position of all patterns.
   for (let k = numCells - 1; k > 0; k--) {
     const j = hash[k % 32] % (k + 1);
     const temp = layout[k];
@@ -43,10 +44,10 @@ export function generateSvg(hash, textSource, options = {}) {
     layout[j] = temp;
   }
 
-  // Iniciar construcción del SVG
+  // Start SVG construction
   let svgContent = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 300" width="100%" height="100%" style="border-radius: 16px; box-shadow: 0 8px 30px rgba(0,0,0,0.3); overflow: hidden; background: #0c0f1d;">`;
   
-  // Clip path para asegurar bordes redondeados globales
+  // Clip path to ensure global rounded borders
   svgContent += `
     <defs>
       <clipPath id="svg-clip">
@@ -59,7 +60,7 @@ export function generateSvg(hash, textSource, options = {}) {
     <g clip-path="url(#svg-clip)">
   `;
 
-  // Renderizar las celdas de acuerdo a la grilla configurada
+  // Render cells according to the configured grid size
   const cellSize = 300 / gridSize;
   const scaleFactor = cellSize / 100;
 
@@ -69,15 +70,15 @@ export function generateSvg(hash, textSource, options = {}) {
     const xOffset = col * cellSize;
     const yOffset = row * cellSize;
 
-    // Obtener el tipo de celda lógica correspondiente a esta posición física
+    // Get the logical cell index corresponding to this physical position
     const logicalIndex = layout[i];
-    const cellType = logicalIndex % 9; // Mapeo cíclico a los 9 tipos de celdas base
+    const cellType = logicalIndex % 9; // Cyclic mapping to 9 base cell types
 
-    // Calcular offset dinámico de bytes para evitar que celdas repetidas usen los mismos colores
+    // Calculate dynamic byte offset to prevent duplicate cells from using the same colors
     const cDataOffset = (logicalIndex * 3) % 26;
     let cData;
     if (cellType === 4) {
-      // El anclaje central requiere 6 bytes
+      // Central anchor requires 6 bytes
       cData = [
         hash[cDataOffset],
         hash[(cDataOffset + 1) % 32],
@@ -94,71 +95,71 @@ export function generateSvg(hash, textSource, options = {}) {
       ];
     }
 
-    // Calcular HSL para la celda
+    // Calculate HSL for the cell
     if (chaoticMode) {
       h = (cData[0] * 1.41) % 360;
       s = 60 + (cData[1] % 35);
       l = 35 + (cData[2] % 35);
     } else {
-      // Modo Armónico: Desviaciones controladas a partir del tono global
+      // Harmonious Mode: Controlled deviations from global hue
       h = (globalHue + (cData[0] % 60) - 30 + 360) % 360;
       s = Math.max(45, Math.min(95, globalSat + (cData[1] % 20) - 10));
       l = Math.max(30, Math.min(75, globalLight + (cData[2] % 20) - 10));
     }
 
-    // Cuantizar el tono a una de las 12 familias cromáticas discretas (de 30 en 30 grados)
-    // Esto asegura consistencia frente a diferencias de calibración de hardware en visualización lado a lado.
+    // Quantize hue to one of 12 discrete color families (every 30 degrees)
+    // This ensures consistency against screen hardware calibration differences.
     h = (Math.round(h / 30) * 30) % 360;
 
     const baseColor = `hsl(${Math.round(h)}, ${Math.round(s)}%, ${Math.round(l)}%)`;
     const darkColor = `hsl(${Math.round(h)}, ${Math.round(s)}%, ${Math.max(10, Math.round(l) - 20)}%)`;
     const lightColor = `hsl(${Math.round(h)}, ${Math.round(s)}%, ${Math.min(95, Math.round(l) + 20)}%)`;
 
-    // Grupo de la celda con su transformación, escala y clip local
+    // Cell group with its transform, scale, and local clipping
     svgContent += `<g transform="translate(${xOffset}, ${yOffset}) scale(${scaleFactor})" clip-path="url(#cell-clip)">`;
 
-    // Renderizar según el tipo de celda lógica
+    // Render based on logical cell type
     switch (cellType) {
-      case 0: // Celda (0,0): Triángulos / Low Poly Crystal
+      case 0: // Cell Type 0: Triangles / Low Poly Crystal
         renderCell0(cData, baseColor, darkColor, lightColor);
         break;
-      case 1: // Celda (1,0): Anillos y Rayos Concentricos
+      case 1: // Cell Type 1: Concentric Rings and Rays
         renderCell1(cData, baseColor, darkColor, lightColor);
         break;
-      case 2: // Celda (2,0): Cuadrícula Checkerboard Rotada
+      case 2: // Cell Type 2: Rotated Checkerboard Grid
         renderCell2(cData, baseColor, darkColor, lightColor);
         break;
-      case 3: // Celda (0,1): Truchet Arcs (Tuberías/Laberinto)
+      case 3: // Cell Type 3: Truchet Arcs (Labyrinth pipes)
         renderCell3(cData, baseColor, darkColor, lightColor);
         break;
-      case 4: // Celda (1,1): Glifo Central (Anclaje Topológico)
+      case 4: // Cell Type 4: Central Glyph (Topological Anchor)
         renderCell4(cData, baseColor, darkColor, lightColor, showAnchors);
         break;
-      case 5: // Celda (2,1): Curvas de Ondas Superpuestas
+      case 5: // Cell Type 5: Overlapping Wave Curves
         renderCell5(cData, baseColor, darkColor, lightColor);
         break;
-      case 6: // Celda (0,2): Vórtice / Espiral de Polígonos Rotados
+      case 6: // Cell Type 6: Vortex / Spiral of Rotated Polygons
         renderCell6(cData, baseColor, darkColor, lightColor);
         break;
-      case 7: // Celda (1,2): Avatar Pixel-Art Simétrico (5x5)
+      case 7: // Cell Type 7: Symmetric Pixel-Art Avatar (5x5)
         renderCell7(cData, baseColor, darkColor, lightColor);
         break;
-      case 8: // Celda (2,2): Fractales Geométricos Recursivos
+      case 8: // Cell Type 8: Recursive Geometric Fractals
         renderCell8(cData, baseColor, darkColor, lightColor);
         break;
     }
 
-    svgContent += `</g>`; // Cerrar grupo de celda
+    svgContent += `</g>`; // Close cell group
   }
 
-  // Capa: Overlay de Caracteres (Mitigación Phishing visual)
+  // Layer: Text Overlay (Visual phishing mitigation)
   if (showOverlay && textSource && textSource.length > 8) {
     const cleanText = textSource.trim();
     const firstPart = cleanText.substring(0, 6);
     const lastPart = cleanText.substring(cleanText.length - 4);
     const displayStr = `${firstPart}...${lastPart}`;
 
-    // Añadir barra inferior oscura semi-transparente con texto monospaciado
+    // Add semi-transparent dark bottom bar with monospaced text
     svgContent += `
       <rect x="0" y="275" width="300" height="25" fill="rgba(6, 9, 22, 0.85)" />
       <text x="150" y="292" fill="#ffffff" font-family="Courier New, Courier, monospace" font-size="12" font-weight="bold" text-anchor="middle" letter-spacing="1">
@@ -170,31 +171,31 @@ export function generateSvg(hash, textSource, options = {}) {
   svgContent += `</g></svg>`;
   return svgContent;
 
-  // ================= SUB-RENDERIZADORES PARA CADA CELDA =================
+  // ================= SUB-RENDERERS FOR EACH CELL =================
 
-  // Celda 0: Low Poly Crystal (Triángulos)
+  // Cell 0: Low Poly Crystal (Triangles)
   function renderCell0(data, color, dark, light) {
     const b1 = data[0];
     const b2 = data[1];
     
-    // Punto central dinámico
-    const cx = 35 + (b1 % 30); // 35 a 65
-    const cy = 35 + (b2 % 30); // 35 a 65
+    // Dynamic central point
+    const cx = 35 + (b1 % 30); // 35 to 65
+    const cy = 35 + (b2 % 30); // 35 to 65
 
-    // Triángulos conectados a las 4 esquinas
+    // Triangles connected to 4 corners
     svgContent += `<polygon points="0,0 100,0 ${cx},${cy}" fill="${light}" />`;
     svgContent += `<polygon points="100,0 100,100 ${cx},${cy}" fill="${color}" />`;
     svgContent += `<polygon points="100,100 0,100 ${cx},${cy}" fill="${dark}" />`;
     svgContent += `<polygon points="0,100 0,0 ${cx},${cy}" fill="hsl(${Math.round(h)}, ${Math.round(s)}%, ${Math.max(15, Math.round(l) - 10)}%)" />`;
     
-    // Líneas divisorias sutiles
+    // Subtle dividing lines
     svgContent += `<line x1="0" y1="0" x2="${cx}" y2="${cy}" stroke="rgba(255,255,255,0.15)" stroke-width="1.5" />`;
     svgContent += `<line x1="100" y1="0" x2="${cx}" y2="${cy}" stroke="rgba(255,255,255,0.15)" stroke-width="1.5" />`;
     svgContent += `<line x1="100" y1="100" x2="${cx}" y2="${cy}" stroke="rgba(255,255,255,0.15)" stroke-width="1.5" />`;
     svgContent += `<line x1="0" y1="100" x2="${cx}" y2="${cy}" stroke="rgba(255,255,255,0.15)" stroke-width="1.5" />`;
   }
 
-  // Celda 1: Anillos y Rayos Concentricos
+  // Cell 1: Concentric Rings and Rays
   function renderCell1(data, color, dark, light) {
     const b1 = data[0];
     const b2 = data[1];
@@ -202,8 +203,8 @@ export function generateSvg(hash, textSource, options = {}) {
 
     svgContent += `<rect width="100" height="100" fill="${dark}" />`;
 
-    // Rayos
-    const numRays = 4 + (b1 % 5); // 4 a 8 rayos
+    // Rays
+    const numRays = 4 + (b1 % 5); // 4 to 8 rays
     const angleOffset = (b2 * 2) % 360;
     svgContent += `<g transform="translate(50, 50) rotate(${angleOffset})">`;
     for (let k = 0; k < numRays; k++) {
@@ -212,7 +213,7 @@ export function generateSvg(hash, textSource, options = {}) {
     }
     svgContent += `</g>`;
 
-    // Anillos concéntricos
+    // Concentric rings
     const r1 = 15 + (b1 % 10);
     const r2 = 28 + (b2 % 12);
     const r3 = 42 + (b3 % 8);
@@ -221,16 +222,14 @@ export function generateSvg(hash, textSource, options = {}) {
     svgContent += `<circle cx="50" cy="50" r="${r3}" fill="none" stroke="${light}" stroke-width="1" stroke-dasharray="5,2" opacity="0.5" />`;
   }
 
-  // Celda 2: Checkerboard Rotado
+  // Cell 2: Rotated Checkerboard
   function renderCell2(data, color, dark, light) {
     const b1 = data[0];
-    const b2 = data[1];
-    
     svgContent += `<rect width="100" height="100" fill="${color}" />`;
 
     const rotation = (b1 * 1.5) % 90;
     svgContent += `<g transform="translate(50,50) rotate(${rotation}) translate(-50,-50)">`;
-    // Dibujar patrón de tablero de ajedrez
+    // Draw chessboard pattern
     for (let x = -1; x <= 4; x++) {
       for (let y = -1; y <= 4; y++) {
         if ((x + y) % 2 === 0) {
@@ -243,24 +242,24 @@ export function generateSvg(hash, textSource, options = {}) {
     svgContent += `</g>`;
   }
 
-  // Celda 3: Truchet Arcs (Tuberías curvadas)
+  // Cell 3: Truchet Arcs (Curved pipes)
   function renderCell3(data, color, dark, light) {
     const b1 = data[0];
     const b2 = data[1];
     
     svgContent += `<rect width="100" height="100" fill="${dark}" />`;
 
-    // 4 cuadrantes de 50x50
-    const strokeW = 6 + (b2 % 6); // 6 a 11
+    // 4 quadrants of 50x50
+    const strokeW = 6 + (b2 % 6); // 6 to 11
     const strokeColor = light;
 
     const drawArc = (qx, qy, type) => {
       if (type === 0) {
-        // Arcos: arriba-izquierda a abajo-derecha
+        // Arcs: top-left to bottom-right
         svgContent += `<path d="M ${qx},${qy + 25} A 25,25 0 0,0 ${qx + 25},${qy}" fill="none" stroke="${strokeColor}" stroke-width="${strokeW}" stroke-linecap="round" />`;
         svgContent += `<path d="M ${qx + 25},${qy + 50} A 25,25 0 0,0 ${qx + 50},${qy + 25}" fill="none" stroke="${strokeColor}" stroke-width="${strokeW}" stroke-linecap="round" />`;
       } else {
-        // Arcos: arriba-derecha a abajo-izquierda
+        // Arcs: top-right to bottom-left
         svgContent += `<path d="M ${qx},${qy + 25} A 25,25 0 0,1 ${qx + 25},${qy + 50}" fill="none" stroke="${strokeColor}" stroke-width="${strokeW}" stroke-linecap="round" />`;
         svgContent += `<path d="M ${qx + 25},${qy} A 25,25 0 0,1 ${qx + 50},${qy + 25}" fill="none" stroke="${strokeColor}" stroke-width="${strokeW}" stroke-linecap="round" />`;
       }
@@ -272,28 +271,27 @@ export function generateSvg(hash, textSource, options = {}) {
     drawArc(50, 50, (b1 & 8) >> 3);
   }
 
-  // Celda 4: Glifo Central (Anclaje Topológico / Estrella o Polígono Regular)
+  // Cell 4: Central Glyph (Topological Anchor / Regular Polygon or Star)
   function renderCell4(data, color, dark, light, activeAnchors) {
-    // Usar datos expandidos del centro (cData tiene 6 bytes)
     const b1 = data[0];
     const b2 = data[1];
     const b3 = data[2];
     const b4 = data[3] || 128;
     const b5 = data[4] || 64;
 
-    // Fondo oscuro contrastante para resaltar el anclaje
+    // Dark contrasting background to highlight the anchor
     svgContent += `<rect width="100" height="100" fill="#080a14" />`;
     
-    // Efecto de aura brillante en el centro
+    // Glowing aura effect in the center
     const glowColor = `hsl(${Math.round(h)}, ${Math.round(s)}%, 50%)`;
     svgContent += `<circle cx="50" cy="50" r="35" fill="${glowColor}" opacity="0.15" filter="blur(4px)" />`;
 
-    // Número de vértices determinista y contable por humanos (3 a 9)
+    // Deterministic, human-countable number of vertices (3 to 9)
     const vertices = 3 + (b1 % 7); 
-    const radius = 30 + (b2 % 12); // 30 a 41
+    const radius = 30 + (b2 % 12); // 30 to 41
     const rotation = (b3 * 2.5) % 360;
 
-    // Generar puntos del polígono/estrella
+    // Generate polygon/star points
     const pts = [];
     for (let k = 0; k < vertices; k++) {
       const angle = (k * 2 * Math.PI) / vertices + (rotation * Math.PI) / 180;
@@ -304,12 +302,12 @@ export function generateSvg(hash, textSource, options = {}) {
 
     const ptsStr = pts.map(p => `${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' ');
 
-    // 1. Dibujar el polígono base relleno
+    // 1. Draw filled base polygon
     svgContent += `<polygon points="${ptsStr}" fill="${color}" stroke="${light}" stroke-width="2.5" stroke-linejoin="round" />`;
 
-    // 2. Si es una estrella o tiene un subpatrón interno (líneas concéntricas / cruzadas)
+    // 2. If it is a star or has an internal subpattern (concentric/crossed lines)
     if (vertices > 4) {
-      // Dibujar líneas cruzadas internas
+      // Draw internal crossed lines
       let linePath = '';
       for (let k = 0; k < vertices; k++) {
         const nextK = (k + 2) % vertices;
@@ -318,15 +316,15 @@ export function generateSvg(hash, textSource, options = {}) {
       svgContent += `<path d="${linePath}" fill="none" stroke="${dark}" stroke-width="1.5" opacity="0.75" />`;
     }
 
-    // 3. Glifo interior (núcleo redondo o diamante contrastante para anclaje)
-    const innerRadius = 8 + (b4 % 8); // 8 a 15
-    const innerColor = `hsl(${(h + 180) % 360}, ${Math.max(70, s)}%, 60%)`; // Tono complementario (180 grados opuesto)
+    // 3. Inner glyph (contrasting core circle or diamond for anchoring)
+    const innerRadius = 8 + (b4 % 8); // 8 to 15
+    const innerColor = `hsl(${(h + 180) % 360}, ${Math.max(70, s)}%, 60%)`; // Complementary hue (180 degrees opposite)
     
     if (b5 % 2 === 0) {
-      // Círculo central
+      // Central circle
       svgContent += `<circle cx="50" cy="50" r="${innerRadius}" fill="${innerColor}" stroke="#ffffff" stroke-width="1.5" />`;
     } else {
-      // Diamante central
+      // Central diamond
       const top = 50 - innerRadius;
       const bottom = 50 + innerRadius;
       const left = 50 - innerRadius;
@@ -334,7 +332,7 @@ export function generateSvg(hash, textSource, options = {}) {
       svgContent += `<polygon points="50,${top} ${right},50 50,${bottom} ${left},50" fill="${innerColor}" stroke="#ffffff" stroke-width="1.5" />`;
     }
 
-    // Dibujar pequeños puntos satélites en los vértices para facilitar el conteo visual
+    // Draw small satellite dots at vertices to facilitate visual counting
     if (activeAnchors) {
       pts.forEach(p => {
         svgContent += `<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="3" fill="#ffffff" stroke="${dark}" stroke-width="1" />`;
@@ -342,7 +340,7 @@ export function generateSvg(hash, textSource, options = {}) {
     }
   }
 
-  // Celda 5: Ondas de curvas superpuestas
+  // Cell 5: Overlapping Wave Curves
   function renderCell5(data, color, dark, light) {
     const b1 = data[0];
     const b2 = data[1];
@@ -350,7 +348,7 @@ export function generateSvg(hash, textSource, options = {}) {
 
     svgContent += `<rect width="100" height="100" fill="${light}" />`;
 
-    // Renderizar dos ondas con diferentes opacidades
+    // Render two waves with different opacities
     const drawWave = (amplitude, freq, phase, fillCol, op) => {
       let path = `M 0,100 L 0,${50 + amplitude * Math.sin(phase)}`;
       for (let x = 1; x <= 100; x += 2) {
@@ -363,13 +361,13 @@ export function generateSvg(hash, textSource, options = {}) {
 
     const amp1 = 8 + (b1 % 15);
     const amp2 = 12 + (b2 % 15);
-    const freq1 = 1 + (b3 % 3); // 1 a 3 ciclos
+    const freq1 = 1 + (b3 % 3); // 1 to 3 cycles
     const freq2 = 1.5 + ((b1 + b2) % 3);
 
     drawWave(amp1, freq1, b1, dark, 0.6);
     drawWave(amp2, freq2, b2, color, 0.5);
     
-    // Línea de la cresta superior de la onda
+    // Top crest line of the wave
     let crestPath = `M 0,${(50 + amp2 * Math.sin(b2)).toFixed(1)}`;
     for (let x = 2; x <= 100; x += 2) {
       const y = 50 + amp2 * Math.sin((x / 100) * freq2 * 2 * Math.PI + b2);
@@ -378,29 +376,29 @@ export function generateSvg(hash, textSource, options = {}) {
     svgContent += `<path d="${crestPath}" fill="none" stroke="#ffffff" stroke-width="1.5" opacity="0.4" />`;
   }
 
-  // Celda 6: Espiral de Polígonos Rotados
+  // Cell 6: Spiral of Rotated Polygons
   function renderCell6(data, color, dark, light) {
     const b1 = data[0];
     const b2 = data[1];
 
     svgContent += `<rect width="100" height="100" fill="${dark}" />`;
 
-    const count = 5 + (b1 % 3); // 5 a 7 capas
-    const rotStep = 8 + (b2 % 12); // 8 a 19 grados por capa
-    const sides = (b1 % 2 === 0) ? 4 : 3; // Cuadrados o Triángulos
+    const count = 5 + (b1 % 3); // 5 to 7 layers
+    const rotStep = 8 + (b2 % 12); // 8 to 19 degrees per layer
+    const sides = (b1 % 2 === 0) ? 4 : 3; // Squares or Triangles
 
     svgContent += `<g transform="translate(50,50)">`;
     for (let j = 0; j < count; j++) {
-      const scale = Math.pow(0.82, j) * 45; // escala decreciente
+      const scale = Math.pow(0.82, j) * 45; // decreasing scale
       const r = j * rotStep;
       const c = `hsl(${Math.round((h + j * 5) % 360)}, ${s}%, ${Math.max(20, Math.round(l) + (j * 5) - 15)}%)`;
 
       svgContent += `<g transform="rotate(${r})">`;
       if (sides === 4) {
-        // Cuadrado
+        // Square
         svgContent += `<rect x="${-scale}" y="${-scale}" width="${scale * 2}" height="${scale * 2}" fill="none" stroke="${c}" stroke-width="2.5" opacity="${0.9 - j * 0.1}" />`;
       } else {
-        // Triángulo
+        // Triangle
         const x1 = 0, y1 = -scale;
         const x2 = scale * 0.86, y2 = scale * 0.5;
         const x3 = -scale * 0.86, y3 = scale * 0.5;
@@ -411,19 +409,19 @@ export function generateSvg(hash, textSource, options = {}) {
     svgContent += `</g>`;
   }
 
-  // Celda 7: Avatar Pixel-Art Simétrico (5x5)
+  // Cell 7: Symmetric Pixel-Art Avatar (5x5)
   function renderCell7(data, color, dark, light) {
     const b1 = data[0];
     const b2 = data[1];
 
     svgContent += `<rect width="100" height="100" fill="${light}" />`;
 
-    // 15 bits para mapear un mapa simétrico de 5x5
-    // Columnas 0, 1 y 2. Las columnas 3 y 4 se copian de 1 y 0 respectivamente.
+    // 15 bits to map a symmetric 5x5 grid
+    // Columns 0, 1, and 2. Columns 3 and 4 are mirrored from 1 and 0 respectively.
     const grid = [];
     let bitIndex = 0;
     
-    // Rellenar bits
+    // Fill bits
     const val = (b1 << 8) | b2;
     for (let r = 0; r < 5; r++) {
       grid[r] = [];
@@ -431,18 +429,18 @@ export function generateSvg(hash, textSource, options = {}) {
         grid[r][c] = ((val >> bitIndex) & 1) === 1;
         bitIndex++;
       }
-      // Espejo
+      // Mirror
       grid[r][3] = grid[r][1];
       grid[r][4] = grid[r][0];
     }
 
-    // Renderizar pixeles
+    // Render pixels
     for (let r = 0; r < 5; r++) {
       for (let c = 0; c < 5; c++) {
         if (grid[r][c]) {
           svgContent += `<rect x="${c * 16 + 10}" y="${r * 16 + 10}" width="16" height="16" fill="${dark}" rx="2" />`;
         } else {
-          // Algunos pixeles vacíos se rellenan con un color de acento muy suave
+          // Some empty pixels are filled with a soft accent color
           if ((r + c) % 3 === 0) {
             svgContent += `<rect x="${c * 16 + 10}" y="${r * 16 + 10}" width="16" height="16" fill="${color}" opacity="0.4" rx="2" />`;
           }
@@ -451,19 +449,19 @@ export function generateSvg(hash, textSource, options = {}) {
     }
   }
 
-  // Celda 8: Fractales Geométricos Recursivos (Mina de cuadrados)
+  // Cell 8: Recursive Geometric Fractals
   function renderCell8(data, color, dark, light) {
     const b1 = data[0];
     
     svgContent += `<rect width="100" height="100" fill="${color}" />`;
 
-    const size = 32 + (b1 % 12); // 32 a 43
+    const size = 32 + (b1 % 12); // 32 to 43
     const half = size / 2;
     
-    // Nivel 1 (Central)
+    // Level 1 (Center)
     svgContent += `<rect x="${50 - half}" y="${50 - half}" width="${size}" height="${size}" fill="${dark}" stroke="${light}" stroke-width="1.5" />`;
 
-    // Nivel 2 (4 esquinas)
+    // Level 2 (4 corners)
     const cSize = size * 0.45;
     const offset = half + cSize/2;
     const corners = [
@@ -476,7 +474,7 @@ export function generateSvg(hash, textSource, options = {}) {
     corners.forEach(c => {
       svgContent += `<rect x="${c.cx - cSize/2}" y="${c.cy - cSize/2}" width="${cSize}" height="${cSize}" fill="${light}" stroke="${dark}" stroke-width="1" />`;
       
-      // Pequeño círculo central en los hijos
+      // Small central circle in children
       svgContent += `<circle cx="${c.cx}" cy="${c.cy}" r="${cSize*0.25}" fill="${color}" />`;
     });
   }

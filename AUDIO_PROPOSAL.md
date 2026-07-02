@@ -1,27 +1,27 @@
-# Propuesta Técnica: Firma Auditiva Mnemónica (Mosaico de Audio)
+# Technical Proposal: Mnemonic Acoustic Signature (Audio Mosaic)
 
-Este documento detalla la viabilidad, diseño técnico y requisitos de desarrollo para crear un **sistema de firmas de audio deterministas** (Llavero Sonoro) diseñado específicamente para personas ciegas o con discapacidad visual severa.
-
----
-
-## 1. Concepto General: Escuchar la Dirección
-
-De la misma manera que el ojo humano puede comparar patrones de color y forma en un mosaico, el oído humano posee una altísima sensibilidad para detectar variaciones en:
-* **Tono y Armonía:** Identificar si un acorde es mayor, menor o disonante.
-* **Ritmo y Secuencia:** Detectar si un arpegio (secuencia de notas) se acelera, se rompe o cambia de orden.
-* **Timbre:** Reconocer el "color" del sonido (suave como una flauta, metálico, o brillante).
-
-Al mapear el hash SHA-256 de la dirección a parámetros de audio, un usuario invidente puede **escuchar su dirección** (un arpegio o melodía corta de 3 segundos) y verificar si suena idéntica al pegarla en el destino. Si un virus altera la dirección, la melodía resultante sonará en una escala diferente, con un ritmo roto o en un tono disonante.
+This document details the feasibility, technical design, and development requirements for creating a **deterministic audio signature system** (Acoustic Key) designed specifically for blind or severely visually impaired individuals.
 
 ---
 
-## 2. Relación y Sincronización con el Mosaico Visual
+## 1. General Concept: Hearing the Address
 
-Al provenir del mismo hash inmutable, la representación visual y la auditiva están **100% acopladas**:
+In the same way the human eye can compare color and shape patterns in a mosaic, the human ear has high sensitivity to detect variations in:
+* **Pitch and Harmony:** Identifying if a chord is major, minor, or dissonant.
+* **Rhythm and Sequence:** Detecting if an arpeggio (sequence of notes) speeds up, breaks, or changes order.
+* **Timbre:** Recognizing the "color" of the sound (soft like a flute, metallic, or bright).
+
+By mapping the SHA-256 hash of an address to audio parameters, a visually impaired user can **hear their address** (a short 3-second arpeggio or melody) and verify if it sounds identical when pasted at the destination. If a virus alters the address, the resulting melody will sound in a different scale, with a broken rhythm, or in a dissonant tone.
+
+---
+
+## 2. Relationship and Synchronization with the Visual Mosaic
+
+Since they derive from the same immutable hash, the visual and acoustic representations are **100% coupled**:
 
 ```
                                   ┌───────────────────────────┐
-                                  │   Dirección de Billetera  │
+                                  │       Wallet Address      │
                                   └─────────────┬─────────────┘
                                                 │
                                                 ▼
@@ -31,57 +31,57 @@ Al provenir del mismo hash inmutable, la representación visual y la auditiva es
                                                 │
                        ┌────────────────────────┴────────────────────────┐
                        ▼                                                 ▼
-             [ Mapeo Visual ]                                  [ Mapeo Auditivo ]
-         - Colores HSL por celda                           - Escala y acordes
-         - Formas geométricas                              - Secuencia de notas (Arpegio)
-         - Posición por Fisher-Yates                       - Ritmo por Fisher-Yates
+             [ Visual Mapping ]                                 [ Acoustic Mapping ]
+         - HSL colors per cell                             - Scale and chords
+         - Geometric shapes                                - Sequence of notes (Arpeggio)
+         - Position by Fisher-Yates                        - Rhythm by Fisher-Yates
 ```
 
-El barajado determinista Fisher-Yates que cambia la ubicación de las 9 celdas en la pantalla puede controlar el **orden temporal de las notas** (la melodía del arpegio), enlazando la física visual y auditiva de forma matemática.
+The deterministic Fisher-Yates shuffling that changes the layout of the 9 cells on the screen controls the **temporal order of the notes** (the arpeggio's melody), linking the visual and auditory physics mathematically.
 
 ---
 
-## 3. Arquitectura y Funcionamiento Técnico
+## 3. Architecture and Technical Operation
 
-Para implementar esto de forma ligera y universal, utilizaremos la **Web Audio API** nativa de HTML5. Esto elimina la necesidad de cargar archivos de audio `.mp3` pesados o usar servidores externos. El sonido se sintetiza procedimentalmente en caliente.
+To implement this in a lightweight and universal way, we use the native HTML5 **Web Audio API**. This eliminates the need to load heavy `.mp3` audio files or use external servers. The sound is synthesized procedurally in real-time.
 
-### A. Mapeo de Parámetros del Sonido
-Dividiremos los 32 bytes del hash para alimentar el sintetizador:
+### A. Sound Parameter Mapping
+We split the 32 bytes of the hash to feed the synthesizer:
 
-1. **La Escala Musical (Tonalidad) - Byte 30 y 31:**
-   * Mapea los bytes a una escala de consonancia garantizada, como la **escala pentatónica mayor o menor**. Esto previene ruidos molestos y produce "firmas acústicas agradables" pero altamente distintivas.
-2. **El Instrumento (Timbre) - Byte 29:**
-   * Configura los osciladores del navegador (`OscillatorNode`). Un byte par puede generar ondas triangulares (timbre suave, tipo flauta) y un byte impar ondas tipo diente de sierra (timbre brillante, tipo sintetizador analógico).
-3. **El Ritmo (Arpegio Secuencial) - Layout barajado:**
-   * Utiliza el mismo array de celdas barajado por Fisher-Yates. 
-   * Por ejemplo, si el layout resultante es `[4, 0, 7, 1, 8, 3, 2, 6, 5]`, el arpegio reproducirá las frecuencias asociadas a cada celda en ese orden secuencial exacto. La celda `4` (anclaje topológico) puede tener un efecto de vibrato o un acento de volumen característico en la melodía.
+1. **The Musical Scale (Key) - Bytes 30 and 31:**
+   * Maps the bytes to a scale of guaranteed consonance, such as the **major or minor pentatonic scale**. This prevents unpleasant noises and produces "pleasant" yet highly distinctive acoustic signatures.
+2. **The Instrument (Timbre) - Byte 29:**
+   * Configures the browser's oscillators (`OscillatorNode`). An even byte generates triangle waves (soft flute-like timbre) and an odd byte generates sawtooth waves (bright, analog synth-like timbre).
+3. **The Rhythm (Sequential Arpeggio) - Shuffled Layout:**
+   * Uses the same cell array shuffled by Fisher-Yates.
+   * For example, if the resulting layout is `[4, 0, 7, 1, 8, 3, 2, 6, 5]`, the arpeggio plays the frequencies associated with each cell in that exact sequential order. Cell `4` (topological anchor) can have a characteristic vibrato or volume accent in the melody.
 
-### B. Ejemplo Teórico del Código
+### B. Theoretical Code Example
 ```javascript
-// Estructura conceptual para generator_audio.js
+// Conceptual structure for generator_audio.js
 export function playMnemonicAudio(hash) {
   const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
   
-  // 1. Determinar escala y tono fundamental (Key)
-  const fundamentalFreq = 220 + (hash[0] % 220); // Rango de 220Hz a 440Hz
+  // 1. Determine scale and fundamental frequency (Key)
+  const fundamentalFreq = 220 + (hash[0] % 220); // Range: 220Hz to 440Hz
   const scale = getPentatonicScale(fundamentalFreq, hash[1]);
   
-  // 2. Obtener el layout secuencial Fisher-Yates
-  const layout = getShuffledLayout(hash); // Ej: [4, 0, 2, ...]
+  // 2. Get the sequential Fisher-Yates layout
+  const layout = getShuffledLayout(hash); // E.g.: [4, 0, 2, ...]
   
-  // 3. Sintetizar las notas en secuencia
+  // 3. Synthesize notes in sequence
   let time = audioCtx.currentTime;
   layout.forEach((cellIdx, step) => {
     const osc = audioCtx.createOscillator();
     const gain = audioCtx.createGain();
     
-    // Asignar frecuencia en base a la escala y el índice de celda
+    // Assign frequency based on scale and cell index
     osc.frequency.value = scale[cellIdx % scale.length];
     
-    // Modulación del timbre basada en los bytes de la celda
+    // Timbre modulation based on cell bytes
     osc.type = hash[cellIdx] % 2 === 0 ? 'triangle' : 'sine';
     
-    // Curva de volumen (Envelope: Attack, Decay, Release)
+    // Volume envelope (ADSR: Attack, Decay, Release)
     gain.gain.setValueAtTime(0, time);
     gain.gain.linearRampToValueAtTime(0.3, time + 0.05); // Attack
     gain.gain.exponentialRampToValueAtTime(0.001, time + 0.3); // Release
@@ -92,65 +92,63 @@ export function playMnemonicAudio(hash) {
     osc.start(time);
     osc.stop(time + 0.3);
     
-    time += 0.25; // Siguiente paso en el tiempo (arpegio de 2.25 segundos en total)
+    time += 0.25; // Next step in time (2.25 seconds total arpeggio)
   });
 }
 ```
 
 ---
 
-## 4. Requisitos y Desafíos del Desarrollo
+## 4. Development Requirements and Challenges
 
-### A. Accesibilidad Nativa (Lector de Pantalla)
-* **Atributos ARIA:** Los elementos interactivos deben poseer descripciones para lectores de pantalla. Por ejemplo:
-  `<button aria-label="Escuchar firma de sonido de la dirección" onclick="playAudio()">🔊 Escuchar Firma</button>`
-* **Transcripción Textual Redundante:** El lector de pantalla debe anunciar el tono (ej. *"Firma de audio: Tono Do sostenido menor, Tempo rápido"*).
+### A. Native Accessibility (Screen Readers)
+* **ARIA Attributes:** Interactive elements must possess descriptions for screen readers. For example:
+  `<button aria-label="Listen to the address audio signature" onclick="playAudio()">🔊 Listen to Signature</button>`
+* **Redundant Textual Transcription:** The screen reader must announce the key (e.g., *"Audio signature: C sharp minor key, Fast tempo"*).
 
-### B. Consistencia Multiplataforma
-* Los sintetizadores de audio Web Audio API pueden sonar ligeramente diferentes entre navegadores (ej. Firefox vs Safari en iOS) debido a las variaciones en las curvas de interpolación de frecuencia. El motor debe ser calibrado con valores matemáticos discretos y rígidos para asegurar que una dirección suene **exactamente igual** en un teléfono que en una computadora de escritorio.
-
----
-
-## 5. Análisis de Vulnerabilidades y Crítica del Llavero Sonoro
-
-Aunque la propuesta acústica añade una capa inclusiva indispensable, el sistema presenta debilidades físicas y cognitivas inherentes al canal auditivo humano que deben ser analizadas críticamente:
-
-### A. Límites de la Memoria y Atención Auditiva
-* **Naturaleza Transitoria:** A diferencia del mosaico visual (que es estático y permite al usuario mirarlo con calma todo el tiempo que requiera), el sonido es **efímero**. Requiere atención activa durante su reproducción de 3 segundos.
-* **Falta de Oído Absoluto:** La mayoría de los usuarios no distinguen con precisión intervalos de semitonos (ej. pasar de una nota en Mi a Fa) a menos que tengan entrenamiento musical. Un atacante podría buscar una dirección que produzca un arpegio muy similar en tonalidad y ritmo, apostando a que el usuario no notará la sutil desviación armónica.
-* *Mitigación:* Limitar los arpegios a saltos tonales distanciados (como terceras o quintas de la escala) para forzar diferencias melódicas toscas y muy evidentes ante colisiones.
-
-### B. Dependencia del Entorno y Hardware de Salida
-* **Ruido de Fondo:** Transaccionar en entornos ruidosos (calle, transporte público) anula por completo la utilidad de la firma sonora, forzando al usuario a depender de auriculares.
-* **Respuesta de Frecuencias de Altavoces:** Los altavoces integrados de laptops o teléfonos de gama baja suelen recortar frecuencias graves por debajo de los 200Hz. Si la fundamental del hash es muy baja, partes del arpegio serán inaudibles.
-* *Mitigación:* Calibrar el sintetizador para operar únicamente en rangos medios-altos (300Hz a 1200Hz), donde cualquier altavoz móvil responde con claridad.
-
-### C. Vulnerabilidad a Replay Attacks (Manipulación del Frontend)
-* **Audio Spoofing:** Si la dApp del navegador está comprometida mediante XSS, el script malicioso puede simplemente reproducir un clip de audio legítimo previamente capturado mientras inyecta una dirección fraudulenta en la transacción.
-* *Mitigación:* El disparador del audio debe residir en el **Contexto Aislado de la Wallet** (el popup de MetaMask o la pantalla de Ledger). El usuario solo debe confiar en el sonido emitido por la interfaz nativa del monedero, nunca en el reproducido por la página web del exchange/dApp.
+### B. Cross-Platform Consistency
+* Web Audio API sound synthesizers can sound slightly different across browsers (e.g., Firefox vs Safari on iOS) due to variations in frequency interpolation curves. The engine must be calibrated with rigid, discrete mathematical values to ensure an address sounds **exactly the same** on a mobile phone as on a desktop computer.
 
 ---
 
-## 6. Evolución del Estándar: Capa Modular y Mitigaciones por Hardware Futuro
+## 5. Vulnerability Analysis and Critique of the Acoustic Key
 
-Para evitar sobrecargar a la mayoría de los usuarios con ruido acústico o fatiga auditiva, y garantizar al mismo tiempo la inalienabilidad del sistema para quienes lo necesitan, la hoja de ruta evolutiva del estándar se define bajo los siguientes pilares de modularidad y aislamiento físico:
+Although the acoustic proposal adds an indispensable inclusion layer, the system presents physical and cognitive weaknesses inherent to the human auditory channel that must be analyzed critically:
 
-### A. Apagado por Defecto (Off-by-Default)
-* **Nativo pero Silencioso:** Cada Mosaico Criptográfico y especificación de dirección en la blockchain calcula su hash y sus frecuencias acústicas de forma nativa e inmutable.
-* **Activación Bajo Demanda:** Por defecto, las billeteras no emiten ningún sonido. La funcionalidad se mantiene deshabilitada hasta que el usuario la active explícitamente en el panel de accesibilidad o configuración avanzada, respetando la sobriedad del entorno financiero digital.
+### A. Limits of Auditory Memory and Attention
+* **Transient Nature:** Unlike the visual mosaic (which is static and allows the user to inspect it calmly for as long as they need), sound is **transient**. It requires active attention during its 3-second playback.
+* **Lack of Absolute Pitch:** Most users do not accurately distinguish semitone intervals (e.g., passing from a note in E to F) unless they have musical training. An attacker could search for an address that produces a very similar arpeggio in key and rhythm, betting that the user won't notice the subtle harmonic deviation.
+* *Mitigative Action:* Limit arpeggios to wider tonal jumps (such as thirds or fifths of the scale) to force coarse, highly obvious melodic differences in case of collisions.
 
-### B. Capa de App Modular sobre Demanda (Wallet Plugins / Snaps)
-* **MetaMask Snaps y Módulos Safe:** En lugar de aumentar el peso de la billetera núcleo con sintetizadores, la reproducción acústica se ofrece como un complemento o **Snap modular** instalable bajo demanda.
-* **Integración Limpia:** Solo los usuarios que requieran o se beneficien del soporte de audio (ciegos, débiles visuales o aquellos que manejen cuentas de altísima seguridad) instalan este módulo. La app modular se suscribe a los eventos de firma de la billetera para generar el arpegio procedimental en un entorno aislado del navegador.
+### B. Environment and Output Hardware Dependencies
+* **Background Noise:** Transacting in noisy environments (streets, public transit) completely negates the utility of the sound signature, forcing the user to rely on headphones.
+* **Speaker Frequency Response:** Built-in speakers on laptops or low-end phones often cut off low frequencies below 200Hz. If the fundamental frequency of the hash is very low, parts of the arpeggio will be inaudible.
+* *Mitigative Action:* Calibrate the synthesizer to operate solely in mid-high ranges (300Hz to 1200Hz), where any mobile speaker responds clearly.
 
-### C. Mitigaciones Mediante Hardware Dedicado y Wearables
-Para anular completamente el vector de ataque del malware en la computadora (suplantación de audio/audio spoofing), el procesamiento y emisión del sonido debe ocurrir en hardware de confianza aislado de la PC/móvil:
+### C. Vulnerability to Replay Attacks (Frontend Tampering)
+* **Audio Spoofing:** If the browser dApp is compromised via XSS, the malicious script can simply play a previously captured legitimate audio clip while injecting a fraudulent address into the transaction.
+* *Mitigative Action:* The audio trigger must reside in the **Isolated Wallet Context** (the MetaMask popup or the Ledger screen). The user must only trust the sound emitted by the wallet's native interface, never that played by the exchange/dApp website.
 
-1. **Hardware Wallets con Altavoz / Zumbador Piezoeléctrico:**
-   * La confirmación auditiva se genera dentro del procesador aislado de la billetera fría (ej. Ledger o Trezor de próxima generación).
-   * Al presionar "Firmar", el dispositivo físico emite la melodía o arpegio directamente desde su bocina interna protegida por hardware, lo que garantiza que lo que escucha el usuario proviene directamente de la clave privada real y no de la pantalla hackeada de la PC.
-2. **Audífonos de Conducción Ósea y Headsets de Firma Criptográfica (Crypto Headsets):**
-   * Dispositivos especializados del usuario (como audífonos Bluetooth con enclave criptográfico seguro o zumbadores discretos) vinculados directamente mediante un canal bluetooth encriptado localmente a la Hardware Wallet.
-   * El arpegio se transmite directamente al canal auditivo del usuario por conducción ósea sin pasar en ningún momento por la tarjeta de sonido de la computadora comprometida. Esto crea un **canal auditivo de confianza (Trusted Audio Path)** físicamente infranqueable para virus y ciberataques.
+---
 
+## 6. Evolution of the Standard: Modular Layer and Future Hardware Mitigations
 
+To avoid overloading most users with acoustic noise or auditory fatigue, while simultaneously guaranteeing the inalienability of the system for those who need it, the evolutionary roadmap of the standard is defined under the following pillars of modularity and physical isolation:
+
+### A. Off-by-Default (Disabled by default)
+* **Native yet Silent:** Each Cryptographic Mosaic and address specification on the blockchain calculates its hash and acoustic frequencies natively and immutably.
+* **On-Demand Activation:** By default, wallets emit no sound. The functionality remains disabled until the user explicitly activates it in the accessibility panel or advanced settings, respecting the simplicity of the digital financial environment.
+
+### B. On-Demand Modular App Layer (Wallet Plugins / Snaps)
+* **MetaMask Snaps and Safe Modules:** Instead of increasing the core wallet's weight with synthesizers, acoustic playback is offered as an installable **modular Snap** on demand.
+* **Clean Integration:** Only users who require or benefit from audio support (blind, low-vision, or high-security accounts) install this module. The modular app subscribes to the wallet's signing events to generate the procedural arpeggio in an isolated browser environment.
+
+### C. Mitigations Through Dedicated Hardware and Wearables
+To completely nullify the malware attack vector on the PC/mobile (audio spoofing), sound processing and emission must occur in trusted hardware isolated from the host:
+
+1. **Hardware Wallets with Speaker / Piezoelectric Buzzer:**
+   * Auditory confirmation is generated inside the isolated processor of the cold wallet (e.g., next-generation Ledger or Trezor).
+   * Upon pressing "Sign", the physical device emits the melody or arpeggio directly from its internal hardware-secured speaker, guaranteeing that what the user hears comes directly from the real private key and not from a hacked PC screen.
+2. **Bone Conduction Headphones and Crypto Headsets:**
+   * Specialized user devices (such as Bluetooth headphones with secure cryptographic enclaves or discrete buzzers) linked directly via an encrypted local Bluetooth channel to the Hardware Wallet.
+   * The arpeggio is transmitted directly to the user's auditory canal via bone conduction without ever passing through the sound card of the compromised computer. This creates a physically unbreachable **Trusted Audio Path** against viruses and cyberattacks.

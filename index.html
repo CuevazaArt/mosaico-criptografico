@@ -1,19 +1,19 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mosaico Criptográfico - Identificadores Visuales Descentralizados</title>
-  <!-- Google Fonts para tipografía premium -->
+  <title>Cryptographic Mosaic - Decentralized Visual Identifiers</title>
+  <!-- Google Fonts for premium typography -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
-  <!-- SDK de JavaScript oficial de XRP Ledger para transacciones on-chain -->
+  <!-- Official XRP Ledger JavaScript SDK for on-chain transactions -->
   <script src="https://unpkg.com/xrpl"></script>
 </head>
 <body>
-  <!-- Fondo con degradados de luz ambiental -->
+  <!-- Ambient light gradients background -->
   <div class="bg-glow bg-glow-1"></div>
   <div class="bg-glow bg-glow-2"></div>
 
@@ -21,10 +21,10 @@
     <header class="app-header">
       <div class="header-logo">
         <span class="logo-icon">💠</span>
-        <h1>Mosaico Criptográfico</h1>
+        <h1>Cryptographic Mosaic</h1>
       </div>
       <p class="header-subtitle">
-        Identificadores visuales deterministicos de 3x3 para direcciones blockchain. Mitigando el phishing mediante reconocimiento visual de alta entropía.
+        Deterministic 3x3 visual identifiers for blockchain addresses. Mitigating phishing through high-entropy visual recognition.
       </p>
       <div style="display: flex; gap: 0.75rem; margin-top: 0.5rem; justify-content: center; z-index: 10;">
         <a href="https://github.com/CuevazaArt/mosaico-criptografico" target="_blank" class="btn-secondary" style="font-size: 0.78rem; padding: 6px 14px; text-decoration: none; border-radius: 20px; display: inline-flex; align-items: center; gap: 0.4rem;">
@@ -35,64 +35,64 @@
         </a>
       </div>
       
-      <!-- Navegación de pestañas -->
+      <!-- Tab Navigation -->
       <nav class="tab-navigation">
         <button class="nav-btn active" data-tab="generator-tab">
-          <span class="btn-icon">⚡</span> Generador
+          <span class="btn-icon">⚡</span> Generator
         </button>
         <button class="nav-btn" data-tab="comparator-tab">
-          <span class="btn-icon">⚖️</span> Comparador
+          <span class="btn-icon">⚖️</span> Comparator
         </button>
         <button class="nav-btn" data-tab="testing-tab">
-          <span class="btn-icon">🎯</span> Pruebas de Campo
+          <span class="btn-icon">🎯</span> Field Testing
         </button>
       </nav>
     </header>
 
     <main class="app-content">
       
-      <!-- ================= PESTAÑA: GENERADOR ================= -->
+      <!-- ================= TAB: GENERATOR ================= -->
       <section id="generator-tab" class="tab-panel active">
         <div class="grid-2col">
-          <!-- Columna Izquierda: Entradas y Opciones -->
+          <!-- Left Column: Inputs and Options -->
           <div class="card glass-panel">
-            <h2 class="card-title">Configuración de Entrada</h2>
-            <p class="card-desc">Ingresa cualquier dirección criptográfica, clave pública o frase semilla para generar su mosaico único.</p>
+            <h2 class="card-title">Input Configuration</h2>
+            <p class="card-desc">Enter any cryptographic address, public key, or seed phrase to generate its unique mosaic.</p>
             
             <div class="form-group">
-              <label for="address-input">Dirección / Clave Criptográfica</label>
+              <label for="address-input">Address / Cryptographic Key</label>
               <div class="input-wrapper">
                 <input type="text" id="address-input" class="form-input" 
-                       placeholder="Ej: 0x71c81857e1519509f0750854d15f20a2b18b3a9" 
+                       placeholder="E.g.: 0x71c81857e1519509f0750854d15f20a2b18b3a9" 
                        value="0x71c81857e1519509f0750854d15f20a2b18b3a9">
-                <button id="random-address-btn" class="btn-secondary" title="Generar dirección aleatoria">🎲</button>
+                <button id="random-address-btn" class="btn-secondary" title="Generate random address">🎲</button>
               </div>
             </div>
 
             <div class="options-group">
-              <h3>Opciones Visuales</h3>
+              <h3>Visual Options</h3>
               
               <div class="toggle-option">
                 <div class="option-info">
-                  <span class="option-title">Modo Cromático</span>
-                  <span class="option-desc">Armónico (colores balanceados) vs Caótico (colores independientes).</span>
+                  <span class="option-title">Chroma Mode</span>
+                  <span class="option-desc">Harmonious (balanced colors) vs Chaotic (independent colors).</span>
                 </div>
                 <div class="radio-toggle">
                   <label class="radio-label">
                     <input type="radio" name="chroma-mode" value="harmonious" checked>
-                    <span>Armónico</span>
+                    <span>Harmonious</span>
                   </label>
                   <label class="radio-label">
                     <input type="radio" name="chroma-mode" value="chaotic">
-                    <span>Caótico</span>
+                    <span>Chaotic</span>
                   </label>
                 </div>
               </div>
 
               <div class="toggle-option">
                 <div class="option-info">
-                  <span class="option-title">Superposición de Texto (Overlay)</span>
-                  <span class="option-desc">Muestra los caracteres iniciales/finales de la clave en la base del mosaico.</span>
+                  <span class="option-title">Text Overlay</span>
+                  <span class="option-desc">Shows the starting/ending characters of the key at the base of the mosaic.</span>
                 </div>
                 <label class="switch">
                   <input type="checkbox" id="toggle-overlay" checked>
@@ -102,8 +102,8 @@
 
               <div class="toggle-option">
                 <div class="option-info">
-                  <span class="option-title">Anclajes Topológicos</span>
-                  <span class="option-desc">Añade marcas y guías visuales en el glifo central para facilitar el conteo.</span>
+                  <span class="option-title">Topological Anchors</span>
+                  <span class="option-desc">Adds visual markers and guides to the central glyph to facilitate counting.</span>
                 </div>
                 <label class="switch">
                   <input type="checkbox" id="toggle-anchors" checked>
@@ -113,8 +113,8 @@
 
               <div class="toggle-option">
                 <div class="option-info">
-                  <span class="option-title">Tamaño de Grilla</span>
-                  <span class="option-desc">Configura el número de sectores (3x3 por defecto, escalable a 4x4 o 5x5).</span>
+                  <span class="option-title">Grid Size</span>
+                  <span class="option-desc">Configures the number of sectors (3x3 default, scalable to 4x4 or 5x5).</span>
                 </div>
                 <select id="grid-size-select" class="form-select">
                   <option value="3" selected>3 x 3</option>
@@ -125,40 +125,40 @@
             </div>
           </div>
 
-          <!-- Columna Derecha: Visualización y Desglose Técnico -->
+          <!-- Right Column: Preview and Technical Breakdown -->
           <div class="card glass-panel flex-center">
-            <h2 class="card-title">Mosaico SVG Resultante</h2>
+            <h2 class="card-title">Resulting SVG Mosaic</h2>
             <div id="identicon-preview" class="identicon-large-container">
-              <!-- SVG inyectado por JS -->
+              <!-- SVG injected by JS -->
             </div>
             
             <button id="play-audio-btn" class="btn-block" style="margin: 1rem 0; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
-              <span>🔊</span> Escuchar Llavero Sonoro
+              <span>🔊</span> Listen to Acoustic Key
             </button>
             
             <div class="technical-details">
-              <h4>Desglose Criptográfico de Semilla</h4>
+              <h4>Cryptographic Seed Breakdown</h4>
               <div class="hash-display">
                 <span class="hash-label">SHA-256:</span>
-                <code id="full-hash-code">Cargando...</code>
+                <code id="full-hash-code">Loading...</code>
               </div>
               <p class="tech-note">
-                El hash se divide en 9 partes de 3 bytes. Cada celda renderiza una geometría diferente (Voronoi, truchet, píxeles, etc.) parametrizada por sus respectivos bytes.
+                The hash is divided into 9 parts of 3 bytes. Each cell renders a different geometry (Voronoi, truchet, pixels, etc.) parameterized by its respective bytes.
               </p>
             </div>
           </div>
         </div>
       </section>
 
-      <!-- ================= PESTAÑA: COMPARADOR ================= -->
+      <!-- ================= TAB: COMPARATOR ================= -->
       <section id="comparator-tab" class="tab-panel">
         <div class="card glass-panel">
-          <h2 class="card-title text-center">Comparador de Direcciones</h2>
-          <p class="card-desc text-center">Permite comparar dos direcciones criptográficas cara a cara. Ideal para verificar que una dirección copiada coincide visualmente con la original.</p>
+          <h2 class="card-title text-center">Address Comparator</h2>
+          <p class="card-desc text-center">Compare two cryptographic addresses side-by-side. Ideal for verifying that a copied address visually matches the original.</p>
 
           <div style="display: flex; justify-content: center; margin-bottom: 1.5rem;">
             <div class="form-group" style="max-width: 250px; margin-bottom: 0; text-align: center;">
-              <label for="compare-grid-size-select" style="margin-bottom: 0.25rem;">Tamaño de Grilla para Comparar</label>
+              <label for="compare-grid-size-select" style="margin-bottom: 0.25rem;">Grid Size for Comparison</label>
               <select id="compare-grid-size-select" class="form-select">
                 <option value="3" selected>3 x 3</option>
                 <option value="4">4 x 4</option>
@@ -168,77 +168,77 @@
           </div>
 
           <div class="match-instructions-bar" style="margin: 0 auto 1.5rem auto; max-width: 650px; text-align: center; font-size: 0.85rem; color: #f59e0b; padding: 0.75rem 1.25rem; background: rgba(245, 158, 11, 0.08); border: 1px solid rgba(245, 158, 11, 0.35); border-radius: 12px; box-shadow: 0 0 15px rgba(245, 158, 11, 0.08);">
-            ⚠️ <strong>ACCIÓN OBLIGATORIA DEL USUARIO:</strong> Para garantizar la seguridad del envío, verifica que ambos llaveros sean <strong style="color: #fbbf24; text-shadow: 0 0 8px rgba(251, 191, 36, 0.4);">VISUAL Y SONORAMENTE IDÉNTICOS</strong>. Si notas cualquier diferencia cromática, de forma o melodía, no firmes la transacción.
+            ⚠️ <strong>REQUIRED USER ACTION:</strong> To guarantee secure transfers, verify that both keys are <strong style="color: #fbbf24; text-shadow: 0 0 8px rgba(251, 191, 36, 0.4);">VISUALLY & AUDIBLY IDENTICAL</strong>. If you notice any color, shape, or melody discrepancy, do not sign the transaction.
           </div>
 
           <div class="comparison-grid">
-            <!-- Dirección A -->
+            <!-- Address A -->
             <div class="comparison-column">
               <div class="form-group flex-row-align" style="display: flex; align-items: center; justify-content: space-between; min-height: 26px; margin-bottom: 0.5rem;">
-                <label for="compare-a-input" style="margin-bottom: 0;">Dirección A (Legítima / Esperada)</label>
-                <span id="xrpl-badge-a" class="xrpl-badge-unregistered">❓ No Registrado</span>
+                <label for="compare-a-input" style="margin-bottom: 0;">Address A (Legitimate / Expected)</label>
+                <span id="xrpl-badge-a" class="xrpl-badge-unregistered">❓ Unregistered</span>
               </div>
               <input type="text" id="compare-a-input" class="form-input" 
-                     placeholder="Pegar dirección de origen..." 
+                     placeholder="Paste source address..." 
                      value="0x71c81857e1519509f0750854d15f20a2b18b3a9">
               <div id="compare-a-preview" class="identicon-medium-container">
                 <!-- SVG A -->
               </div>
               <button id="play-audio-a-btn" class="btn-tiny btn-block" style="margin-top: 0.5rem; display: flex; align-items: center; justify-content: center; gap: 0.25rem;">
-                <span>🔊</span> Escuchar Llavero A
+                <span>🔊</span> Listen to Key A
               </button>
             </div>
 
-            <!-- Centro: Indicador de Estado -->
+            <!-- Center: Status Indicator -->
             <div class="comparison-status-container">
               <div id="comparison-badge" class="badge">
-                <!-- Icono de estado -->
+                <!-- Status Icon -->
               </div>
               <div id="comparison-msg" class="status-msg">
-                Cargando...
+                Loading...
               </div>
             </div>
 
-            <!-- Dirección B -->
+            <!-- Address B -->
             <div class="comparison-column">
               <div class="form-group flex-row-align" style="display: flex; align-items: center; justify-content: space-between; min-height: 26px; margin-bottom: 0.5rem;">
-                <label for="compare-b-input" style="margin-bottom: 0;">Dirección B (Destino / Copiada)</label>
+                <label for="compare-b-input" style="margin-bottom: 0;">Address B (Destination / Copied)</label>
                 <div style="display: flex; gap: 0.35rem; align-items: center;">
-                  <span id="xrpl-badge-b" class="xrpl-badge-unregistered" style="margin-right: 0.5rem;">❓ No Registrado</span>
-                  <button id="simulate-phishing-btn" class="btn-tiny" title="Mutar ligeramente para simular phishing">Phishing ⚠️</button>
-                  <button id="force-match-btn" class="btn-tiny" style="background: rgba(16, 185, 129, 0.2); border: 1px solid rgba(16, 185, 129, 0.35); color: #10b981;" title="Copiar Dirección A para comparación perfecta">Perfecta ✅</button>
+                  <span id="xrpl-badge-b" class="xrpl-badge-unregistered" style="margin-right: 0.5rem;">❓ Unregistered</span>
+                  <button id="simulate-phishing-btn" class="btn-tiny" title="Mutate slightly to simulate phishing">Phishing ⚠️</button>
+                  <button id="force-match-btn" class="btn-tiny" style="background: rgba(16, 185, 129, 0.2); border: 1px solid rgba(16, 185, 129, 0.35); color: #10b981;" title="Copy Address A for perfect comparison">Perfect ✅</button>
                 </div>
               </div>
               <input type="text" id="compare-b-input" class="form-input" 
-                     placeholder="Pegar dirección a verificar..." 
+                     placeholder="Paste address to verify..." 
                      value="0x71c81857e1519509f0750854d15f20a2b18b3a8">
               <div id="compare-b-preview" class="identicon-medium-container">
                 <!-- SVG B -->
               </div>
               <button id="play-audio-b-btn" class="btn-tiny btn-block" style="margin-top: 0.5rem; display: flex; align-items: center; justify-content: center; gap: 0.25rem;">
-                <span>🔊</span> Escuchar Llavero B
+                <span>🔊</span> Listen to Key B
               </button>
             </div>
           </div>
 
-          <!-- Panel de Registro XRPL -->
+          <!-- XRPL Registration Panel -->
           <div class="card glass-panel" style="margin-top: 2rem;">
             <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 1rem;">
               <div>
                 <h3 class="card-title" style="margin-bottom: 0.25rem; display: flex; align-items: center; gap: 0.5rem;">
-                  <span>🔒</span> Registro de Identidad Inmutable en XRPL
+                  <span>🔒</span> Immutable Identity Registry on XRPL
                 </h3>
                 <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0; line-height: 1.4;">
-                  Acuña tu llavero mosaico como un Soulbound NFT. Esto asocia tu clave pública de forma inmutable y previene ataques de phishing.
+                  Mint your mosaic key as a Soulbound NFT. This associates your public key immutably and prevents phishing attacks.
                 </p>
               </div>
               <div style="display: flex; gap: 0.75rem; align-items: center;">
                 <select id="xrpl-network-select" class="form-select" style="font-size: 0.8rem; padding: 6px 12px; max-width: 170px; margin: 0; background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; color: #fff; outline: none; cursor: pointer;">
                   <option value="testnet" selected>Testnet (Sandbox)</option>
-                  <option value="mainnet">Mainnet (Producción)</option>
+                  <option value="mainnet">Mainnet (Production)</option>
                 </select>
                 <div id="xrpl-connection-status" style="font-size: 0.78rem; font-weight: 700; color: #f43f5e; background: rgba(244, 63, 94, 0.1); padding: 0.35rem 0.75rem; border-radius: 6px; border: 1px solid rgba(244, 63, 94, 0.2); text-transform: uppercase; letter-spacing: 0.5px;">
-                  🔴 XRPL Desconectado
+                  🔴 XRPL Disconnected
                 </div>
               </div>
             </div>
@@ -247,66 +247,66 @@
               <div style="display: flex; flex-direction: column; gap: 0.85rem;">
                 
                 <div class="form-group" style="margin-bottom: 0;">
-                  <label for="xrpl-wallet-select" style="font-size: 0.8rem; font-weight: 600;">Método de Firma / Billetera</label>
+                  <label for="xrpl-wallet-select" style="font-size: 0.8rem; font-weight: 600;">Signing Method / Wallet</label>
                   <select id="xrpl-wallet-select" class="form-select" style="font-size: 0.8rem; padding: 8px 12px; background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; color: #fff; width: 100%; cursor: pointer; outline: none;">
-                    <option value="local" selected>Demostración Local (Semilla/Secret)</option>
-                    <option value="gem">Gem Wallet (Extensión Web)</option>
-                    <option value="crossmark">Crossmark (Extensión Web)</option>
-                    <option value="xaman">Xaman / Xumm (Móvil QR)</option>
+                    <option value="local" selected>Local Demo (Seed/Secret)</option>
+                    <option value="gem">Gem Wallet (Web Extension)</option>
+                    <option value="crossmark">Crossmark (Web Extension)</option>
+                    <option value="xaman">Xaman / Xumm (Mobile QR)</option>
                   </select>
                 </div>
 
-                <!-- Advertencia de seguridad para Mainnet (oculta por defecto) -->
+                <!-- Security warning for Mainnet (hidden by default) -->
                 <div id="xrpl-mainnet-warning" style="display: none; font-size: 0.8rem; color: #f43f5e; padding: 0.75rem 1rem; background: rgba(244, 63, 94, 0.08); border: 1px solid rgba(244, 63, 94, 0.3); border-radius: 8px; line-height: 1.45;">
-                  ⚠️ <strong>ADVERTENCIA DE SEGURIDAD:</strong> Nunca expongas la clave secreta de tu cuenta principal. Recomendamos usar una cuenta de pruebas dedicada con fondos mínimos (ej. 12 XRP) únicamente para mintear tu NFT de identidad.
+                  ⚠️ <strong>SECURITY WARNING:</strong> Never expose the secret key of your main account. We recommend using a dedicated testing account with minimal funds (e.g. 12 XRP) solely for minting your identity NFT.
                 </div>
 
                 <button id="xrpl-generate-wallet-btn" class="btn-generate">
-                  ⚡ Generar & Fondear Wallet de Prueba
+                  ⚡ Generate & Fund Test Wallet
                 </button>
 
                 <button id="xrpl-connect-wallet-btn" class="btn-connect" style="display: none;">
-                  🔗 Conectar Billetera Externa
+                  🔗 Connect External Wallet
                 </button>
                 
                 <div class="form-group" style="margin-bottom: 0;">
-                  <label id="xrpl-address-label" for="xrpl-address-output" style="font-size: 0.8rem; font-weight: 600;">Dirección XRPL</label>
-                  <input type="text" id="xrpl-address-output" class="form-input" readonly placeholder="Esperando conexión..." style="font-family: var(--font-mono); font-size: 0.78rem; background: rgba(15, 23, 42, 0.4); border-color: rgba(255,255,255,0.06); padding: 8px 12px; color: #38bdf8;">
+                  <label id="xrpl-address-label" for="xrpl-address-output" style="font-size: 0.8rem; font-weight: 600;">XRPL Address</label>
+                  <input type="text" id="xrpl-address-output" class="form-input" readonly placeholder="Waiting for connection..." style="font-family: var(--font-mono); font-size: 0.78rem; background: rgba(15, 23, 42, 0.4); border-color: rgba(255,255,255,0.06); padding: 8px 12px; color: #38bdf8;">
                 </div>
 
                 <div id="xrpl-secret-container" class="form-group" style="margin-bottom: 0;">
                   <label for="xrpl-secret-output" style="font-size: 0.8rem; font-weight: 600; display: flex; justify-content: space-between;">
-                    <span>Secret (Semilla / Clave Privada)</span>
-                    <span id="xrpl-secret-badge" style="color: #fbbf24; font-size: 0.75rem;">⚠️ Demostración Local</span>
+                    <span>Secret (Seed / Private Key)</span>
+                    <span id="xrpl-secret-badge" style="color: #fbbf24; font-size: 0.75rem;">⚠️ Local Demo</span>
                   </label>
-                  <input type="password" id="xrpl-secret-output" class="form-input" readonly placeholder="Esperando generación..." style="font-family: var(--font-mono); font-size: 0.78rem; background: rgba(15, 23, 42, 0.4); border-color: rgba(255,255,255,0.06); padding: 8px 12px; color: #fbbf24;">
+                  <input type="password" id="xrpl-secret-output" class="form-input" readonly placeholder="Waiting for generation..." style="font-family: var(--font-mono); font-size: 0.78rem; background: rgba(15, 23, 42, 0.4); border-color: rgba(255,255,255,0.06); padding: 8px 12px; color: #fbbf24;">
                 </div>
 
                 <button id="xrpl-register-mosaico-btn" class="btn-register" disabled>
-                  🛡️ Acuñar Llavero Mosaico (Soulbound NFT)
+                  🛡️ Mint Mosaic Key (Soulbound NFT)
                 </button>
               </div>
 
               <div style="display: flex; flex-direction: column; gap: 0.5rem; height: 100%;">
-                <label style="font-size: 0.8rem; font-weight: 600; color: var(--text-color);">Consola de Operaciones Ledger</label>
-                <div id="xrpl-console-log" style="flex-grow: 1; min-height: 220px; background: rgba(15, 23, 42, 0.75); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; font-family: var(--font-mono); font-size: 0.76rem; padding: 0.85rem; color: #38bdf8; overflow-y: auto; line-height: 1.45; box-sizing: border-box; max-height: 235px; white-space: pre-wrap; word-break: break-all; box-shadow: inset 0 2px 8px rgba(0,0,0,0.5);">[info] Inicializando cliente... Listo para conectar con Testnet.</div>
+                <label style="font-size: 0.8rem; font-weight: 600; color: var(--text-color);">Ledger Operations Console</label>
+                <div id="xrpl-console-log" style="flex-grow: 1; min-height: 220px; background: rgba(15, 23, 42, 0.75); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; font-family: var(--font-mono); font-size: 0.76rem; padding: 0.85rem; color: #38bdf8; overflow-y: auto; line-height: 1.45; box-sizing: border-box; max-height: 235px; white-space: pre-wrap; word-break: break-all; box-shadow: inset 0 2px 8px rgba(0,0,0,0.5);">[info] Initializing client... Ready to connect with Testnet.</div>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      <!-- ================= PESTAÑA: PRUEBAS DE CAMPO ================= -->
+      <!-- ================= TAB: FIELD TESTING ================= -->
       <section id="testing-tab" class="tab-panel">
         <div class="grid-2col-73">
           
-          <!-- Lado Izquierdo: El Juego de Pruebas de Campo -->
+          <!-- Left Column: Field Testing Game -->
           <div class="card glass-panel" id="game-card">
             <div class="game-header">
-              <h2 class="card-title">Simulador de Verificación Cognitiva</h2>
+              <h2 class="card-title">Cognitive Verification Simulator</h2>
               <div class="game-settings" style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
                 <div style="display: flex; align-items: center; gap: 0.5rem;">
-                  <label for="game-grid-size-select">Grilla:</label>
+                  <label for="game-grid-size-select">Grid:</label>
                   <select id="game-grid-size-select" class="form-select">
                     <option value="3" selected>3 x 3</option>
                     <option value="4">4 x 4</option>
@@ -314,80 +314,80 @@
                   </select>
                 </div>
                 <div style="display: flex; align-items: center; gap: 0.5rem;">
-                  <label for="game-mode-select">Modo:</label>
+                  <label for="game-mode-select">Mode:</label>
                   <select id="game-mode-select" class="form-select">
-                    <option value="harmonious">Modo Armónico (Recomendado)</option>
-                    <option value="chaotic">Modo Caótico</option>
+                    <option value="harmonious">Harmonious Mode (Recommended)</option>
+                    <option value="chaotic">Chaotic Mode</option>
                   </select>
                 </div>
               </div>
             </div>
             
             <p class="card-desc">
-              Prueba de campo interactiva. Se te presentará un <strong>Mosaico Objetivo</strong> y abajo verás 6 opciones de direcciones y sus identicones. 5 de ellas han sido sutilmente mutadas en su parte media para simular ataques de phishing. 
-              <strong>¿Puedes identificar la correcta al instante?</strong>
+              Interactive field test. You will be presented with a <strong>Target Mosaic</strong>, and below you will see 6 address options and their identicons. 5 of them have been subtly mutated in their middle part to simulate phishing attacks. 
+              <strong>Can you identify the correct one instantly?</strong>
             </p>
 
-            <!-- Pantalla de Inicio del Juego -->
+            <!-- Game Start Screen -->
             <div id="game-start-screen" class="game-screen active">
               <div class="start-content">
                 <span class="start-icon">🎯</span>
-                <h3>Prueba de Velocidad y Precisión Visual</h3>
-                <p>Mide cuánto tiempo te toma detectar una dirección mutada (ataque de phishing) utilizando la ayuda visual de los mosaicos 3x3 en comparación con ambos modos cromáticos.</p>
-                <button id="start-game-btn" class="btn-primary">Iniciar Simulación</button>
+                <h3>Visual Accuracy & Speed Test</h3>
+                <p>Measure how long it takes you to detect a mutated address (phishing attack) using the visual aid of 3x3 mosaics compared across both chromatic modes.</p>
+                <button id="start-game-btn" class="btn-primary">Start Simulation</button>
               </div>
             </div>
 
-            <!-- Pantalla del Juego Activo -->
+            <!-- Game Active Screen -->
             <div id="game-active-screen" class="game-screen">
               <div class="target-container">
                 <div class="target-card">
-                  <span class="badge-target">OBJETIVO</span>
+                  <span class="badge-target">TARGET</span>
                   <div id="game-target-preview" class="identicon-target-container">
-                    <!-- SVG Objetivo -->
+                    <!-- Target SVG -->
                   </div>
                 </div>
                  <div class="target-instructions">
                   <div class="flex-row-align" style="margin-bottom: 0.5rem; gap: 1rem; width: 100%;">
-                    <h4 style="margin: 0;">Busca este mosaico exacto abajo</h4>
+                    <h4 style="margin: 0;">Find this exact mosaic below</h4>
                     <div class="game-timer" style="font-family: var(--font-mono); font-size: 0.9rem; font-weight: 700; color: var(--primary); background: rgba(99, 102, 241, 0.1); padding: 0.25rem 0.6rem; border-radius: 6px; border: 1px solid rgba(99, 102, 241, 0.2); white-space: nowrap;">
                       ⏱️ <span id="game-timer-ms">0.000</span>s
                     </div>
                   </div>
-                  <p>Compara el patrón geométrico, el anclaje y escucha los audios de las opciones.</p>
+                  <p>Compare the geometric pattern, the anchors, and listen to the audios of the options.</p>
                   <p style="color: #fbbf24; background: rgba(245, 158, 11, 0.08); border: 1px solid rgba(245, 158, 11, 0.25); padding: 0.4rem 0.8rem; border-radius: 8px; font-size: 0.82rem; font-weight: 600; line-height: 1.4; margin-top: 0.4rem;">
-                    ⚠️ <strong>REGLA DE CONCORDANCIA:</strong> La opción correcta debe ser <span style="text-shadow: 0 0 6px rgba(251, 191, 36, 0.5); text-decoration: underline;">visual y sonoramente idéntica</span> al objetivo.
+                    ⚠️ <strong>MATCHING RULE:</strong> The correct option must be <span style="text-shadow: 0 0 6px rgba(251, 191, 36, 0.5); text-decoration: underline;">visually and audibly identical</span> to the target.
                   </p>
                   <button id="play-game-target-audio-btn" class="btn-tiny" style="margin-top: 0.5rem; display: flex; align-items: center; gap: 0.25rem; width: auto; max-width: 180px;">
-                    <span>🔊</span> Escuchar Objetivo
+                    <span>🔊</span> Listen to Target
                   </button>
                 </div>
               </div>
 
               <div class="options-grid" id="game-options-container">
-                <!-- 6 Tarjetas de opción inyectadas por JS -->
+                <!-- 6 Option cards injected by JS -->
               </div>
             </div>
           </div>
 
-          <!-- Lado Derecho: Estadísticas del Estudio de Campo -->
+          <!-- Right Column: Field Study Statistics -->
           <div class="card glass-panel">
-            <h2 class="card-title">Panel de Resultados</h2>
-            <p class="card-desc">Métricas y datos locales agregados del estudio de usabilidad.</p>
+            <h2 class="card-title">Results Panel</h2>
+            <p class="card-desc">Aggregated local metrics and usability study data.</p>
 
             <div class="stats-box">
               <div class="stat-group">
-                <h4>Modo Armónico (Colores balanceados)</h4>
+                <h4>Harmonious Mode (Balanced colors)</h4>
                 <div class="stat-row">
-                  <span class="stat-label">Pruebas Totales:</span>
+                  <span class="stat-label">Total Tests:</span>
                   <span id="stat-harm-count" class="stat-value">0</span>
                 </div>
                 <div class="stat-row">
-                  <span class="stat-label">Tasa de Acierto:</span>
+                  <span class="stat-label">Success Rate:</span>
                   <span id="stat-harm-success" class="stat-value">0%</span>
                 </div>
                 <div class="stat-row">
-                  <span class="stat-label">Tiempo de Reacción:</span>
+                  <span class="stat-label">Reaction Time:</span>
                   <span id="stat-harm-time" class="stat-value">0.0s</span>
                 </div>
               </div>
@@ -395,17 +395,17 @@
               <div class="divider"></div>
 
               <div class="stat-group">
-                <h4>Modo Caótico (Máxima entropía)</h4>
+                <h4>Chaotic Mode (Maximum entropy)</h4>
                 <div class="stat-row">
-                  <span class="stat-label">Pruebas Totales:</span>
+                  <span class="stat-label">Total Tests:</span>
                   <span id="stat-chao-count" class="stat-value">0</span>
                 </div>
                 <div class="stat-row">
-                  <span class="stat-label">Tasa de Acierto:</span>
+                  <span class="stat-label">Success Rate:</span>
                   <span id="stat-chao-success" class="stat-value">0%</span>
                 </div>
                 <div class="stat-row">
-                  <span class="stat-label">Tiempo de Reacción:</span>
+                  <span class="stat-label">Reaction Time:</span>
                   <span id="stat-chao-time" class="stat-value">0.0s</span>
                 </div>
               </div>
@@ -413,29 +413,29 @@
               <div class="divider"></div>
 
               <div class="stat-group">
-                <h4>Rendimiento de Racha Perfecta</h4>
+                <h4>Perfect Streak Performance</h4>
                 <div class="stat-row">
-                  <span class="stat-label">Racha de Aciertos:</span>
+                  <span class="stat-label">Success Streak:</span>
                   <span id="stat-current-streak" class="stat-value">0</span>
                 </div>
                 <div class="stat-row">
-                  <span class="stat-label">Promedio Racha (5+):</span>
+                  <span class="stat-label">Streak Average (5+):</span>
                   <span id="stat-streak-avg-time" class="stat-value">N/A</span>
                 </div>
               </div>
             </div>
 
             <div class="stats-actions" style="display: flex; gap: 0.75rem; margin-bottom: 1.5rem;">
-              <button id="reset-stats-btn" class="btn-danger btn-block" style="flex: 1; padding: 10px 16px;">Reiniciar</button>
+              <button id="reset-stats-btn" class="btn-danger btn-block" style="flex: 1; padding: 10px 16px;">Reset</button>
               <button id="share-stats-btn" class="btn-secondary btn-block" style="flex: 1; font-size: 0.85rem; padding: 10px 16px; margin: 0; display: inline-flex; align-items: center; justify-content: center; gap: 0.25rem;">
-                <span>📢</span> Compartir
+                <span>📢</span> Share
               </button>
             </div>
 
             <div class="conclusions-box">
-              <h5>Análisis de Diseño</h5>
+              <h5>Design Analysis</h5>
               <p id="stats-analysis-text">
-                Realiza al menos 3 pruebas en cada modo para ver el análisis de rendimiento cognitivo y verificar cuál de las propuestas resulta más efectiva frente a la fatiga visual humana.
+                Perform at least 3 tests in each mode to see the cognitive performance analysis and verify which proposal is more effective against human visual fatigue.
               </p>
             </div>
           </div>
@@ -446,11 +446,11 @@
     </main>
 
     <footer class="app-footer-info">
-      <p>Mosaico Criptográfico es un estándar de código abierto, determinista e inmutable. Desarrollado localmente de forma descentralizada y Zero-Server.</p>
+      <p>Cryptographic Mosaic is an open-source, deterministic, and immutable standard. Developed locally in a decentralized and serverless manner.</p>
     </footer>
   </div>
 
-  <!-- Inyección de módulos JavaScript -->
+  <!-- JavaScript module injection -->
   <script type="module" src="main.js"></script>
 </body>
 </html>

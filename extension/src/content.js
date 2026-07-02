@@ -1,16 +1,16 @@
 /**
- * Content Script de Mosaico Criptográfico Overlay
- * Escanea el DOM en busca de direcciones XRPL e inyecta la insignia visual.
+ * Cryptographic Mosaic Overlay Content Script.
+ * Scans the DOM for XRPL addresses and injects the visual badge.
  */
 
-// Expresión regular para direcciones XRPL estándar
+// Regular expression for standard XRPL addresses
 const XRPL_ADDRESS_REGEX = /\b(r[1-9A-HJ-NP-Za-km-z]{25,35})\b/g;
 
-// Evitar inyectar múltiples veces en el mismo nodo
+// Avoid double injection in the same node
 const MARKER_CLASS = 'mosaico-processed';
 
 /**
- * Calcula el hash SHA-256 de forma asíncrona usando Web Crypto API.
+ * Computes the SHA-256 hash asynchronously using Web Crypto API.
  */
 async function computeSha256(text) {
   const msgUint8 = new TextEncoder().encode(text);
@@ -19,7 +19,7 @@ async function computeSha256(text) {
 }
 
 /**
- * Escanea y procesa nodos de texto en el DOM
+ * Scans and processes text nodes in the DOM.
  */
 function scanDocument() {
   const walker = document.createTreeWalker(
@@ -27,7 +27,7 @@ function scanDocument() {
     NodeFilter.SHOW_TEXT,
     {
       acceptNode: function(node) {
-        // Ignorar scripts, estilos, e inputs
+        // Ignore scripts, styles, inputs, and textareas
         const parent = node.parentElement;
         if (!parent) return NodeFilter.FILTER_REJECT;
         const tag = parent.tagName.toLowerCase();
@@ -53,14 +53,14 @@ function scanDocument() {
 }
 
 /**
- * Procesa un nodo de texto que contiene una dirección XRPL
+ * Processes a text node containing an XRPL address.
  */
 function processTextNode(node) {
   const parent = node.parentElement;
   if (!parent) return;
 
   const text = node.nodeValue;
-  XRPL_ADDRESS_REGEX.lastIndex = 0; // Resetear expresión regular
+  XRPL_ADDRESS_REGEX.lastIndex = 0; // Reset regex index
 
   const fragment = document.createDocumentFragment();
   let lastIndex = 0;
@@ -70,43 +70,43 @@ function processTextNode(node) {
     const matchText = match[0];
     const matchIndex = match.index;
 
-    // Texto antes de la dirección
+    // Text before the address
     if (matchIndex > lastIndex) {
       fragment.appendChild(document.createTextNode(text.substring(lastIndex, matchIndex)));
     }
 
-    // Contenedor de la dirección + Mosaico
+    // Address + Mosaic container
     const container = document.createElement('span');
     container.className = 'mosaico-address-container';
 
-    // Dirección original
+    // Original address text
     const addressSpan = document.createElement('span');
     addressSpan.className = 'mosaico-address-text';
     addressSpan.textContent = matchText;
     container.appendChild(addressSpan);
 
-    // Placeholder del Mosaico (Círculo cargando / miniatura)
+    // Mosaic placeholder (Miniature / loading icon)
     const badge = document.createElement('span');
     badge.className = 'mosaico-mini-badge';
-    badge.title = `Firma visual para: ${matchText}`;
-    badge.innerHTML = '💠'; // Icono placeholder antes del render síncrono del SVG
+    badge.title = `Visual signature for: ${matchText}`;
+    badge.innerHTML = '💠'; // Placeholder icon before asynchronous SVG rendering
     
-    // Asignar datos para procesamiento asíncrono
+    // Assign data for asynchronous processing
     badge.dataset.address = matchText;
 
-    // Calcular el hash y renderizar el mosaico real de forma asíncrona
+    // Compute hash and render visual mosaic asynchronously
     computeSha256(matchText).then(hash => {
       if (window.generateMosaicoSvg) {
         const svgString = window.generateMosaicoSvg(hash, matchText, {
           chaoticMode: false,
-          showOverlay: false, // Ocultar overlay de texto ya que es una mini insignia
+          showOverlay: false, // Hide text overlay since this is a mini badge
           showAnchors: true,
           gridSize: 3
         });
         badge.innerHTML = svgString;
       }
     }).catch(err => {
-      console.error("Error al generar mosaico para la extensión:", err);
+      console.error("Error generating mosaic for extension:", err);
     });
     
     container.appendChild(badge);
@@ -115,21 +115,21 @@ function processTextNode(node) {
     lastIndex = XRPL_ADDRESS_REGEX.lastIndex;
   }
 
-  // Texto restante
+  // Remaining text
   if (lastIndex < text.length) {
     fragment.appendChild(document.createTextNode(text.substring(lastIndex)));
   }
 
-  // Marcar elemento padre para evitar loops y reemplazar
+  // Mark parent element to avoid infinite loops and replace node
   parent.classList.add(MARKER_CLASS);
   parent.replaceChild(fragment, node);
 }
 
-// Iniciar escaneo al cargar la página
+// Start scanning upon page load
 window.addEventListener('load', () => {
   scanDocument();
   
-  // Observar cambios dinámicos en el DOM (Single Page Applications)
+  // Observe dynamic changes in the DOM (Single Page Applications)
   const observer = new MutationObserver((mutations) => {
     let shouldScan = false;
     for (const mutation of mutations) {

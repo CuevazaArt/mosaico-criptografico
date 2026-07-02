@@ -1,84 +1,88 @@
-# XLS-XX: Mosaico Criptográfico (Visual Identity Standard)
+# XLS-XX: Cryptographic Mosaic (Visual Identity Standard)
 
-**Autor:** CuevazaArt  
-**Estatus:** Borrador (Draft)  
-**Categoría:** Estándar de Interfaz (Standards Track / XLS)  
-**Fecha:** 2026-07-02  
-
----
-
-## 1. Resumen Ejecutivo (Abstract)
-Esta propuesta define un estándar de generación de **hashes visuales y acústicos deterministas (Identicones y Llaveros Sonoros)** para direcciones de XRP Ledger. El estándar permite a billeteras, dApps y exploradores de bloques renderizar una cuadrícula SVG de $3 \times 3$, $4 \times 4$ o $5 \times 5$ sectores y reproducir un arpegio sonoro de 4 notas de manera uniforme, ayudando al usuario a validar visual y auditivamente la autenticidad de las direcciones de envío y prevenir ataques de phishing por semejanza y clipboard hijacking.
+**Author:** CuevazaArt  
+**Status:** Draft  
+**Category:** Standards Track / XLS (Interface Standard)  
+**Date:** 2026-07-02  
 
 ---
 
-## 2. Motivación (Motivation)
-Las direcciones públicas de XRPL son cadenas alfanuméricas complejas de 25 a 35 caracteres (ej. `rP1p...g2y`). Los humanos son incapaces de recordar o comparar estas cadenas de forma exhaustiva bajo fatiga, revisando típicamente solo los primeros y últimos caracteres. Los atacantes aprovechan esto generando direcciones falsas con los mismos caracteres extremos (*Vanity Addresses*).
+## 1. Abstract
 
-Al mapear el hash SHA-256 de la dirección a formas geométricas y colores discretos deterministas, convertimos la validación en una tarea de reconocimiento sensorial simple. Si una dirección varía en un solo carácter intermedio, el mosaico resultante y la melodía son drásticamente diferentes, alertando al instante al usuario.
+This proposal defines a standard for generating **deterministic visual and acoustic hashes (Identicons and Acoustic Keys)** for XRP Ledger addresses. The standard enables wallets, dApps, and block explorers to uniformly render a vector SVG grid of $3 \times 3$, $4 \times 4$, or $5 \times 5$ sectors and play a 4-note arpeggio melody. This helps users visually and acoustically validate the authenticity of destination addresses, preventing vanity phishing and clipboard hijacking attacks.
 
 ---
 
-## 3. Especificación Técnica (Technical Specification)
+## 2. Motivation
 
-Para que el mosaico sea idéntico en cualquier billetera o cliente (JavaScript, Swift, Kotlin, Rust), se deben cumplir los siguientes requisitos de cálculo:
+XRPL public addresses are complex alphanumeric strings of 25 to 35 characters (e.g., `rP1p...g2y`). Humans are unable to remember or compare these strings exhaustively under fatigue, typically checking only the start and end characters. Attackers exploit this by generating malicious addresses with matching extreme characters (*Vanity Addresses*).
 
-### A. Cálculo del Hash Base
-1. La dirección XRPL en formato base58 se somete a un algoritmo de hashing **SHA-256**.
-2. El resultado debe ser un buffer de **32 bytes** ($Bytes[0..31]$).
+By mapping the address's SHA-256 hash to deterministic, discrete geometric shapes and colors, we convert validation into a simple sensory recognition task. If an address varies by a single intermediate character, the resulting mosaic and melody will be drastically different, alerting the user instantly.
 
-### B. Distribución Espacial (Fisher-Yates Shuffle)
-Para una cuadrícula de tamaño $N \times N$ (donde $N \in \{3, 4, 5\}$), el número total de celdas es $C = N^2$.
-1. Inicializar un array secuencial del tamaño de las celdas: $Layout = [0, 1, 2, ..., C-1]$.
-2. Realizar un barajado Fisher-Yates determinista indexado por el hash:
+---
+
+## 3. Technical Specification
+
+For the mosaic to remain identical across any wallet or client (JavaScript, Swift, Kotlin, Rust), the following computation requirements must be met:
+
+### A. Base Hash Computation
+1. The base58-encoded XRPL address is processed using the **SHA-256** hashing algorithm.
+2. The result must be a **32-byte** buffer ($Bytes[0..31]$).
+
+### B. Spatial Distribution (Fisher-Yates Shuffle)
+For a grid of size $N \times N$ (where $N \in \{3, 4, 5\}$), the total number of cells is $C = N^2$.
+1. Initialize a sequential cell array: $Layout = [0, 1, 2, ..., C-1]$.
+2. Perform a deterministic Fisher-Yates shuffle indexed by the hash:
    ```javascript
    for (let k = C - 1; k > 0; k--) {
      const j = Hash[k % 32] % (k + 1);
-     // Intercambiar Layout[k] y Layout[j]
+     // Swap Layout[k] and Layout[j]
      const temp = Layout[k];
      Layout[k] = Layout[j];
      Layout[j] = temp;
    }
    ```
-3. Cada celda física $i \in [0..C-1]$ de la grilla renderizará la celda lógica correspondiente a $Layout[i]$.
+3. Each physical cell $i \in [0..C-1]$ of the grid will render the logical cell corresponding to $Layout[i]$.
 
-### C. Mapeo Cromático Discreto (12 Familias de Color)
-Para evitar que diferencias en pantallas o filtros nocturnos (Night Shift) alteren la percepción del color:
-1. Extraer los bytes de configuración:
+### C. Discrete Chromatic Mapping (12 Color Families)
+To prevent screen differences or blue-light filters (Night Shift) from altering color perception:
+1. Extract configuration bytes:
    * $globalHue = (Hash[30] \times 256 + Hash[31]) \pmod{360}$
-2. Para cada celda lógica $LogicalIndex$, calcular un offset dinámico de datos de 3 bytes:
+2. For each logical cell $LogicalIndex$, calculate a dynamic 3-byte data offset:
    * $cDataOffset = (LogicalIndex \times 3) \pmod{26}$
    * $cData = [Hash[cDataOffset], Hash[cDataOffset + 1], Hash[cDataOffset + 2]]$
-3. Calcular el tono ($h$), saturación ($s$) y luminosidad ($l$):
-   * Modo Armónico: $h = (globalHue + (cData[0] \pmod{60}) - 30 + 360) \pmod{360}$
-4. **Cuantizar el tono ($h$) en múltiplos de 30 grados** para forzar 12 familias cromáticas distinguibles:
-   * $h = (\text{redondear}(h / 30) \times 30) \pmod{360}$
-5. Definir la paleta de la celda:
-   * $ColorBase = HSL(h, s, l)$
-   * $ColorOscuro = HSL(h, s, \max(10, l - 20))$
-   * $ColorClaro = HSL(h, s, \min(95, l + 20))$
+3. Calculate hue ($h$), saturation ($s$), and lightness ($l$):
+   * Harmonious Mode: $h = (globalHue + (cData[0] \pmod{60}) - 30 + 360) \pmod{360}$
+4. **Quantize the hue ($h$) in multiples of 30 degrees** to force 12 distinguishable chromatic families:
+   * $h = (\text{round}(h / 30) \times 30) \pmod{360}$
+5. Define the cell's palette:
+   * $BaseColor = HSL(h, s, l)$
+   * $DarkColor = HSL(h, s, \max(10, l - 20))$
+   * $LightColor = HSL(h, s, \min(95, l + 20))$
 
-### D. Geometrías de Celdas (9 Tipos Base)
-Cada celda lógica de la grilla ejecuta un sub-renderizador basado en $CellType = LogicalIndex \pmod 9$:
-* **Tipo 0:** Cristal Low-Poly (Triángulos conectados a las esquinas).
-* **Tipo 1:** Anillos y rayos concéntricos.
-* **Tipo 2:** Checkerboard rotado (Tablero de ajedrez).
-* **Tipo 3:** Truchet Arcs (Tuberías curvas de laberinto).
-* **Tipo 4 (Anclaje):** Glifo central (Estrella o polígono regular contable).
-* **Tipo 5:** Ondas sinusoidales superpuestas.
-* **Tipo 6:** Vórtice espiral.
-* **Tipo 7:** Avatar Pixel-Art 5x5 simétrico.
-* **Tipo 8:** Fractales geométricos recursivos.
-
----
-
-## 4. Firma Acústica Mnemónica (Acoustic Specification)
-El audio debe generarse de forma determinista usando osciladores sinusoidales y triangulares libres de samples:
-1. **Frecuencia Fundamental (F0):** $F0 = 160 + (Hash[31] \pmod{120}) \text{ Hz}$.
-2. **Escala Pentatónica:** Generar la escala usando intervalos en semitonos: $[0, 2, 4, 7, 9, 12, 14, 16, 19, 21]$.
-3. **Secuenciación:** Reproducir una melodía de 4 notas de 160ms cada una utilizando las celdas lógicas de las primeras 4 posiciones del $Layout$ para determinar las notas.
+### D. Cell Geometries (9 Base Types)
+Each logical cell in the grid executes a sub-renderer based on $CellType = LogicalIndex \pmod 9$:
+* **Type 0:** Low-Poly Crystal (Triangles connected to corners).
+* **Type 1:** Concentric rings and rays.
+* **Type 2:** Rotated checkerboard.
+* **Type 3:** Truchet Arcs (Curved labyrinth pipes).
+* **Type 4 (Anchor):** Central glyph (Countable star or regular polygon).
+* **Type 5:** Overlapping sine waves.
+* **Type 6:** Spiral vortex.
+* **Type 7:** Symmetric 5x5 Pixel-Art avatar.
+* **Type 8:** Recursive geometric fractals.
 
 ---
 
-## 5. Consideraciones de Seguridad (Security Considerations)
-* **Autenticidad Autónoma (Self-Issued Verification):** Para evitar que un tercero emita un NFT representativo de otra cuenta, el validador cliente debe verificar que para cualquier NFT con taxon `1001`, el emisor (`Issuer`) coincida exactamente con el propietario (`Owner`).
+## 4. Mnemonic Acoustic Signature (Acoustic Specification)
+
+Audio must be generated deterministically using sample-free sine and triangle oscillators:
+1. **Fundamental Frequency (F0):** $F0 = 160 + (Hash[31] \pmod{120}) \text{ Hz}$.
+2. **Pentatonic Scale:** Generate the scale using intervals in semitones: $[0, 2, 4, 7, 9, 12, 14, 16, 19, 21]$.
+3. **Sequencing:** Play a 4-note melody (160ms per note) using the logical cells of the first 4 positions of the $Layout$ to determine the notes.
+
+---
+
+## 5. Security Considerations
+
+* **Autonomous Authenticity (Self-Issued Verification):** To prevent third parties from issuing an NFT representative of another account, the client validator must verify that for any NFT with taxon `1001`, the issuer (`Issuer`) matches the owner (`Owner`) exactly.

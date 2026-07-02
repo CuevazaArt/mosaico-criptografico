@@ -155,25 +155,25 @@ function initComparator() {
   let isInitialLoad = true;
   let generatedSecret = null;
 
-  // Consola de logs en UI con soporte para links de transacciones
-  const logToXrplConsole = (msg) => {
-    const timestamp = new Date().toLocaleTimeString();
-    const cleanMsg = msg.replace(/\[red\]/g, '').replace(/\[info\]/g, '');
-    let finalMsg = cleanMsg;
-    
-    // Si contiene "Hash de Tx: <hash>", agregar link del explorador
-    const txHashMatch = cleanMsg.match(/Hash de Tx:\s*([A-F0-9]+)/i);
-    if (txHashMatch) {
-      const txHash = txHashMatch[1];
-      const explorerUrl = getXrplNetwork() === 'mainnet' 
-        ? `https://livenet.xrpl.org/transactions/${txHash}` 
-        : `https://testnet.xrpl.org/transactions/${txHash}`;
-      finalMsg += `\n[Explorador] ${explorerUrl}`;
-    }
-    
-    xrplConsoleLog.innerText += `\n[${timestamp}] ${finalMsg}`;
-    xrplConsoleLog.scrollTop = xrplConsoleLog.scrollHeight;
-  };
+    // Consola de logs en UI con soporte para links de transacciones
+    const logToXrplConsole = (msg) => {
+      const timestamp = new Date().toLocaleTimeString();
+      const cleanMsg = msg.replace(/\[red\]/g, '').replace(/\[info\]/g, '');
+      let finalMsg = cleanMsg;
+      
+      // Si contiene "Hash de Tx: <hash>", agregar link del explorador
+      const txHashMatch = cleanMsg.match(/Tx Hash:\s*([A-F0-9]+)/i);
+      if (txHashMatch) {
+        const txHash = txHashMatch[1];
+        const explorerUrl = getXrplNetwork() === 'mainnet' 
+          ? `https://livenet.xrpl.org/transactions/${txHash}` 
+          : `https://testnet.xrpl.org/transactions/${txHash}`;
+        finalMsg += `\n[Explorer] ${explorerUrl}`;
+      }
+      
+      xrplConsoleLog.innerText += `\n[${timestamp}] ${finalMsg}`;
+      xrplConsoleLog.scrollTop = xrplConsoleLog.scrollHeight;
+    };
 
   const updateComparison = async (userTriggered = false) => {
     // Parar audio activo al cambiar entradas
@@ -195,10 +195,10 @@ function initComparator() {
       checkAddressRegistration(valA, logToXrplConsole).then(isReg => {
         if (isReg) {
           xrplBadgeA.className = 'xrpl-badge-registered';
-          xrplBadgeA.innerHTML = `🛡️ Registrado (${netLabel})`;
+          xrplBadgeA.innerHTML = `🛡️ Registered (${netLabel})`;
         } else {
           xrplBadgeA.className = 'xrpl-badge-unregistered';
-          xrplBadgeA.innerHTML = '❓ No Registrado';
+          xrplBadgeA.innerHTML = '❓ Unregistered';
         }
       });
     } else {
@@ -206,12 +206,12 @@ function initComparator() {
       previewA.innerHTML = `
         <div class="empty-preview-placeholder">
           <span>🔑</span>
-          <p>Esperando Dirección A...</p>
+          <p>Waiting for Address A...</p>
         </div>
       `;
       playAudioABtn.disabled = true;
       xrplBadgeA.className = 'xrpl-badge-unregistered';
-      xrplBadgeA.innerHTML = '❓ No Registrado';
+      xrplBadgeA.innerHTML = '❓ Unregistered';
     }
 
     if (valB) {
@@ -224,10 +224,10 @@ function initComparator() {
       checkAddressRegistration(valB, logToXrplConsole).then(isReg => {
         if (isReg) {
           xrplBadgeB.className = 'xrpl-badge-registered';
-          xrplBadgeB.innerHTML = `🛡️ Registrado (${netLabel})`;
+          xrplBadgeB.innerHTML = `🛡️ Registered (${netLabel})`;
         } else {
           xrplBadgeB.className = 'xrpl-badge-unregistered';
-          xrplBadgeB.innerHTML = '❓ No Registrado';
+          xrplBadgeB.innerHTML = '❓ Unregistered';
         }
       });
     } else {
@@ -235,12 +235,12 @@ function initComparator() {
       previewB.innerHTML = `
         <div class="empty-preview-placeholder">
           <span>🔑</span>
-          <p>Esperando Dirección B...</p>
+          <p>Waiting for Address B...</p>
         </div>
       `;
       playAudioBBtn.disabled = true;
       xrplBadgeB.className = 'xrpl-badge-unregistered';
-      xrplBadgeB.innerHTML = '❓ No Registrado';
+      xrplBadgeB.innerHTML = '❓ Unregistered';
     }
 
     // Efecto de feedback auditivo al pegar/escribir direcciones
@@ -249,20 +249,20 @@ function initComparator() {
         if (valA === valB) {
           playMatchSequence();
           statusBadge.className = 'status-badge match';
-          statusBadge.innerText = '✓ COINCIDENCIA PERFECTA';
-          statusMsg.innerText = 'Ambas firmas criptográficas y acústicas son idénticas. Es seguro proceder.';
+          statusBadge.innerText = '✓ PERFECT MATCH';
+          statusMsg.innerText = 'Both cryptographic and acoustic signatures are identical. Safe to proceed.';
           comparisonGrid.classList.remove('mismatch-detected');
         } else {
           playMismatchSequence();
           statusBadge.className = 'status-badge mismatch';
-          statusBadge.innerText = '⚠️ DISCREPANCIA DETECTADA';
-          statusMsg.innerText = '¡Alerta! Las firmas visuales y de audio difieren. Posible ataque de phishing o dirección corrupta.';
+          statusBadge.innerText = '⚠️ DISCREPANCY DETECTED';
+          statusMsg.innerText = 'Warning! Visual and audio signatures differ. Possible phishing attack or corrupted address.';
           comparisonGrid.classList.add('mismatch-detected');
         }
       } else {
         statusBadge.className = 'status-badge neutral';
-        statusBadge.innerText = 'ESPERANDO ENTRADAS';
-        statusMsg.innerText = 'Ingresa o pega dos direcciones para comparar instantáneamente su firma sensorial.';
+        statusBadge.innerText = 'WAITING FOR INPUTS';
+        statusMsg.innerText = 'Enter or paste two addresses to instantly compare their sensory signature.';
         comparisonGrid.classList.remove('mismatch-detected');
       }
     }
@@ -277,13 +277,13 @@ function initComparator() {
       xrplAddressOutput.value = "";
       xrplRegisterMosaicoBtn.disabled = true;
       xrplConnStatus.className = 'disconnected';
-      xrplConnStatus.textContent = '🔴 XRPL Desconectado';
+      xrplConnStatus.textContent = '🔴 XRPL Disconnected';
       return;
     }
 
     try {
       if (typeof window.xrpl === 'undefined') {
-        throw new Error("SDK de XRPL no disponible.");
+        throw new Error("XRPL SDK not available.");
       }
       
       const wallet = window.xrpl.Wallet.fromSeed(seed);
@@ -291,16 +291,16 @@ function initComparator() {
       generatedSecret = seed;
       
       xrplConnStatus.className = 'connected';
-      xrplConnStatus.textContent = '🟢 XRPL Conectado';
+      xrplConnStatus.textContent = '🟢 XRPL Connected';
       xrplRegisterMosaicoBtn.disabled = false;
       
-      logToXrplConsole(`[info] Clave secreta válida para: ${wallet.address}`);
+      logToXrplConsole(`[info] Valid secret key for: ${wallet.address}`);
     } catch (err) {
       xrplAddressOutput.value = "";
       generatedSecret = null;
       xrplRegisterMosaicoBtn.disabled = true;
       xrplConnStatus.className = 'disconnected';
-      xrplConnStatus.textContent = '🔴 Clave Secreta Inválida';
+      xrplConnStatus.textContent = '🔴 Invalid Secret Key';
     }
   };
 
@@ -311,7 +311,7 @@ function initComparator() {
 
     // Resetear estados al cambiar opciones
     xrplConnStatus.className = 'disconnected';
-    xrplConnStatus.textContent = '🔴 XRPL Desconectado';
+    xrplConnStatus.textContent = '🔴 XRPL Disconnected';
     xrplRegisterMosaicoBtn.disabled = true;
     generatedSecret = null;
 
@@ -323,14 +323,14 @@ function initComparator() {
         xrplGenWalletBtn.style.display = 'none';
         xrplMainnetWarning.style.display = 'block';
 
-        xrplAddressLabel.textContent = "Dirección XRPL Autocargada (desde Secret)";
+        xrplAddressLabel.textContent = "Autoloaded XRPL Address (from Secret)";
         xrplAddressOutput.value = "";
-        xrplAddressOutput.placeholder = "Se calculará al ingresar el Secret...";
+        xrplAddressOutput.placeholder = "Will be calculated upon entering the Secret...";
 
         xrplSecretBadge.style.color = "#f43f5e";
-        xrplSecretBadge.textContent = "⚠️ Entrada Requerida";
+        xrplSecretBadge.textContent = "⚠️ Input Required";
         xrplSecretOutput.value = "";
-        xrplSecretOutput.placeholder = "Ingresa tu clave secreta (Secret/Seed) de Mainnet...";
+        xrplSecretOutput.placeholder = "Enter your Mainnet secret key (Secret/Seed)...";
         xrplSecretOutput.readOnly = false;
         xrplSecretOutput.removeAttribute('readonly');
 
@@ -340,14 +340,14 @@ function initComparator() {
         xrplGenWalletBtn.disabled = false;
         xrplMainnetWarning.style.display = 'none';
 
-        xrplAddressLabel.textContent = "Dirección XRPL Testnet Faucet";
+        xrplAddressLabel.textContent = "XRPL Testnet Faucet Address";
         xrplAddressOutput.value = "";
-        xrplAddressOutput.placeholder = "Esperando generación...";
+        xrplAddressOutput.placeholder = "Waiting for generation...";
 
         xrplSecretBadge.style.color = "#fbbf24";
-        xrplSecretBadge.textContent = "⚠️ Demostración Local";
+        xrplSecretBadge.textContent = "⚠️ Local Demo";
         xrplSecretOutput.value = "";
-        xrplSecretOutput.placeholder = "Esperando generación...";
+        xrplSecretOutput.placeholder = "Waiting for generation...";
         xrplSecretOutput.readOnly = true;
         xrplSecretOutput.setAttribute('readonly', 'true');
 
@@ -364,11 +364,11 @@ function initComparator() {
       xrplConnectWalletBtn.disabled = false;
 
       const walletName = selectedWallet === 'gem' ? 'Gem Wallet' : (selectedWallet === 'crossmark' ? 'Crossmark' : 'Xaman');
-      xrplConnectWalletBtn.textContent = `🔗 Conectar Billetera (${walletName})`;
+      xrplConnectWalletBtn.textContent = `🔗 Connect Wallet (${walletName})`;
 
-      xrplAddressLabel.textContent = `Dirección vinculada via ${walletName}`;
+      xrplAddressLabel.textContent = `Address linked via ${walletName}`;
       xrplAddressOutput.value = "";
-      xrplAddressOutput.placeholder = `Haz clic en 'Conectar Billetera (${walletName})'...`;
+      xrplAddressOutput.placeholder = `Click 'Connect Wallet (${walletName})'...`;
     }
     updateComparison(false);
   };
@@ -377,12 +377,12 @@ function initComparator() {
   xrplNetworkSelect.addEventListener('change', () => {
     const selectedNet = xrplNetworkSelect.value;
     setXrplNetwork(selectedNet);
-    logToXrplConsole(`[info] Red cambiada a ${selectedNet === 'mainnet' ? 'Mainnet' : 'Testnet'}. Listo para conectar.`);
+    logToXrplConsole(`[info] Network changed to ${selectedNet === 'mainnet' ? 'Mainnet' : 'Testnet'}. Ready to connect.`);
     updateWalletUILayout();
   });
 
   xrplWalletSelect.addEventListener('change', () => {
-    logToXrplConsole(`[info] Método cambiado a ${xrplWalletSelect.value}.`);
+    logToXrplConsole(`[info] Method changed to ${xrplWalletSelect.value}.`);
     updateWalletUILayout();
   });
 
@@ -590,23 +590,23 @@ function initTestingSuite() {
     const c = stats.chaotic;
     
     if (h.total < 3 || c.total < 3) {
-      statsAnalysisText.innerHTML = `Realiza al menos <strong>3 pruebas en cada modo</strong> para evaluar el rendimiento. <br>(Llevas: Armónico ${h.total}/3, Caótico ${c.total}/3)`;
+      statsAnalysisText.innerHTML = `Perform at least <strong>3 tests in each mode</strong> to evaluate cognitive performance. <br>(Progress: Harmonious ${h.total}/3, Chaotic ${c.total}/3)`;
     } else {
-      let analysis = "<strong>Conclusiones del estudio de campo:</strong><br>";
+      let analysis = "<strong>Field study conclusions:</strong><br>";
       
       if (h.successRate === c.successRate) {
-        analysis += "Ambos modos lograron una tasa de acierto similar. ";
+        analysis += "Both modes achieved a similar success rate. ";
         if (h.avgTime < c.avgTime) {
-          analysis += `Sin embargo, el <strong>Modo Armónico</strong> permitió identificar el objetivo <strong>${Math.round((c.avgTime - h.avgTime)*100)/100}s más rápido</strong>, sugiriendo menor fatiga visual.`;
+          analysis += `However, **Harmonious Mode** allowed identifying the target **${Math.round((c.avgTime - h.avgTime)*100)/100}s faster**, suggesting less visual fatigue.`;
         } else if (c.avgTime < h.avgTime) {
-          analysis += `Sin embargo, el <strong>Modo Caótico</strong> fue <strong>${Math.round((h.avgTime - c.avgTime)*100)/100}s más rápido</strong> gracias a la alta diferencia de contraste de color.`;
+          analysis += `However, **Chaotic Mode** was **${Math.round((h.avgTime - c.avgTime)*100)/100}s faster** due to high color contrast differences.`;
         } else {
-          analysis += "Ambos registraron idénticos tiempos de reacción.";
+          analysis += "Both recorded identical reaction times.";
         }
       } else if (h.successRate > c.successRate) {
-        analysis += `El <strong>Modo Armónico</strong> obtuvo mayor precisión (<strong>${h.successRate}% acierto</strong> vs ${c.successRate}% del caótico). La unificación de color ayuda a estructurar y comparar patrones geométricos sin saturar la mente con ruido cromático.`;
+        analysis += `**Harmonious Mode** achieved higher accuracy (**${h.successRate}% success** vs ${c.successRate}% for chaotic). Color unification helps structure and compare geometric patterns without overloading the mind with chromatic noise.`;
       } else {
-        analysis += `El <strong>Modo Caótico</strong> obtuvo mayor precisión (<strong>${c.successRate}% acierto</strong> vs ${h.successRate}% del armónico). El contraste radical de colores entre celdas ayuda a descartar rápidamente impostores visuales.`;
+        analysis += `**Chaotic Mode** achieved higher accuracy (**${c.successRate}% success** vs ${h.successRate}% for harmonious). Radical color contrast between cells helps quickly discard visual impostors.`;
       }
       
       statsAnalysisText.innerHTML = analysis;
@@ -672,7 +672,7 @@ function initTestingSuite() {
       playOptAudioBtn.style.display = 'flex';
       playOptAudioBtn.style.alignItems = 'center';
       playOptAudioBtn.style.gap = '0.25rem';
-      playOptAudioBtn.innerHTML = '<span>🔊</span> Oír';
+      playOptAudioBtn.innerHTML = '<span>🔊</span> Listen';
 
       playOptAudioBtn.addEventListener('click', (e) => {
         e.stopPropagation(); // Prevenir que el click active la selección y termine el turno
@@ -751,7 +751,7 @@ function initTestingSuite() {
     const stats = testSession.getStats();
     const total = stats.totalTrials;
     const streak = stats.currentStreak;
-    const text = `🎯 ¡Mi racha en el Simulador de Mosaico Criptográfico es de ${streak} aciertos! He completado ${total} evaluaciones de seguridad de direcciones de XRPL sin caer en phishing. ¡Mide tu velocidad visual! 💠 #XRPL #MakeWaves`;
+    const text = `🎯 My success streak in the Cryptographic Mosaic Simulator is ${streak}! I completed ${total} security checks on XRPL addresses without falling for phishing. Test your visual speed! 💠 #XRPL #MakeWaves`;
     const shareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`;
     window.open(shareUrl, '_blank');
   });

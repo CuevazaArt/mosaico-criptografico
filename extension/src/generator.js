@@ -1,6 +1,6 @@
 /**
- * Motor de Generación del Mosaico SVG 3x3 (Adaptador para Extensión de Navegador)
- * Genera un SVG vectorial determinista a partir de un hash de 32 bytes (SHA-256).
+ * 3x3 SVG Mosaic Generation Engine (Browser Extension Adapter).
+ * Generates a deterministic vector SVG from a 32-byte hash (SHA-256) exposing it globally.
  */
 
 window.generateMosaicoSvg = function(hash, textSource, options = {}) {
@@ -10,20 +10,20 @@ window.generateMosaicoSvg = function(hash, textSource, options = {}) {
   const gridSize = parseInt(options.gridSize) || 3;
   const numCells = gridSize * gridSize;
 
-  // Declarar h, s, l a nivel de función para evitar ReferenceError en sub-renderizadores
+  // Declare h, s, l at function scope to avoid ReferenceError in sub-renderers
   let h, s, l;
 
-  // Extraer bytes generales de configuración
+  // Extract general configuration bytes
   const configByte1 = hash[30];
   const configByte2 = hash[31];
   const globalHue = (configByte1 * 256 + configByte2) % 360;
-  const globalSat = 65 + (hash[29] % 25); // 65% a 90%
-  const globalLight = 40 + (hash[28] % 20); // 40% a 60%
+  const globalSat = 65 + (hash[29] % 25); // 65% to 90%
+  const globalLight = 40 + (hash[28] % 20); // 40% to 60%
 
-  // Crear una distribución (layout) de celdas determinista basada en los bytes del hash.
+  // Create a deterministic cell layout based on hash bytes.
   const layout = Array.from({ length: numCells }, (_, idx) => idx);
   
-  // Realizar un barajado Fisher-Yates determinista usando bytes del hash
+  // Perform a deterministic Fisher-Yates shuffle using hash bytes.
   for (let k = numCells - 1; k > 0; k--) {
     const j = hash[k % 32] % (k + 1);
     const temp = layout[k];
@@ -31,7 +31,7 @@ window.generateMosaicoSvg = function(hash, textSource, options = {}) {
     layout[j] = temp;
   }
 
-  // Iniciar construcción del SVG
+  // Start SVG construction (using border-radius: 6px for tighter extension overlay aesthetics)
   let svgContent = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 300" width="100%" height="100%" style="border-radius: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.35); overflow: hidden; background: #0c0f1d;">`;
   
   svgContent += `
@@ -46,7 +46,7 @@ window.generateMosaicoSvg = function(hash, textSource, options = {}) {
     <g clip-path="url(#svg-clip)">
   `;
 
-  // Renderizar las celdas de acuerdo a la grilla configurada
+  // Render cells according to the configured grid size
   const cellSize = 300 / gridSize;
   const scaleFactor = cellSize / 100;
 
@@ -78,7 +78,7 @@ window.generateMosaicoSvg = function(hash, textSource, options = {}) {
       ];
     }
 
-    // Calcular HSL para la celda
+    // Calculate HSL for the cell
     if (chaoticMode) {
       h = (cData[0] * 1.41) % 360;
       s = 60 + (cData[1] % 35);
@@ -130,6 +130,7 @@ window.generateMosaicoSvg = function(hash, textSource, options = {}) {
     svgContent += `</g>`;
   }
 
+  // Layer: Text Overlay
   if (showOverlay && textSource && textSource.length > 8) {
     const cleanText = textSource.trim();
     const firstPart = cleanText.substring(0, 6);
@@ -146,6 +147,8 @@ window.generateMosaicoSvg = function(hash, textSource, options = {}) {
 
   svgContent += `</g></svg>`;
   return svgContent;
+
+  // ================= SUB-RENDERERS FOR EACH CELL =================
 
   function renderCell0(data, color, dark, light) {
     const b1 = data[0];
@@ -190,8 +193,9 @@ window.generateMosaicoSvg = function(hash, textSource, options = {}) {
 
   function renderCell2(data, color, dark, light) {
     const b1 = data[0];
-    const rotation = (b1 * 1.5) % 90;
     svgContent += `<rect width="100" height="100" fill="${color}" />`;
+
+    const rotation = (b1 * 1.5) % 90;
     svgContent += `<g transform="translate(50,50) rotate(${rotation}) translate(-50,-50)">`;
     for (let x = -1; x <= 4; x++) {
       for (let y = -1; y <= 4; y++) {
@@ -242,7 +246,7 @@ window.generateMosaicoSvg = function(hash, textSource, options = {}) {
     const glowColor = `hsl(${Math.round(h)}, ${Math.round(s)}%, 50%)`;
     svgContent += `<circle cx="50" cy="50" r="35" fill="${glowColor}" opacity="0.15" filter="blur(4px)" />`;
 
-    const vertices = 3 + (b1 % 7); 
+    const vertices = 3 + (b1 % 7);
     const radius = 30 + (b2 % 12);
     const rotation = (b3 * 2.5) % 360;
 
@@ -385,6 +389,7 @@ window.generateMosaicoSvg = function(hash, textSource, options = {}) {
 
   function renderCell8(data, color, dark, light) {
     const b1 = data[0];
+    
     svgContent += `<rect width="100" height="100" fill="${color}" />`;
 
     const size = 32 + (b1 % 12);
