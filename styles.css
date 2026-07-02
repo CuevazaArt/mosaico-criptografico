@@ -1,8 +1,8 @@
 /* ----------------------------------------------------
-   CONFIGURACIÓN GLOBAL Y VARIABLES
+   GLOBAL CONFIGURATION AND VARIABLES
    ---------------------------------------------------- */
 :root {
-  /* Paleta de colores premium - Estilo ciberpunk / oscuro */
+  /* Premium color palette - Cyberpunk / dark style */
   --bg-primary: #070913;
   --bg-card: rgba(16, 20, 38, 0.65);
   --bg-card-hover: rgba(22, 28, 54, 0.75);
@@ -11,9 +11,9 @@
   
   --primary: #6366f1; /* Indigo */
   --primary-glow: rgba(99, 102, 241, 0.4);
-  --secondary: #10b981; /* Esmeralda / Éxito */
+  --secondary: #10b981; /* Emerald / Success */
   --secondary-glow: rgba(16, 185, 129, 0.3);
-  --accent: #f43f5e; /* Coral / Alerta */
+  --accent: #f43f5e; /* Coral / Alert */
   --accent-glow: rgba(244, 63, 94, 0.3);
   
   --text-main: #f1f5f9;
@@ -27,7 +27,7 @@
   --transition-normal: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Restablecimiento básico */
+/* Basic reset */
 * {
   box-sizing: border-box;
   margin: 0;
@@ -45,7 +45,7 @@ body {
 }
 
 /* ----------------------------------------------------
-   LUCES AMBIENTALES DE FONDO (GLOWS)
+   AMBIENT BACKGROUND LIGHTS (GLOWS)
    ---------------------------------------------------- */
 .bg-glow {
   position: absolute;
@@ -71,7 +71,7 @@ body {
 }
 
 /* ----------------------------------------------------
-   DISEÑO DE CONTENEDORES Y ESTRUCTURAS
+   CONTAINER AND STRUCTURE LAYOUT
    ---------------------------------------------------- */
 .app-container {
   max-width: 1200px;
@@ -83,7 +83,7 @@ body {
   min-height: 100vh;
 }
 
-/* Cabecera */
+/* Header */
 .app-header {
   display: flex;
   flex-direction: column;
@@ -119,7 +119,7 @@ body {
   font-weight: 400;
 }
 
-/* Navegación por pestañas */
+/* Tab navigation */
 .tab-navigation {
   display: flex;
   background: rgba(15, 23, 42, 0.8);
@@ -160,7 +160,7 @@ body {
 }
 
 /* ----------------------------------------------------
-   DISEÑO DE COMPONENTES: TARJETAS (CARDS)
+   COMPONENT DESIGN: CARDS
    ---------------------------------------------------- */
 .glass-panel {
   background: var(--bg-card);
@@ -192,7 +192,7 @@ body {
   line-height: 1.45;
 }
 
-/* Cuadrículas */
+/* Grids */
 .grid-2col {
   display: grid;
   grid-template-columns: 1.1fr 0.9fr;
@@ -218,7 +218,7 @@ body {
 }
 
 /* ----------------------------------------------------
-   FORMULARIOS Y ENTRADAS (INPUTS)
+   FORMS AND INPUTS
    ---------------------------------------------------- */
 .form-group {
   display: flex;
@@ -276,7 +276,7 @@ body {
   border-color: var(--primary);
 }
 
-/* Botones */
+/* Buttons */
 .btn-primary, .btn-secondary, .btn-danger, .btn-tiny {
   font-family: var(--font-family);
   font-weight: 600;
@@ -352,7 +352,7 @@ body {
 }
 
 /* ----------------------------------------------------
-   CONTROLES DE CONFIGURACIÓN Y TOGGLES
+   CONFIGURATION CONTROLS AND TOGGLES
    ---------------------------------------------------- */
 .options-group {
   margin-top: 1.5rem;
@@ -395,7 +395,7 @@ body {
   color: var(--text-muted);
 }
 
-/* Switch Deslizador */
+/* Slider Switch */
 .switch {
   position: relative;
   display: inline-block;
@@ -480,7 +480,7 @@ input:checked + .slider:before {
 }
 
 /* ----------------------------------------------------
-   CONTENEDORES DE IDENTICONES Y PREVIAS
+   IDENTICON CONTAINERS AND PREVIEWS
    ---------------------------------------------------- */
 .identicon-large-container {
   width: 250px;
@@ -549,7 +549,7 @@ input:checked + .slider:before {
 }
 
 /* ----------------------------------------------------
-   PESTAÑA DE COMPARADOR
+   COMPARATOR TAB
    ---------------------------------------------------- */
 .comparison-grid {
   display: grid;
@@ -623,7 +623,7 @@ input:checked + .slider:before {
 }
 
 /* ----------------------------------------------------
-   PESTAÑA DE PRUEBAS DE CAMPO Y JUEGO COGNITIVO
+   COGNITIVE FIELD TESTING AND GAME TAB
    ---------------------------------------------------- */
 .game-header {
   display: flex;
@@ -658,7 +658,7 @@ input:checked + .slider:before {
   flex-direction: column;
 }
 
-/* Pantalla de Inicio del Juego */
+/* Game Start Screen */
 .start-content {
   display: flex;
   flex-direction: column;
@@ -692,7 +692,7 @@ input:checked + .slider:before {
   margin-bottom: 1rem;
 }
 
-/* Pantalla de Juego Activo */
+/* Active Game Screen */
 .target-container {
   display: flex;
   background: rgba(6, 9, 22, 0.4);
@@ -748,7 +748,7 @@ input:checked + .slider:before {
   line-height: 1.4;
 }
 
-/* Grilla de opciones para elegir */
+/* Options Grid for Selection */
 .options-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -781,7 +781,7 @@ input:checked + .slider:before {
   transform: translateY(-2px);
 }
 
-/* Efectos visuales de respuesta */
+/* Visual Feedback Effects */
 .option-card.correct-flash {
   animation: correct-pulse 0.6s ease-out forwards;
 }
@@ -824,7 +824,7 @@ input:checked + .slider:before {
   text-align: center;
 }
 
-/* Panel de estadísticas */
+/* Statistics Panel */
 .stats-box {
   display: flex;
   flex-direction: column;
@@ -898,7 +898,7 @@ input:checked + .slider:before {
 }
 
 /* ----------------------------------------------------
-   PANEL DE CONTROL DE PESTAÑAS (TABS DISPLAY)
+   TABS DISPLAY CONTROL PANEL
    ---------------------------------------------------- */
 .tab-panel {
   display: none;
@@ -914,7 +914,7 @@ input:checked + .slider:before {
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* Footer de información */
+/* Information Footer */
 .app-footer-info {
   text-align: center;
   color: var(--text-muted);
@@ -925,7 +925,7 @@ input:checked + .slider:before {
   line-height: 1.4;
 }
 
-/* Animaciones y Clases para Comparador y Alertas */
+/* Animations and Classes for Comparator and Alerts */
 @keyframes pulse-red-glow {
   0% { box-shadow: 0 0 12px rgba(244, 63, 94, 0.35); border-color: rgba(244, 63, 94, 0.5); }
   50% { box-shadow: 0 0 35px rgba(244, 63, 94, 0.95); border-color: rgb(244, 63, 94); }
@@ -960,7 +960,7 @@ input:checked + .slider:before {
   font-weight: 800;
 }
 
-/* Placeholder para Vistas Vacías en Comparador */
+/* Placeholder for Empty Views in Comparator */
 .empty-preview-placeholder {
   display: flex;
   flex-direction: column;
@@ -1008,7 +1008,7 @@ input:checked + .slider:before {
   padding: 0 0.5rem;
 }
 
-/* Énfasis de los botones Phishing y Perfecta */
+/* Emphasis of Phishing and Perfect Match buttons */
 #simulate-phishing-btn, #force-match-btn {
   font-size: 0.75rem !important;
   font-weight: 700 !important;
@@ -1051,7 +1051,7 @@ input:checked + .slider:before {
   transform: translateY(-1px);
 }
 
-/* Badges de Validación XRPL */
+/* XRPL Validation Badges */
 .xrpl-badge-registered {
   font-size: 0.7rem !important;
   font-weight: 700 !important;
@@ -1101,7 +1101,7 @@ input:checked + .slider:before {
   border-color: rgba(244, 63, 94, 0.2) !important;
 }
 
-/* Botones Deshabilitados */
+/* Disabled Buttons */
 .btn-block:disabled, .btn-tiny:disabled, button:disabled {
   opacity: 0.35 !important;
   cursor: not-allowed !important;
@@ -1109,7 +1109,7 @@ input:checked + .slider:before {
   box-shadow: none !important;
 }
 
-/* Clases Premium para Botones de XRPL */
+/* Premium Classes for XRPL Buttons */
 .btn-generate {
   background: linear-gradient(135deg, #6366f1, #4f46e5);
   color: #fff;
