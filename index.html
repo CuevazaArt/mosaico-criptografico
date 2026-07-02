@@ -26,6 +26,14 @@
       <p class="header-subtitle">
         Identificadores visuales deterministicos de 3x3 para direcciones blockchain. Mitigando el phishing mediante reconocimiento visual de alta entropía.
       </p>
+      <div style="display: flex; gap: 0.75rem; margin-top: 0.5rem; justify-content: center; z-index: 10;">
+        <a href="https://github.com/CuevazaArt/mosaico-criptografico" target="_blank" class="btn-secondary" style="font-size: 0.78rem; padding: 6px 14px; text-decoration: none; border-radius: 20px; display: inline-flex; align-items: center; gap: 0.4rem;">
+          <span>💻</span> GitHub
+        </a>
+        <a href="https://www.npmjs.com/package/mosaico-criptografico" target="_blank" class="btn-secondary" style="font-size: 0.78rem; padding: 6px 14px; text-decoration: none; border-radius: 20px; display: inline-flex; align-items: center; gap: 0.4rem;">
+          <span>📦</span> NPM Registry
+        </a>
+      </div>
       
       <!-- Navegación de pestañas -->
       <nav class="tab-navigation">
@@ -417,8 +425,11 @@
               </div>
             </div>
 
-            <div class="stats-actions">
-              <button id="reset-stats-btn" class="btn-danger btn-block">Reiniciar Estadísticas</button>
+            <div class="stats-actions" style="display: flex; gap: 0.75rem; margin-bottom: 1.5rem;">
+              <button id="reset-stats-btn" class="btn-danger btn-block" style="flex: 1; padding: 10px 16px;">Reiniciar</button>
+              <button id="share-stats-btn" class="btn-secondary btn-block" style="flex: 1; font-size: 0.85rem; padding: 10px 16px; margin: 0; display: inline-flex; align-items: center; justify-content: center; gap: 0.25rem;">
+                <span>📢</span> Compartir
+              </button>
             </div>
 
             <div class="conclusions-box">

@@ -73,6 +73,31 @@ export class CognitiveTestSession {
     this.startTime = null;
     this.currentStreak = 0;
     this.streakTimes = [];
+    this.loadFromStorage();
+  }
+
+  loadFromStorage() {
+    try {
+      const stored = localStorage.getItem('mosaico_game_trials');
+      if (stored) {
+        this.trials = JSON.parse(stored);
+      }
+      const storedStreak = localStorage.getItem('mosaico_game_streak');
+      if (storedStreak) {
+        this.currentStreak = parseInt(storedStreak) || 0;
+      }
+    } catch (e) {
+      console.warn("No se pudo cargar historial de localStorage:", e);
+    }
+  }
+
+  saveToStorage() {
+    try {
+      localStorage.setItem('mosaico_game_trials', JSON.stringify(this.trials));
+      localStorage.setItem('mosaico_game_streak', this.currentStreak.toString());
+    } catch (e) {
+      console.warn("No se pudo guardar historial en localStorage:", e);
+    }
   }
 
   /**
@@ -142,6 +167,7 @@ export class CognitiveTestSession {
     
     this.trials.push(trialRecord);
     this.startTime = null; // Reiniciar timer
+    this.saveToStorage();
 
     return {
       isCorrect,
@@ -201,5 +227,11 @@ export class CognitiveTestSession {
     this.trials = [];
     this.currentStreak = 0;
     this.streakTimes = [];
+    try {
+      localStorage.removeItem('mosaico_game_trials');
+      localStorage.removeItem('mosaico_game_streak');
+    } catch (e) {
+      console.warn("No se pudo limpiar localStorage:", e);
+    }
   }
 }

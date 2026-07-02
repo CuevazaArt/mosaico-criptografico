@@ -512,6 +512,7 @@ function initComparator() {
 function initTestingSuite() {
   const startBtn = document.getElementById('start-game-btn');
   const resetStatsBtn = document.getElementById('reset-stats-btn');
+  const shareStatsBtn = document.getElementById('share-stats-btn');
   const modeSelect = document.getElementById('game-mode-select');
   const gameGridSizeSelect = document.getElementById('game-grid-size-select');
   const playGameTargetAudioBtn = document.getElementById('play-game-target-audio-btn');
@@ -744,6 +745,15 @@ function initTestingSuite() {
     updateStatsDisplay();
     activeScreen.classList.remove('active');
     startScreen.classList.add('active');
+  });
+
+  shareStatsBtn.addEventListener('click', () => {
+    const stats = testSession.getStats();
+    const total = stats.totalTrials;
+    const streak = stats.currentStreak;
+    const text = `🎯 ¡Mi racha en el Simulador de Mosaico Criptográfico es de ${streak} aciertos! He completado ${total} evaluaciones de seguridad de direcciones de XRPL sin caer en phishing. ¡Mide tu velocidad visual! 💠 #XRPL #MakeWaves`;
+    const shareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`;
+    window.open(shareUrl, '_blank');
   });
 
   modeSelect.addEventListener('change', () => {

@@ -3,7 +3,19 @@
   "version": "3.1.1",
   "description": "2FA Sensorial Determinístico (Visual & Auditivo) para identidades criptográficas en XRPL.",
   "type": "module",
-  "main": "main.js",
+  "main": "src/core/generator.js",
+  "files": [
+    "src/core/crypto.js",
+    "src/core/generator.js",
+    "src/core/audio.js",
+    "src/core/xrpl.js"
+  ],
+  "exports": {
+    "./crypto": "./src/core/crypto.js",
+    "./generator": "./src/core/generator.js",
+    "./audio": "./src/core/audio.js",
+    "./xrpl": "./src/core/xrpl.js"
+  },
   "scripts": {
     "test": "node --test tests/**/*.test.js",
     "dev": "npx -y serve ."

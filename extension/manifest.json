@@ -1,0 +1,31 @@
+{
+  "manifest_version": 3,
+  "name": "Mosaico Criptográfico Overlay",
+  "version": "1.0.0",
+  "description": "Inyecta identificadores visuales (mosaicos) al lado de direcciones XRPL detectadas en el navegador.",
+  "icons": {
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "permissions": [
+    "activeTab"
+  ],
+  "content_scripts": [
+    {
+      "matches": [
+        "*://*.bithomp.com/*",
+        "*://*.xrpl.org/*",
+        "*://livenet.xrpl.org/*",
+        "*://testnet.xrpl.org/*",
+        "*://localhost/*"
+      ],
+      "js": [
+        "src/generator.js",
+        "src/content.js"
+      ],
+      "css": [
+        "src/overlay.css"
+      ]
+    }
+  ]
+}
