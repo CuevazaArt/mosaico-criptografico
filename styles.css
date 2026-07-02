@@ -1109,4 +1109,99 @@ input:checked + .slider:before {
   box-shadow: none !important;
 }
 
+/* Clases Premium para Botones de XRPL */
+.btn-generate {
+  background: linear-gradient(135deg, #6366f1, #4f46e5);
+  color: #fff;
+  width: 100%;
+  font-weight: 700;
+  font-size: 0.85rem;
+  padding: 12px 18px;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px var(--primary-glow);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: all var(--transition-fast);
+  border: none;
+  cursor: pointer;
+}
+
+.btn-generate:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px var(--primary-glow);
+  background: linear-gradient(135deg, #4f46e5, #4338ca);
+}
+
+.btn-generate:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.btn-connect {
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: #fff;
+  width: 100%;
+  font-weight: 700;
+  font-size: 0.85rem;
+  padding: 12px 18px;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(16, 185, 129, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: all var(--transition-fast);
+  border: none;
+  cursor: pointer;
+}
+
+.btn-connect:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+  background: linear-gradient(135deg, #059669, #047857);
+}
+
+.btn-connect:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.btn-register {
+  background: linear-gradient(135deg, #10b981, #047857);
+  color: #fff;
+  width: 100%;
+  font-weight: 700;
+  font-size: 0.85rem;
+  padding: 12px 18px;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(16, 185, 129, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: all var(--transition-fast);
+  border: none;
+  cursor: pointer;
+}
+
+.btn-register:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+  background: linear-gradient(135deg, #047857, #065f46);
+}
+
+.btn-register:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.btn-register:disabled {
+  background: rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid var(--border-color) !important;
+  color: var(--text-muted) !important;
+  box-shadow: none !important;
+  cursor: not-allowed !important;
+  opacity: 0.35 !important;
+}
+
+
 
