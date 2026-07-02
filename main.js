@@ -2,7 +2,7 @@ import { sha256, bytesToHex } from './src/core/crypto.js';
 import { generateSvg } from './src/core/generator.js';
 import { playMnemonicAudio, stopMnemonicAudio, playMismatchSequence, playMatchSequence } from './src/core/audio.js';
 import { CognitiveTestSession, generateRandomAddress, generateSimilarAddress } from './src/web/testing.js';
-import { checkAddressRegistration, registerMnemonicNft, generateFaucetWallet, setXrplNetwork, getXrplNetwork } from './src/core/xrpl.js';
+import { checkAddressRegistration, registerMnemonicNft, generateFaucetWallet, setXrplNetwork, getXrplNetwork, connectWallet, registerMnemonicNftNonCustodial } from './src/core/xrpl.js';
 
 // Instanciar la sesión global de pruebas
 const testSession = new CognitiveTestSession();
@@ -135,11 +135,14 @@ function initComparator() {
 
   // Elementos de la UI de XRPL
   const xrplNetworkSelect = document.getElementById('xrpl-network-select');
+  const xrplWalletSelect = document.getElementById('xrpl-wallet-select');
   const xrplConnStatus = document.getElementById('xrpl-connection-status');
   const xrplMainnetWarning = document.getElementById('xrpl-mainnet-warning');
   const xrplGenWalletBtn = document.getElementById('xrpl-generate-wallet-btn');
+  const xrplConnectWalletBtn = document.getElementById('xrpl-connect-wallet-btn');
   const xrplAddressLabel = document.getElementById('xrpl-address-label');
   const xrplAddressOutput = document.getElementById('xrpl-address-output');
+  const xrplSecretContainer = document.getElementById('xrpl-secret-container');
   const xrplSecretBadge = document.getElementById('xrpl-secret-badge');
   const xrplSecretOutput = document.getElementById('xrpl-secret-output');
   const xrplRegisterMosaicoBtn = document.getElementById('xrpl-register-mosaico-btn');
@@ -240,89 +243,32 @@ function initComparator() {
       xrplBadgeB.innerHTML = '❓ No Registrado';
     }
 
-    // Comparación y estado global
-    if (!valA || !valB) {
-      // Estado de espera (placeholder)
-      statusBadge.className = 'badge';
-      statusBadge.style.background = 'rgba(255, 255, 255, 0.05)';
-      statusBadge.style.color = 'var(--text-muted)';
-      statusBadge.textContent = '🔍';
-      statusMsg.className = 'status-msg';
-      statusMsg.style.color = 'var(--text-muted)';
-      statusMsg.innerHTML = 'Esperando Direcciones<br><span style="font-size:11px;color:#64748b;text-transform:none;">Introduce ambas claves para comparar</span>';
-
-      comparisonGrid.classList.remove('match-active', 'mismatch-active');
-    } else {
-      // Ambas direcciones presentes -> comparar
-      const isMatched = (valA === valB);
-
-      // Limpiar estilos personalizados de espera
-      statusBadge.style.background = '';
-      statusBadge.style.color = '';
-      statusMsg.style.color = '';
-
-      if (isMatched) {
-        statusBadge.className = 'badge match';
-        statusMsg.className = 'status-msg match-text';
-        statusMsg.innerHTML = 'Coinciden Totalmente<br><span style="font-size:11px;color:#10b981;text-transform:none;">Direcciones idénticas</span>';
-        
-        comparisonGrid.classList.add('match-active');
-        comparisonGrid.classList.remove('mismatch-active');
-
-        if (userTriggered && !isInitialLoad) {
-          playMatchSequence(currentHashA, currentHashB, { gridSize });
+    // Efecto de feedback auditivo al pegar/escribir direcciones
+    if (userTriggered) {
+      if (valA && valB) {
+        if (valA === valB) {
+          playMatchSequence();
+          statusBadge.className = 'status-badge match';
+          statusBadge.innerText = '✓ COINCIDENCIA PERFECTA';
+          statusMsg.innerText = 'Ambas firmas criptográficas y acústicas son idénticas. Es seguro proceder.';
+          comparisonGrid.classList.remove('mismatch-detected');
+        } else {
+          playMismatchSequence();
+          statusBadge.className = 'status-badge mismatch';
+          statusBadge.innerText = '⚠️ DISCREPANCIA DETECTADA';
+          statusMsg.innerText = '¡Alerta! Las firmas visuales y de audio difieren. Posible ataque de phishing o dirección corrupta.';
+          comparisonGrid.classList.add('mismatch-detected');
         }
       } else {
-        statusBadge.className = 'badge mismatch';
-        statusMsg.className = 'status-msg mismatch-text';
-        statusMsg.innerHTML = 'Discrepancia Detectada<br><span style="font-size:11px;color:#f43f5e;text-transform:none;">¡Alerta de phishing o error!</span>';
-        
-        comparisonGrid.classList.add('mismatch-active');
-        comparisonGrid.classList.remove('match-active');
-
-        if (userTriggered && !isInitialLoad) {
-          playMismatchSequence(currentHashA, { gridSize });
-        }
+        statusBadge.className = 'status-badge neutral';
+        statusBadge.innerText = 'ESPERANDO ENTRADAS';
+        statusMsg.innerText = 'Ingresa o pega dos direcciones para comparar instantáneamente su firma sensorial.';
+        comparisonGrid.classList.remove('mismatch-detected');
       }
     }
 
     isInitialLoad = false;
   };
-
-  // Event Listeners
-  compareA.addEventListener('input', () => updateComparison(true));
-  compareB.addEventListener('input', () => updateComparison(true));
-  compareGridSizeSelect.addEventListener('change', () => updateComparison(false));
-
-  playAudioABtn.addEventListener('click', () => {
-    if (currentHashA) {
-      const gridSize = parseInt(compareGridSizeSelect.value) || 3;
-      playMnemonicAudio(currentHashA, { gridSize, chaoticMode: false });
-    }
-  });
-
-  playAudioBBtn.addEventListener('click', () => {
-    if (currentHashB) {
-      const gridSize = parseInt(compareGridSizeSelect.value) || 3;
-      playMnemonicAudio(currentHashB, { gridSize, chaoticMode: false });
-    }
-  });
-
-  simulatePhishingBtn.addEventListener('click', () => {
-    if (compareA.value) {
-      // Simular ataque mutando 1 o 2 caracteres del medio
-      compareB.value = generateSimilarAddress(compareA.value.trim(), 1);
-      updateComparison(true);
-    }
-  });
-
-  forceMatchBtn.addEventListener('click', () => {
-    if (compareA.value) {
-      // Forzar copia exacta perfecta
-      compareB.value = compareA.value.trim();
-      updateComparison(true);
-    }
-  });
 
   // Manejador para entrada de semilla manual en Mainnet
   const handleManualSecretInput = () => {
@@ -358,56 +304,86 @@ function initComparator() {
     }
   };
 
-  // Event Listener para el Selector de Red
+  // Función unificada para actualizar el diseño de la interfaz de billeteras
+  const updateWalletUILayout = () => {
+    const selectedNet = xrplNetworkSelect.value;
+    const selectedWallet = xrplWalletSelect.value;
+
+    // Resetear estados al cambiar opciones
+    xrplConnStatus.className = 'disconnected';
+    xrplConnStatus.textContent = '🔴 XRPL Desconectado';
+    xrplRegisterMosaicoBtn.disabled = true;
+    generatedSecret = null;
+
+    if (selectedWallet === 'local') {
+      xrplSecretContainer.style.display = 'block';
+      xrplConnectWalletBtn.style.display = 'none';
+
+      if (selectedNet === 'mainnet') {
+        xrplGenWalletBtn.style.display = 'none';
+        xrplMainnetWarning.style.display = 'block';
+
+        xrplAddressLabel.textContent = "Dirección XRPL Autocargada (desde Secret)";
+        xrplAddressOutput.value = "";
+        xrplAddressOutput.placeholder = "Se calculará al ingresar el Secret...";
+
+        xrplSecretBadge.style.color = "#f43f5e";
+        xrplSecretBadge.textContent = "⚠️ Entrada Requerida";
+        xrplSecretOutput.value = "";
+        xrplSecretOutput.placeholder = "Ingresa tu clave secreta (Secret/Seed) de Mainnet...";
+        xrplSecretOutput.readOnly = false;
+        xrplSecretOutput.removeAttribute('readonly');
+
+        xrplSecretOutput.addEventListener('input', handleManualSecretInput);
+      } else {
+        xrplGenWalletBtn.style.display = 'block';
+        xrplGenWalletBtn.disabled = false;
+        xrplMainnetWarning.style.display = 'none';
+
+        xrplAddressLabel.textContent = "Dirección XRPL Testnet Faucet";
+        xrplAddressOutput.value = "";
+        xrplAddressOutput.placeholder = "Esperando generación...";
+
+        xrplSecretBadge.style.color = "#fbbf24";
+        xrplSecretBadge.textContent = "⚠️ Demostración Local";
+        xrplSecretOutput.value = "";
+        xrplSecretOutput.placeholder = "Esperando generación...";
+        xrplSecretOutput.readOnly = true;
+        xrplSecretOutput.setAttribute('readonly', 'true');
+
+        xrplSecretOutput.removeEventListener('input', handleManualSecretInput);
+      }
+    } else {
+      // Billeteras no custodias
+      xrplSecretContainer.style.display = 'none';
+      xrplGenWalletBtn.style.display = 'none';
+      xrplMainnetWarning.style.display = 'none';
+      xrplSecretOutput.removeEventListener('input', handleManualSecretInput);
+
+      xrplConnectWalletBtn.style.display = 'block';
+      xrplConnectWalletBtn.disabled = false;
+
+      const walletName = selectedWallet === 'gem' ? 'Gem Wallet' : (selectedWallet === 'crossmark' ? 'Crossmark' : 'Xaman');
+      xrplConnectWalletBtn.textContent = `🔗 Conectar Billetera (${walletName})`;
+
+      xrplAddressLabel.textContent = `Dirección vinculada via ${walletName}`;
+      xrplAddressOutput.value = "";
+      xrplAddressOutput.placeholder = `Haz clic en 'Conectar Billetera (${walletName})'...`;
+    }
+    updateComparison(false);
+  };
+
+  // Event Listeners para selectores de configuración de billetera
   xrplNetworkSelect.addEventListener('change', () => {
     const selectedNet = xrplNetworkSelect.value;
     setXrplNetwork(selectedNet);
+    logToXrplConsole(`[info] Red cambiada a ${selectedNet === 'mainnet' ? 'Mainnet' : 'Testnet'}. Listo para conectar.`);
+    updateWalletUILayout();
+  });
 
-    // Resetear estado
-    xrplConnStatus.className = 'disconnected';
-    xrplConnStatus.textContent = '🔴 XRPL Desconectado';
-    generatedSecret = null;
-    xrplConsoleLog.innerText = `[info] Red cambiada a ${selectedNet === 'mainnet' ? 'Mainnet' : 'Testnet'}. Listo para conectar.`;
-
-    if (selectedNet === 'mainnet') {
-      xrplGenWalletBtn.style.display = 'none';
-
-      xrplAddressLabel.textContent = "Dirección XRPL Autocargada (desde Secret)";
-      xrplAddressOutput.value = "";
-      xrplAddressOutput.placeholder = "Se calculará al ingresar el Secret...";
-
-      xrplSecretBadge.style.color = "#f43f5e";
-      xrplSecretBadge.textContent = "⚠️ Entrada Requerida";
-
-      xrplSecretOutput.value = "";
-      xrplSecretOutput.placeholder = "Ingresa tu clave secreta (Secret/Seed) de Mainnet...";
-      xrplSecretOutput.readOnly = false;
-      xrplSecretOutput.removeAttribute('readonly');
-
-      xrplMainnetWarning.style.display = 'block';
-      xrplSecretOutput.addEventListener('input', handleManualSecretInput);
-    } else {
-      xrplGenWalletBtn.style.display = 'block';
-      xrplGenWalletBtn.disabled = false;
-
-      xrplAddressLabel.textContent = "Dirección XRPL Testnet Faucet";
-      xrplAddressOutput.value = "";
-      xrplAddressOutput.placeholder = "Esperando generación...";
-
-      xrplSecretBadge.style.color = "#fbbf24";
-      xrplSecretBadge.textContent = "⚠️ Demostración Local";
-
-      xrplSecretOutput.value = "";
-      xrplSecretOutput.placeholder = "Esperando generación...";
-      xrplSecretOutput.readOnly = true;
-      xrplSecretOutput.setAttribute('readonly', 'true');
-
-      xrplMainnetWarning.style.display = 'none';
-      xrplSecretOutput.removeEventListener('input', handleManualSecretInput);
-    }
-
-    xrplRegisterMosaicoBtn.disabled = true;
-    updateComparison(false);
+  xrplWalletSelect.addEventListener('change', () => {
+    logToXrplConsole(`[info] Método cambiado a ${xrplWalletSelect.value}.`);
+    updateWalletUILayout();
   });
 
   // Event Listeners del Panel XRPL
@@ -435,19 +411,55 @@ function initComparator() {
     }
   });
 
-  xrplRegisterMosaicoBtn.addEventListener('click', async () => {
-    if (!generatedSecret) return;
+  xrplConnectWalletBtn.addEventListener('click', async () => {
+    xrplConnectWalletBtn.disabled = true;
+    xrplConnStatus.className = 'connecting';
+    xrplConnStatus.textContent = '🟡 Conectando...';
     
+    const walletType = xrplWalletSelect.value;
+    const walletName = walletType === 'gem' ? 'Gem Wallet' : (walletType === 'crossmark' ? 'Crossmark' : 'Xaman');
+
+    try {
+      const address = await connectWallet(walletType, logToXrplConsole);
+      
+      xrplAddressOutput.value = address;
+      xrplConnStatus.className = 'connected';
+      xrplConnStatus.textContent = '🟢 XRPL Conectado';
+      xrplRegisterMosaicoBtn.disabled = false;
+      
+      logToXrplConsole(`[info] Billetera ${walletName} conectada con dirección: ${address}`);
+    } catch (err) {
+      logToXrplConsole(`[error] Error conectando wallet: ${err.message}`);
+      xrplConnStatus.className = 'disconnected';
+      xrplConnStatus.textContent = '🔴 Conexión Fallida';
+      xrplAddressOutput.value = "";
+      xrplRegisterMosaicoBtn.disabled = true;
+    } finally {
+      xrplConnectWalletBtn.disabled = false;
+    }
+  });
+
+  xrplRegisterMosaicoBtn.addEventListener('click', async () => {
     xrplRegisterMosaicoBtn.disabled = true;
+    const walletType = xrplWalletSelect.value;
+    const netName = getXrplNetwork() === 'mainnet' ? 'Mainnet' : 'Testnet';
     
     try {
-      const netName = getXrplNetwork() === 'mainnet' ? 'Mainnet' : 'Testnet';
-      logToXrplConsole(`[info] Enviando minteo XLS-20 (Soulbound NFT) en ${netName}...`);
-      const res = await registerMnemonicNft(generatedSecret, logToXrplConsole);
+      let res;
+      if (walletType === 'local') {
+        if (!generatedSecret) return;
+        logToXrplConsole(`[info] Enviando minteo XLS-20 (Soulbound NFT) en ${netName}...`);
+        res = await registerMnemonicNft(generatedSecret, logToXrplConsole);
+      } else {
+        const address = xrplAddressOutput.value.trim();
+        if (!address) {
+          throw new Error("No hay dirección de billetera conectada.");
+        }
+        res = await registerMnemonicNftNonCustodial(address, walletType, logToXrplConsole);
+      }
       
-      if (res.success) {
+      if (res && res.success) {
         logToXrplConsole(`[info] ¡Registro inmutable en ${netName} verificado!`);
-        // Disparar re-evaluación en el comparador para actualizar badges
         updateComparison(false);
       }
     } catch (err) {
@@ -457,8 +469,41 @@ function initComparator() {
     }
   });
 
+  // Eventos de entrada y botones generales del comparador
+  compareA.addEventListener('input', () => updateComparison(true));
+  compareB.addEventListener('input', () => updateComparison(true));
+  compareGridSizeSelect.addEventListener('change', () => updateComparison(false));
+
+  playAudioABtn.addEventListener('click', () => {
+    if (currentHashA) {
+      const gridSize = parseInt(compareGridSizeSelect.value) || 3;
+      playMnemonicAudio(currentHashA, { gridSize, chaoticMode: false });
+    }
+  });
+
+  playAudioBBtn.addEventListener('click', () => {
+    if (currentHashB) {
+      const gridSize = parseInt(compareGridSizeSelect.value) || 3;
+      playMnemonicAudio(currentHashB, { gridSize, chaoticMode: false });
+    }
+  });
+
+  simulatePhishingBtn.addEventListener('click', () => {
+    if (compareA.value) {
+      compareB.value = generateSimilarAddress(compareA.value.trim(), 1);
+      updateComparison(true);
+    }
+  });
+
+  forceMatchBtn.addEventListener('click', () => {
+    if (compareA.value) {
+      compareB.value = compareA.value.trim();
+      updateComparison(true);
+    }
+  });
+
   // Ejecución inicial
-  updateComparison(false);
+  updateWalletUILayout();
 }
 
 /* ----------------------------------------------------

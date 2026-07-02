@@ -1,0 +1,19 @@
+{
+  "name": "mosaico-criptografico",
+  "version": "3.1.1",
+  "description": "2FA Sensorial Determinístico (Visual & Auditivo) para identidades criptográficas en XRPL.",
+  "type": "module",
+  "main": "main.js",
+  "scripts": {
+    "test": "node --test tests/**/*.test.js"
+  },
+  "keywords": [
+    "xrpl",
+    "identicon",
+    "security",
+    "phishing",
+    "mosaico"
+  ],
+  "author": "",
+  "license": "MIT"
+}
