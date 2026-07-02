@@ -12,7 +12,7 @@ Para profundizar en el diseño técnico, la teoría y la integración de la herr
 * **[AUDIO_PROPOSAL.md](file:///c:/Users/Dell/Desktop/llavero%20mnemonico/AUDIO_PROPOSAL.md):** Especificación de la capa sensorial acústica y mitigaciones en hardware.
 * **[CRITIQUE.md](file:///c:/Users/Dell/Desktop/llavero%20mnemonico/CRITIQUE.md):** Auditoría e informe de usabilidad cognitiva, calibración y ergonomía.
 * **[DISCUSSION.md](file:///c:/Users/Dell/Desktop/llavero%20mnemonico/DISCUSSION.md):** Modelado de amenazas e integración técnica en wallets y exchanges.
-* **[xrpl_make_waves_proposal.md](file:///C:/Users/lexar/Desktop/mosaico-criptografico/xrpl_make_waves_proposal.md):** Arquitectura técnica de registro inmutable XLS-20 y Plan de Acción de 90 días para el programa *Make Waves*.
+* **[xrpl_make_waves_proposal.md](file:///c:/Users/Dell/Desktop/llavero%20mnemonico/xrpl_make_waves_proposal.md):** Arquitectura técnica de registro inmutable XLS-20 y Plan de Acción de 90 días para el programa *Make Waves*.
 
 ---
 
@@ -23,25 +23,41 @@ Para profundizar en el diseño técnico, la teoría y la integración de la herr
 * **Anclajes Topológicos:** Glifo con vértices contables y satélites para facilitar la memoria visual.
 * **Firma Acústica Abreviada (Snappy Signature):** Arpegios melódicos deterministas rápidos (4 notas de 160ms) para evitar la fatiga cognitiva del oído.
 * **Narrativa y Secuencias de Audio Orquestadas:** Secuencias de éxito armónico (campanas ascendentes de Do Mayor) o alarma disonante de doble oscilador sierra (alertas de phishing) para una clara diferenciación sonora.
-* **Registro Inmutable en XRPL Testnet (XLS-20):** Panel interactivo integrado en el Comparador que genera y fondea carteras de prueba en el ledger, permitiendo acuñar y validar identidades visuales inmutables de tipo **Soulbound (NFTs no transferibles)** en la blockchain de pruebas de XRP Ledger.
-* **Marcadores de Posición Simétricos (Placeholders):** Esquinas redondeadas de 16px y alineación vertical pixel-perfect en las tarjetas del comparador vacío.
+* **Registro Inmutable en XRPL (XLS-20):** Panel interactivo integrado en el Comparador que soporta redes Testnet y Mainnet, permitiendo acuñar y validar identidades visuales inmutables de tipo **Soulbound (NFTs no transferibles)** de forma no custodia (Gem Wallet, Crossmark, Xaman) en el ledger de XRP.
+* **Diseño Premium y Responsivo:** Curvatura de bordes a 16px y alineación vertical pixel-perfect en las tarjetas con efectos glassmorphism.
 
 ---
 
 ## 🚀 ¿Cómo ejecutar el proyecto localmente?
 
-Este es un proyecto **zero-server** y **zero-dependency**. No requiere bases de datos ni dependencias pesadas.
-Simplemente abre el archivo `index.html` en tu navegador de preferencia.
+Este es un proyecto **zero-server** y **zero-dependency** en su núcleo. 
 
-Si deseas ejecutar un servidor de desarrollo local ligero para evitar restricciones estrictas de CORS en algunos entornos corporativos:
-```bash
-# Si tienes Python
-python -m http.server 8000
+Si deseas ejecutarlo de forma rápida:
+1. Instala el entorno y ejecuta las pruebas de integridad:
+   ```bash
+   npm install
+   npm test
+   ```
+2. Inicia el servidor de desarrollo local estático:
+   ```bash
+   npm run dev
+   ```
+3. Visita `http://localhost:3000` (o el puerto indicado en pantalla) en tu navegador.
 
-# O si tienes Node/npm
-npx serve .
-```
-Luego visita `http://localhost:8000` en tu navegador.
+---
+
+## 🌐 Arquitectura Autónoma y Seguridad (Para todos los públicos)
+
+### Explicación Sencilla (No Técnica)
+Este proyecto está diseñado para ser **eterno y auto-suficiente**. Una vez que se publica en internet (por ejemplo, en Vercel):
+* **No requiere mantenimiento:** No hay un servidor central encendido las 24 horas que pueda colapsar, llenarse de virus o necesitar actualizaciones de software que cuesten dinero.
+* **Sin base de datos central:** No guardamos tu dirección ni tus claves en un servidor privado de la dApp. Toda tu identidad visual se almacena de forma inmutable en el **XRP Ledger** (la red pública descentralizada de Ripple).
+* **Seguridad absoluta:** La aplicación no conoce ni almacena tus claves privadas; cuando firmas, lo haces a través de tu propia billetera segura y aislada (Gem Wallet, Crossmark o Xaman).
+
+### Detalle Arquitectónico (Técnico)
+* **Arquitectura 100% Client-Side:** Los cálculos matemáticos del algoritmo de barajado Fisher-Yates, Hashing SHA-256 y renderizado vectorial de las celdas SVG se ejecutan enteramente en la CPU del navegador del usuario.
+* **Seguridad por Cabeceras (vercel.json):** El archivo de despliegue define reglas estrictas de **Content Security Policy (CSP)** limitando los scripts e inyecciones de red externas únicamente a los WebSockets públicos y redundantes de XRPL (`wss://xrplcluster.com`, `wss://s1.ripple.com`, etc.).
+* **Sin Administrador Perpetuo (Zero-Sysadmin):** Al no utilizar bases de datos tradicionales, contenedores Docker ni procesos de backend activos (NodeJS servers), el coste de infraestructura y mantenimiento es de $0$, eliminando la necesidad de un administrador perpetuo del sistema. El único flujo administrativo necesario es el envío de correcciones a través de GitHub, el cual despliega de forma automatizada mediante pipelines de CI/CD.
 
 ---
 
@@ -52,6 +68,7 @@ Luego visita `http://localhost:8000` en tu navegador.
 * `main.js`: Lógica y orquestación de eventos de la UI.
 * `src/core/crypto.js`: Módulo de hashing determinista nativo (SHA-256).
 * `src/core/generator.js`: Motor generador del SVG con el barajado de celdas.
+* `src/core/xrpl.js`: Integración de firmas no custodias y conectores de red.
 * `src/web/testing.js`: Simulador interactivo de pruebas de usabilidad y phishing.
 
 ---
