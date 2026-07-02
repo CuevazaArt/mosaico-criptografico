@@ -2,7 +2,7 @@ import { sha256, bytesToHex } from './src/core/crypto.js';
 import { generateSvg } from './src/core/generator.js';
 import { playMnemonicAudio, stopMnemonicAudio, playMismatchSequence, playMatchSequence } from './src/core/audio.js';
 import { CognitiveTestSession, generateRandomAddress, generateSimilarAddress } from './src/web/testing.js';
-import { checkAddressRegistration, registerMnemonicNft, generateFaucetWallet } from './src/core/xrpl.js';
+import { checkAddressRegistration, registerMnemonicNft, generateFaucetWallet, setXrplNetwork, getXrplNetwork } from './src/core/xrpl.js';
 
 // Instanciar la sesión global de pruebas
 const testSession = new CognitiveTestSession();
@@ -134,9 +134,13 @@ function initComparator() {
   const comparisonGrid = document.querySelector('.comparison-grid');
 
   // Elementos de la UI de XRPL
+  const xrplNetworkSelect = document.getElementById('xrpl-network-select');
   const xrplConnStatus = document.getElementById('xrpl-connection-status');
+  const xrplMainnetWarning = document.getElementById('xrpl-mainnet-warning');
   const xrplGenWalletBtn = document.getElementById('xrpl-generate-wallet-btn');
+  const xrplAddressLabel = document.getElementById('xrpl-address-label');
   const xrplAddressOutput = document.getElementById('xrpl-address-output');
+  const xrplSecretBadge = document.getElementById('xrpl-secret-badge');
   const xrplSecretOutput = document.getElementById('xrpl-secret-output');
   const xrplRegisterMosaicoBtn = document.getElementById('xrpl-register-mosaico-btn');
   const xrplConsoleLog = document.getElementById('xrpl-console-log');
@@ -148,11 +152,23 @@ function initComparator() {
   let isInitialLoad = true;
   let generatedSecret = null;
 
-  // Consola de logs en UI
+  // Consola de logs en UI con soporte para links de transacciones
   const logToXrplConsole = (msg) => {
     const timestamp = new Date().toLocaleTimeString();
     const cleanMsg = msg.replace(/\[red\]/g, '').replace(/\[info\]/g, '');
-    xrplConsoleLog.innerText += `\n[${timestamp}] ${cleanMsg}`;
+    let finalMsg = cleanMsg;
+    
+    // Si contiene "Hash de Tx: <hash>", agregar link del explorador
+    const txHashMatch = cleanMsg.match(/Hash de Tx:\s*([A-F0-9]+)/i);
+    if (txHashMatch) {
+      const txHash = txHashMatch[1];
+      const explorerUrl = getXrplNetwork() === 'mainnet' 
+        ? `https://livenet.xrpl.org/transactions/${txHash}` 
+        : `https://testnet.xrpl.org/transactions/${txHash}`;
+      finalMsg += `\n[Explorador] ${explorerUrl}`;
+    }
+    
+    xrplConsoleLog.innerText += `\n[${timestamp}] ${finalMsg}`;
     xrplConsoleLog.scrollTop = xrplConsoleLog.scrollHeight;
   };
 
@@ -163,6 +179,7 @@ function initComparator() {
     const valA = compareA.value.trim();
     const valB = compareB.value.trim();
     const gridSize = parseInt(compareGridSizeSelect.value) || 3;
+    const netLabel = getXrplNetwork() === 'mainnet' ? 'Mainnet' : 'Testnet';
 
     // Controlar vistas previas individuales
     if (valA) {
@@ -175,7 +192,7 @@ function initComparator() {
       checkAddressRegistration(valA, logToXrplConsole).then(isReg => {
         if (isReg) {
           xrplBadgeA.className = 'xrpl-badge-registered';
-          xrplBadgeA.innerHTML = '🛡️ Registrado (Testnet)';
+          xrplBadgeA.innerHTML = `🛡️ Registrado (${netLabel})`;
         } else {
           xrplBadgeA.className = 'xrpl-badge-unregistered';
           xrplBadgeA.innerHTML = '❓ No Registrado';
@@ -204,7 +221,7 @@ function initComparator() {
       checkAddressRegistration(valB, logToXrplConsole).then(isReg => {
         if (isReg) {
           xrplBadgeB.className = 'xrpl-badge-registered';
-          xrplBadgeB.innerHTML = '🛡️ Registrado (Testnet)';
+          xrplBadgeB.innerHTML = `🛡️ Registrado (${netLabel})`;
         } else {
           xrplBadgeB.className = 'xrpl-badge-unregistered';
           xrplBadgeB.innerHTML = '❓ No Registrado';
@@ -307,6 +324,92 @@ function initComparator() {
     }
   });
 
+  // Manejador para entrada de semilla manual en Mainnet
+  const handleManualSecretInput = () => {
+    const seed = xrplSecretOutput.value.trim();
+    if (!seed) {
+      xrplAddressOutput.value = "";
+      xrplRegisterMosaicoBtn.disabled = true;
+      xrplConnStatus.className = 'disconnected';
+      xrplConnStatus.textContent = '🔴 XRPL Desconectado';
+      return;
+    }
+
+    try {
+      if (typeof window.xrpl === 'undefined') {
+        throw new Error("SDK de XRPL no disponible.");
+      }
+      
+      const wallet = window.xrpl.Wallet.fromSeed(seed);
+      xrplAddressOutput.value = wallet.address;
+      generatedSecret = seed;
+      
+      xrplConnStatus.className = 'connected';
+      xrplConnStatus.textContent = '🟢 XRPL Conectado';
+      xrplRegisterMosaicoBtn.disabled = false;
+      
+      logToXrplConsole(`[info] Clave secreta válida para: ${wallet.address}`);
+    } catch (err) {
+      xrplAddressOutput.value = "";
+      generatedSecret = null;
+      xrplRegisterMosaicoBtn.disabled = true;
+      xrplConnStatus.className = 'disconnected';
+      xrplConnStatus.textContent = '🔴 Clave Secreta Inválida';
+    }
+  };
+
+  // Event Listener para el Selector de Red
+  xrplNetworkSelect.addEventListener('change', () => {
+    const selectedNet = xrplNetworkSelect.value;
+    setXrplNetwork(selectedNet);
+
+    // Resetear estado
+    xrplConnStatus.className = 'disconnected';
+    xrplConnStatus.textContent = '🔴 XRPL Desconectado';
+    generatedSecret = null;
+    xrplConsoleLog.innerText = `[info] Red cambiada a ${selectedNet === 'mainnet' ? 'Mainnet' : 'Testnet'}. Listo para conectar.`;
+
+    if (selectedNet === 'mainnet') {
+      xrplGenWalletBtn.style.display = 'none';
+
+      xrplAddressLabel.textContent = "Dirección XRPL Autocargada (desde Secret)";
+      xrplAddressOutput.value = "";
+      xrplAddressOutput.placeholder = "Se calculará al ingresar el Secret...";
+
+      xrplSecretBadge.style.color = "#f43f5e";
+      xrplSecretBadge.textContent = "⚠️ Entrada Requerida";
+
+      xrplSecretOutput.value = "";
+      xrplSecretOutput.placeholder = "Ingresa tu clave secreta (Secret/Seed) de Mainnet...";
+      xrplSecretOutput.readOnly = false;
+      xrplSecretOutput.removeAttribute('readonly');
+
+      xrplMainnetWarning.style.display = 'block';
+      xrplSecretOutput.addEventListener('input', handleManualSecretInput);
+    } else {
+      xrplGenWalletBtn.style.display = 'block';
+      xrplGenWalletBtn.disabled = false;
+
+      xrplAddressLabel.textContent = "Dirección XRPL Testnet Faucet";
+      xrplAddressOutput.value = "";
+      xrplAddressOutput.placeholder = "Esperando generación...";
+
+      xrplSecretBadge.style.color = "#fbbf24";
+      xrplSecretBadge.textContent = "⚠️ Demostración Local";
+
+      xrplSecretOutput.value = "";
+      xrplSecretOutput.placeholder = "Esperando generación...";
+      xrplSecretOutput.readOnly = true;
+      xrplSecretOutput.setAttribute('readonly', 'true');
+
+      xrplMainnetWarning.style.display = 'none';
+      xrplSecretOutput.removeEventListener('input', handleManualSecretInput);
+    }
+
+    xrplRegisterMosaicoBtn.disabled = true;
+    updateComparison(false);
+  });
+
   // Event Listeners del Panel XRPL
   xrplGenWalletBtn.addEventListener('click', async () => {
     xrplGenWalletBtn.disabled = true;
@@ -338,11 +441,12 @@ function initComparator() {
     xrplRegisterMosaicoBtn.disabled = true;
     
     try {
-      logToXrplConsole("[info] Enviando minteo XLS-20 (Soulbound NFT)...");
+      const netName = getXrplNetwork() === 'mainnet' ? 'Mainnet' : 'Testnet';
+      logToXrplConsole(`[info] Enviando minteo XLS-20 (Soulbound NFT) en ${netName}...`);
       const res = await registerMnemonicNft(generatedSecret, logToXrplConsole);
       
       if (res.success) {
-        logToXrplConsole("[info] ¡Registro inmutable en Testnet verificado!");
+        logToXrplConsole(`[info] ¡Registro inmutable en ${netName} verificado!`);
         // Disparar re-evaluación en el comparador para actualizar badges
         updateComparison(false);
       }

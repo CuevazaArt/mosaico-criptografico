@@ -12,7 +12,7 @@ Para profundizar en el diseño técnico, la teoría y la integración de la herr
 * **[AUDIO_PROPOSAL.md](file:///c:/Users/Dell/Desktop/llavero%20mnemonico/AUDIO_PROPOSAL.md):** Especificación de la capa sensorial acústica y mitigaciones en hardware.
 * **[CRITIQUE.md](file:///c:/Users/Dell/Desktop/llavero%20mnemonico/CRITIQUE.md):** Auditoría e informe de usabilidad cognitiva, calibración y ergonomía.
 * **[DISCUSSION.md](file:///c:/Users/Dell/Desktop/llavero%20mnemonico/DISCUSSION.md):** Modelado de amenazas e integración técnica en wallets y exchanges.
-* **[xrpl_make_waves_proposal.md](file:///C:/Users/Dell/.gemini/antigravity-ide/brain/ba674ce1-1c9f-4118-84c7-3ff57c2aa816/xrpl_make_waves_proposal.md):** Arquitectura técnica de registro inmutable XLS-20 y Plan de Acción de 90 días para el programa *Make Waves*.
+* **[xrpl_make_waves_proposal.md](file:///C:/Users/lexar/Desktop/mosaico-criptografico/xrpl_make_waves_proposal.md):** Arquitectura técnica de registro inmutable XLS-20 y Plan de Acción de 90 días para el programa *Make Waves*.
 
 ---
 

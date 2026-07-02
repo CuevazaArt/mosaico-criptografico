@@ -5,9 +5,30 @@
  */
 
 const TESTNET_NODE = "wss://s.altnet.rippletest.net:51233";
+const MAINNET_NODE = "wss://xrplcluster.com";
 const NFT_TAXON_MOSAICO = 1001; // Taxón oficial reservado para identidades Mosaico Criptográfico
 
 let clientInstance = null;
+let currentNetwork = 'testnet'; // 'testnet' | 'mainnet'
+
+/**
+ * Configurar la red activa para las operaciones de XRPL.
+ */
+export function setXrplNetwork(network) {
+  if (network === 'mainnet' || network === 'testnet') {
+    if (currentNetwork !== network) {
+      currentNetwork = network;
+      disconnectXrpl();
+    }
+  }
+}
+
+/**
+ * Obtener la red activa.
+ */
+export function getXrplNetwork() {
+  return currentNetwork;
+}
 
 /**
  * Obtener o inicializar la instancia conectada del cliente de XRPL.
@@ -21,11 +42,14 @@ export async function getXrplClient(logger = console.log) {
     return clientInstance;
   }
 
-  logger("[red] Conectando con nodo Testnet...");
-  clientInstance = new window.xrpl.Client(TESTNET_NODE);
+  const endpoint = currentNetwork === 'mainnet' ? MAINNET_NODE : TESTNET_NODE;
+  const netName = currentNetwork === 'mainnet' ? "Mainnet" : "Testnet";
+
+  logger(`[red] Conectando con nodo ${netName}...`);
+  clientInstance = new window.xrpl.Client(endpoint);
 
   await clientInstance.connect();
-  logger("[red] ¡Conexión establecida con XRPL Testnet!");
+  logger(`[red] ¡Conexión establecida con XRPL ${netName}!`);
   return clientInstance;
 }
 
@@ -35,14 +59,18 @@ export async function getXrplClient(logger = console.log) {
 export async function disconnectXrpl() {
   if (clientInstance && clientInstance.isConnected()) {
     await clientInstance.disconnect();
-    clientInstance = null;
   }
+  clientInstance = null;
 }
 
 /**
  * Genera y fondea una nueva cuenta (billetera) de prueba usando el Faucet oficial de XRPL Testnet.
  */
 export async function generateFaucetWallet(logger = console.log) {
+  if (currentNetwork === 'mainnet') {
+    throw new Error("La generación automática de billeteras con Faucet no está disponible en Mainnet. Debes importar una billetera con saldo existente.");
+  }
+
   const client = await getXrplClient(logger);
   logger("[red] Solicitando fondos del Faucet de XRPL Testnet...");
   
