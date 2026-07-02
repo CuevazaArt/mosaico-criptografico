@@ -1,7 +1,15 @@
 {
   "name": "mosaico-criptografico",
   "version": "3.1.1",
-  "description": "2FA Sensorial Determinístico (Visual & Auditivo) para identidades criptográficas en XRPL.",
+  "description": "Deterministic Sensory 2FA (Visual & Acoustic) for cryptographic identities on XRPL.",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CuevazaArt/mosaico-criptografico.git"
+  },
+  "bugs": {
+    "url": "https://github.com/CuevazaArt/mosaico-criptografico/issues"
+  },
+  "homepage": "https://github.com/CuevazaArt/mosaico-criptografico#readme",
   "type": "module",
   "main": "src/core/generator.js",
   "files": [
