@@ -7,7 +7,7 @@ window.__APP_CONFIG__ = {
   "xummApiKey": "",
   "xummBackendEnabled": false,
   "enableLocalDemo": false,
-  "defaultWallet": "gem",
+  "defaultWallet": "xaman",
   "sampleXrplAddress": "rG1QQv2dh2AGTf5gZUXyZEaXcRmGRHsGQE",
   "hostPlatform": "github-pages",
   "version": "3.1.1"

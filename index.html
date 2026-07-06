@@ -19,7 +19,7 @@
       xummApiKey: '',
       xummBackendEnabled: false,
       enableLocalDemo: true,
-      defaultWallet: 'local',
+      defaultWallet: 'xaman',
       sampleXrplAddress: 'rG1QQv2dh2AGTf5gZUXyZEaXcRmGRHsGQE',
       version: '3.1.1'
     };
@@ -88,8 +88,10 @@
         </div>
       </div>
       <div class="welcome-banner-actions">
-        <button type="button" id="welcome-start-tour-btn" class="btn-primary btn-sm">Ver mapa de secciones</button>
-        <button type="button" id="welcome-dismiss-btn" class="btn-secondary btn-sm">Entendido</button>
+        <button type="button" id="welcome-xaman-btn" class="btn-primary btn-sm">📱 Empezar con Xaman</button>
+        <button type="button" id="welcome-gem-btn" class="btn-secondary btn-sm">💎 Alternativa: Gem</button>
+        <button type="button" id="welcome-start-tour-btn" class="btn-secondary btn-sm">Ver mapa</button>
+        <button type="button" id="welcome-dismiss-btn" class="btn-secondary btn-sm">Explorar solo</button>
       </div>
     </aside>
 
@@ -277,6 +279,31 @@
             </div>
           </div>
 
+          <!-- Primer abordaje: Xaman (recomendado) + Gem (alternativa) -->
+          <div id="wallet-approach-panel" class="wallet-approach-panel">
+            <div class="wallet-approach-header">
+              <div>
+                <h3 class="wallet-approach-title">🚀 Primer abordaje — Registra tu identidad en XRPL</h3>
+                <p class="wallet-approach-desc">Conecta tu billetera, mintea un NFT Soulbound y ancla tu mosaico en la blockchain. <strong>Recomendamos Xaman</strong> (app móvil); Gem Wallet es la alternativa en navegador.</p>
+              </div>
+              <button type="button" id="wallet-approach-dismiss" class="wallet-approach-close" aria-label="Ocultar panel">✕</button>
+            </div>
+            <ol class="wallet-approach-steps">
+              <li><strong>Conecta</strong> Xaman en tu móvil (QR) o Gem Wallet (extensión)</li>
+              <li><strong>Firma</strong> el mint del NFT Soulbound (~2 XRP reserva recuperable)</li>
+              <li><strong>Verifica</strong> el badge verde ✅ en tu dirección</li>
+            </ol>
+            <div class="wallet-approach-actions">
+              <button type="button" id="xaman-connect-btn" class="btn-xaman-primary" data-tip="xaman-connect-btn">
+                📱 Conectar con Xaman <span class="btn-badge">Recomendado</span>
+              </button>
+              <button type="button" id="gem-connect-btn" class="btn-gem-alt" data-tip="gem-connect-btn">
+                💎 Alternativa: Gem Wallet
+              </button>
+            </div>
+            <p class="wallet-approach-note">Necesitas la app <a href="https://xaman.app" target="_blank" rel="noopener">Xaman</a> instalada y al menos ~2 XRP libres en Mainnet para el NFT.</p>
+          </div>
+
           <!-- XRPL Registration Panel -->
           <div class="card glass-panel xrpl-registry-panel" style="margin-top: 2rem;">
             <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 1rem;">
@@ -285,7 +312,7 @@
                   <span>🔒</span> Registro de identidad en XRPL <span class="section-badge">Opcional · ~2 XRP</span>
                 </h3>
                 <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0; line-height: 1.4;">
-                  Mintea un NFT Soulbound (no transferible) que prueba on-chain que tú registraste tu mosaico. Requiere billetera Gem, Crossmark o Xaman.
+                  Mintea un NFT Soulbound (no transferible) que prueba on-chain tu mosaico. <strong>Xaman</strong> (móvil) o <strong>Gem Wallet</strong> (alternativa en navegador).
                 </p>
               </div>
               <div style="display: flex; gap: 0.75rem; align-items: center;">
@@ -303,12 +330,12 @@
               <div style="display: flex; flex-direction: column; gap: 0.85rem;">
                 
                 <div class="form-group" style="margin-bottom: 0;">
-                  <label for="xrpl-wallet-select" style="font-size: 0.8rem; font-weight: 600;">Signing Method / Wallet</label>
+                  <label for="xrpl-wallet-select" style="font-size: 0.8rem; font-weight: 600;">Método de firma / Billetera</label>
                   <select id="xrpl-wallet-select" class="form-select" style="font-size: 0.8rem; padding: 8px 12px; background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; color: #fff; width: 100%; cursor: pointer; outline: none;">
-                    <option value="local" selected>Local Demo (Testnet Faucet)</option>
-                    <option value="gem">Gem Wallet (Web Extension)</option>
-                    <option value="crossmark">Crossmark (Web Extension)</option>
-                    <option value="xaman">Xaman / Xumm (Mobile QR)</option>
+                    <option value="xaman">Xaman / Xumm (Móvil QR) — Recomendado</option>
+                    <option value="gem">Gem Wallet (Extensión navegador) — Alternativa</option>
+                    <option value="crossmark">Crossmark (Extensión navegador)</option>
+                    <option value="local">Demo local (Testnet Faucet)</option>
                   </select>
                 </div>
 
@@ -322,7 +349,7 @@
                 </button>
 
                 <button id="xrpl-connect-wallet-btn" class="btn-connect" style="display: none;">
-                  🔗 Connect External Wallet
+                  📱 Conectar Xaman
                 </button>
                 
                 <div class="form-group" style="margin-bottom: 0;">
@@ -521,27 +548,27 @@
       <div class="help-map">
         <article class="help-map-card">
           <span class="help-map-num">1</span>
+          <h3>📱 Xaman (recomendado)</h3>
+          <p>App móvil → QR → firma el NFT Soulbound. Primer abordaje ideal para Make Waves.</p>
+          <span class="help-map-cost">~2 XRP reserva · Móvil</span>
+        </article>
+        <article class="help-map-card help-map-card--optional">
+          <span class="help-map-num">2</span>
+          <h3>💎 Gem Wallet (alternativa)</h3>
+          <p>Extensión de navegador en Chrome/Brave si no usas móvil.</p>
+          <span class="help-map-cost">~2 XRP reserva · Escritorio</span>
+        </article>
+        <article class="help-map-card">
+          <span class="help-map-num">3</span>
           <h3>⚡ Generador</h3>
           <p>Pega una dirección → obtén su mosaico y melodía → memoriza el patrón.</p>
           <span class="help-map-cost">Gratis · Sin billetera</span>
         </article>
         <article class="help-map-card">
-          <span class="help-map-num">2</span>
+          <span class="help-map-num">4</span>
           <h3>⚖️ Comparador</h3>
           <p>Compara dirección esperada vs copiada. Badge verde = OK, rojo = alerta.</p>
           <span class="help-map-cost">Gratis · Uso diario</span>
-        </article>
-        <article class="help-map-card">
-          <span class="help-map-num">3</span>
-          <h3>🎯 Simulador</h3>
-          <p>Juego de 6 opciones para entrenar detección de phishing bajo presión.</p>
-          <span class="help-map-cost">Gratis · Sin límite</span>
-        </article>
-        <article class="help-map-card help-map-card--optional">
-          <span class="help-map-num">+</span>
-          <h3>🔒 Registro XRPL</h3>
-          <p>NFT Soulbound opcional que ancla tu identidad visual en la blockchain.</p>
-          <span class="help-map-cost">~2 XRP reserva (recuperable) + comisión mínima</span>
         </article>
       </div>
       <div class="help-modal-footer">

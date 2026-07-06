@@ -131,17 +131,19 @@ Esto crea un NFT Soulbound que dice al mundo: *"esta dirección registró su mos
 ### Paso 2 — Configura la red y la billetera
 
 1. En **Network**, selecciona **Mainnet (Production)**.
-2. En **Signing Method**, elige tu billetera:
-   - **Gem Wallet** — extensión de Chrome/Brave
-   - **Crossmark** — extensión de navegador
-   - **Xaman** — app móvil (firma por QR)
+2. **Recomendado:** pulsa **📱 Conectar con Xaman** en el panel "Primer abordaje" (o selecciona Xaman en el desplegable).
+3. **Alternativa:** pulsa **💎 Gem Wallet** si prefieres extensión de navegador (Chrome/Brave).
 
 ### Paso 3 — Conecta tu billetera
 
-1. Pulsa **🔗 Connect Wallet**.
-2. Acepta la conexión en tu billetera.
-3. Tu dirección aparecerá en el campo **XRPL Address**.
-4. El indicador cambiará a **🟢 XRPL Connected**.
+**Con Xaman (recomendado):**
+1. Pulsa **📱 Conectar con Xaman** o **Conectar Xaman (móvil / QR)**.
+2. Autoriza en la app Xaman de tu teléfono.
+3. Tu dirección aparecerá en **XRPL Address** y el indicador pasará a **🟢 XRPL Connected**.
+
+**Con Gem Wallet (alternativa):**
+1. Instala la extensión desde [gemwallet.app](https://gemwallet.app).
+2. Pulsa **💎 Conectar Gem Wallet** y acepta la conexión.
 
 ### Paso 4 — Mintea tu NFT de identidad
 

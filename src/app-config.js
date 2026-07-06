@@ -9,7 +9,7 @@ const DEFAULTS = {
   xummApiKey: '',
   xummBackendEnabled: false,
   enableLocalDemo: true,
-  defaultWallet: 'local',
+  defaultWallet: 'xaman',
   sampleXrplAddress: 'rG1QQv2dh2AGTf5gZUXyZEaXcRmGRHsGQE',
   version: '3.1.1'
 };

@@ -4,7 +4,7 @@ import { playMnemonicAudio, stopMnemonicAudio, playMismatchSequence, playMatchSe
 import { CognitiveTestSession, generateRandomAddress, generateSimilarAddress } from './src/web/testing.js';
 import { checkAddressRegistration, registerMnemonicNft, generateFaucetWallet, setXrplNetwork, getXrplNetwork, connectWallet, registerMnemonicNftNonCustodial } from './src/core/xrpl.js';
 import { getAppConfig, isLocalDemoEnabled } from './src/app-config.js';
-import { initOnboarding, onTabChanged, onAddressGenerated, onComparisonResult, showToast } from './src/web/onboarding.js';
+import { initOnboarding, onTabChanged, onAddressGenerated, onComparisonResult, showToast, registerWalletApproachHandlers } from './src/web/onboarding.js';
 
 const testSession = new CognitiveTestSession();
 
@@ -36,7 +36,7 @@ function applyDeploymentSettings() {
 
   if (xrplWalletSelect) {
     const hasOption = Array.from(xrplWalletSelect.options).some(o => o.value === config.defaultWallet);
-    xrplWalletSelect.value = hasOption ? config.defaultWallet : 'gem';
+    xrplWalletSelect.value = hasOption ? config.defaultWallet : 'xaman';
   }
 
   const prodBanner = document.getElementById('production-mode-banner');
@@ -416,14 +416,44 @@ function initComparator() {
       xrplConnectWalletBtn.disabled = false;
 
       const walletName = selectedWallet === 'gem' ? 'Gem Wallet' : (selectedWallet === 'crossmark' ? 'Crossmark' : 'Xaman');
-      xrplConnectWalletBtn.textContent = `🔗 Connect Wallet (${walletName})`;
+      const connectLabels = {
+        xaman: '📱 Conectar Xaman (móvil / QR)',
+        gem: '💎 Conectar Gem Wallet',
+        crossmark: '🔗 Conectar Crossmark'
+      };
+      xrplConnectWalletBtn.textContent = connectLabels[selectedWallet] || `🔗 Conectar ${walletName}`;
 
-      xrplAddressLabel.textContent = `Address linked via ${walletName}`;
+      xrplAddressLabel.textContent = `Dirección vinculada vía ${walletName}`;
       xrplAddressOutput.value = "";
-      xrplAddressOutput.placeholder = `Click 'Connect Wallet (${walletName})'...`;
+      xrplAddressOutput.placeholder = selectedWallet === 'xaman'
+        ? 'Pulsa "Conectar Xaman" y autoriza en tu móvil...'
+        : `Pulsa conectar ${walletName}...`;
     }
     updateComparison(false);
   };
+
+  const triggerWalletConnect = () => {
+    xrplConnectWalletBtn.click();
+  };
+
+  const setWalletType = (type) => {
+    if (xrplWalletSelect.querySelector(`option[value="${type}"]`)) {
+      xrplWalletSelect.value = type;
+      logToXrplConsole(`[info] Billetera seleccionada: ${type}.`);
+      updateWalletUILayout();
+    }
+  };
+
+  const switchToComparatorTab = () => {
+    const comparatorBtn = document.querySelector('.nav-btn[data-tab="comparator-tab"]');
+    comparatorBtn?.click();
+  };
+
+  registerWalletApproachHandlers({
+    switchToComparator: switchToComparatorTab,
+    setWalletType,
+    connectWallet: triggerWalletConnect
+  });
 
   // Event Listeners para selectores de configuración de billetera
   xrplNetworkSelect.addEventListener('change', () => {

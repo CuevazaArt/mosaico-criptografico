@@ -4,6 +4,11 @@
 
 const STORAGE_WELCOME = 'mosaico_welcome_dismissed';
 const STORAGE_TOUR = 'mosaico_tour_completed';
+const STORAGE_WALLET_APPROACH = 'mosaico_wallet_approach_seen';
+
+let switchToComparatorCallback = null;
+let connectWalletCallback = null;
+let setWalletTypeCallback = null;
 
 const TAB_GUIDES = {
   'generator-tab': {
@@ -20,12 +25,12 @@ const TAB_GUIDES = {
   'comparator-tab': {
     icon: '⚖️',
     title: 'Comparador — Verifica antes de firmar',
-    summary: 'Compara dos direcciones lado a lado. Si el dibujo cambia, algo anda mal.',
+    summary: 'Compara dos direcciones lado a lado. Para registrar tu identidad on-chain, empieza con Xaman (móvil) o Gem Wallet (alternativa).',
     steps: [
       'Address A: la dirección que esperas (de confianza).',
       'Address B: la que acabas de copiar o pegar en tu billetera.',
       'Badge verde ✅ = seguro · Badge rojo ⚠️ = posible phishing — no firmes.',
-      'Opcional: registra tu identidad en XRPL con un NFT Soulbound (panel inferior).'
+      'Primer abordaje: conecta Xaman → mintea NFT Soulbound → verifica badge verde.'
     ]
   },
   'testing-tab': {
@@ -50,8 +55,48 @@ const ELEMENT_TIPS = {
   'simulate-phishing-btn': 'Demostración: altera un carácter para ver cómo cambia el mosaico.',
   'force-match-btn': 'Copia Address A en B para ver el badge verde de coincidencia perfecta.',
   'xrpl-register-mosaico-btn': 'Mintea un NFT Soulbound en XRPL (~2 XRP de reserva recuperable en Mainnet).',
+  'xaman-connect-btn': 'Abre Xaman en tu móvil, autoriza la conexión y firma el NFT con QR.',
+  'gem-connect-btn': 'Alternativa: extensión Gem Wallet en Chrome o Brave.',
   'start-game-btn': 'Inicia el reto de detección visual contra direcciones falsificadas.'
 };
+
+export function registerWalletApproachHandlers({ switchToComparator, setWalletType, connectWallet }) {
+  switchToComparatorCallback = switchToComparator;
+  setWalletTypeCallback = setWalletType;
+  connectWalletCallback = connectWallet;
+}
+
+function scrollToWalletApproach() {
+  document.getElementById('wallet-approach-panel')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+export function startXamanApproach(autoConnect = false) {
+  localStorage.setItem(STORAGE_WALLET_APPROACH, '1');
+  switchToComparatorCallback?.();
+  setWalletTypeCallback?.('xaman');
+  scrollToWalletApproach();
+  showToast('Abordaje con Xaman: autoriza en tu móvil → conecta → mintea el NFT Soulbound.', 'info', 6500);
+  if (autoConnect) {
+    setTimeout(() => connectWalletCallback?.(), 400);
+  }
+}
+
+export function startGemApproach(autoConnect = false) {
+  localStorage.setItem(STORAGE_WALLET_APPROACH, '1');
+  switchToComparatorCallback?.();
+  setWalletTypeCallback?.('gem');
+  scrollToWalletApproach();
+  showToast('Alternativa Gem Wallet: instala la extensión y pulsa Conectar.', 'info', 5500);
+  if (autoConnect) {
+    setTimeout(() => connectWalletCallback?.(), 400);
+  }
+}
+
+function dismissWalletApproachPanel() {
+  localStorage.setItem(STORAGE_WALLET_APPROACH, '1');
+  document.getElementById('wallet-approach-panel')?.classList.add('collapsed');
+}
+
 
 let toastTimer = null;
 
@@ -163,7 +208,7 @@ function showHostNotice() {
     notice.style.display = 'flex';
     notice.innerHTML = `
       <span>🌊</span>
-      <span>Versión completa con registro XRPL en Mainnet y billeteras Gem / Crossmark / Xaman.</span>
+      <span>Versión completa con registro XRPL en Mainnet. Primer abordaje: <strong>Xaman</strong> (móvil) o Gem Wallet (alternativa).</span>
     `;
   }
 }
@@ -185,6 +230,24 @@ export function initOnboarding() {
     dismissWelcome();
     openHelpModal();
   });
+  document.getElementById('welcome-xaman-btn')?.addEventListener('click', () => {
+    dismissWelcome();
+    startXamanApproach(true);
+  });
+  document.getElementById('welcome-gem-btn')?.addEventListener('click', () => {
+    dismissWelcome();
+    startGemApproach(true);
+  });
+
+  document.getElementById('xaman-connect-btn')?.addEventListener('click', () => {
+    setWalletTypeCallback?.('xaman');
+    connectWalletCallback?.();
+  });
+  document.getElementById('gem-connect-btn')?.addEventListener('click', () => {
+    setWalletTypeCallback?.('gem');
+    connectWalletCallback?.();
+  });
+  document.getElementById('wallet-approach-dismiss')?.addEventListener('click', dismissWalletApproachPanel);
 
   document.getElementById('help-open-btn')?.addEventListener('click', openHelpModal);
   document.getElementById('help-close-btn')?.addEventListener('click', closeHelpModal);
@@ -196,8 +259,12 @@ export function initOnboarding() {
 
   if (!localStorage.getItem(STORAGE_TOUR)) {
     setTimeout(() => {
-      showToast('Tip: empieza en ⚡ Generador, luego prueba ⚖️ Comparador con el botón "Phishing ⚠️".', 'info', 7000);
+      showToast('Tip: primer abordaje con 📱 Xaman (móvil) o alternativa 💎 Gem Wallet en el Comparador.', 'info', 7500);
     }, 1200);
+  }
+
+  if (!localStorage.getItem(STORAGE_WALLET_APPROACH)) {
+    document.getElementById('wallet-approach-panel')?.classList.remove('collapsed');
   }
 }
 

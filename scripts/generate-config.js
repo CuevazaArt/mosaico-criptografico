@@ -52,7 +52,7 @@ const config = {
   xummApiKey: pick(fileEnv, 'XUMM_API_KEY', ''),
   xummBackendEnabled: Boolean(pick(fileEnv, 'XUMM_API_KEY') && pick(fileEnv, 'XUMM_API_SECRET')),
   enableLocalDemo,
-  defaultWallet: isProduction ? 'gem' : 'local',
+  defaultWallet: isProduction ? 'xaman' : 'local',
   sampleXrplAddress: 'rG1QQv2dh2AGTf5gZUXyZEaXcRmGRHsGQE',
   version: pick(fileEnv, 'npm_package_version', '3.1.1')
 };
