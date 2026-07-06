@@ -46,7 +46,7 @@ Make Waves rewards projects that drive **real usage on the XRP Ledger**. Cryptog
 1. Open the **[live demo](https://mosaico-criptografico.vercel.app)** → tab **Comparator**.
 2. Notice Address A and B look similar in text but produce **radically different mosaics** (red badge = phishing detected).
 3. Switch to **Generator** → paste any XRPL address → click **Listen to Acoustic Key**.
-4. In the Comparator panel, select **Mainnet** → connect **Gem Wallet** → **Mint Mosaic Key**.
+4. In the Comparator panel, select **Mainnet** → connect **Xaman** (or Gem Wallet) → **Mint Mosaic Key**.
 5. Watch the ledger console for your `NFTokenMint` transaction hash.
 6. Load the **browser extension** (`/extension` folder) on [xrpl.org](https://xrpl.org) to see live mosaic badges beside addresses.
 

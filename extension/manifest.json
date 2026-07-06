@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "Mosaico Criptográfico Overlay",
+  "name": "Cryptographic Mosaic Overlay",
   "version": "1.0.0",
-  "description": "Inyecta identificadores visuales (mosaicos) al lado de direcciones XRPL detectadas en el navegador.",
+  "description": "Injects visual identicon mosaics next to XRPL addresses detected in the browser.",
   "icons": {
     "48": "icons/icon48.png",
     "128": "icons/icon128.png"

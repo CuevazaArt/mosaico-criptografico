@@ -127,7 +127,7 @@ First sensory 2FA layer designed specifically for XRPL address verification, com
 
 Judges can immediately:
 1. See two similar addresses produce different mosaics (Comparator tab).
-2. Connect Gem Wallet on Mainnet and mint a Soulbound NFT.
+2. Connect Xaman on Mainnet (or Gem Wallet) and mint a Soulbound NFT.
 3. Verify on-chain registration via the green badge.
 4. Play acoustic signatures and run the phishing simulator.
 
@@ -184,7 +184,7 @@ Even one prevented phishing attack (often worth thousands of XRP) justifies the 
 |------|---------|
 | 0:00–0:30 | "Addresses are unhuman. Scammers exploit that." Show similar `r...` addresses. |
 | 0:30–1:30 | Comparator demo — mosaics diverge on one-character change. Play mismatch audio. |
-| 1:30–2:30 | Connect Gem Wallet → Mint Soulbound NFT on Mainnet → show tx hash. |
+| 1:30–2:30 | Connect Xaman (mobile QR) or Gem Wallet → Mint Soulbound NFT on Mainnet → show tx hash. |
 | 2:30–3:30 | Explain self-issued proof (`Issuer == Owner`). Show extension on xrpl.org. |
 | 3:30–4:30 | Cognitive simulator results. XLS standard vision. Ecosystem scale. |
 | 4:30–5:00 | "Every XRPL wallet should show a mosaic before you sign. We built the standard." |

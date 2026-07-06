@@ -77,7 +77,7 @@ When `DEPLOYMENT_MODE=production`:
 | Setting | Value |
 |---------|-------|
 | Default network | Mainnet |
-| Default wallet | Gem Wallet |
+| Default wallet | Xaman (Gem Wallet alternative) |
 | Seed/secret input | Hidden |
 | Xaman signing | `/api/xumm/payload` (secret server-side) |
 | Sample addresses | XRPL format (`rG1QQ...`) |
@@ -89,7 +89,7 @@ When `DEPLOYMENT_MODE=production`:
 
 1. **Problem** (30s): Comparator — two similar XRPL addresses, different mosaics.
 2. **Generator** (60s): Paste address → visual mosaic + acoustic key.
-3. **Mainnet mint** (90s): Gem Wallet → Mint Soulbound NFT (taxon 1001) → tx hash.
+3. **Mainnet mint** (90s): Xaman (mobile QR) or Gem Wallet → Mint Soulbound NFT (taxon 1001) → tx hash.
 4. **Verification** (60s): Green on-chain badge; explain `Issuer == Owner`.
 5. **Extension** (30s): Overlay on xrpl.org / Bithomp.
 6. **Impact** (30s): Ecosystem standard → every wallet, every payment, on-chain verification.

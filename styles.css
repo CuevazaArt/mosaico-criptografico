@@ -846,7 +846,7 @@ input:checked + .slider:before {
 }
 
 .stat-group:nth-child(3) h4 {
-  border-left-color: #ec4899; /* Rosa para el caótico */
+  border-left-color: #ec4899; /* Pink accent for chaotic mode */
 }
 
 .stat-row {
@@ -970,7 +970,7 @@ input:checked + .slider:before {
   height: 100%;
   aspect-ratio: 1 / 1;
   border: 2px dashed rgba(99, 102, 241, 0.25);
-  border-radius: 16px; /* Idéntico al border-radius de los SVG */
+  border-radius: 16px; /* Matches SVG border-radius */
   background: rgba(99, 102, 241, 0.03);
   box-shadow: inset 0 0 15px rgba(99, 102, 241, 0.05);
   color: var(--text-muted);

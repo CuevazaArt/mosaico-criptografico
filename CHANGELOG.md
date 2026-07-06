@@ -4,6 +4,20 @@ All notable changes to the **Cryptographic Mosaic** project are documented in th
 
 ---
 
+## [3.1.2] - 2026-07-06
+
+### Added
+* **USER_GUIDE.md:** Full English step-by-step guide for new users (replaces Spanish `GUIA_USUARIO.md`).
+* **Onboarding UI:** Welcome banner, contextual tab guides, tooltips, and help modal (all English).
+
+### Changed
+* **Full English UI:** Translated `index.html`, `main.js`, and `src/web/onboarding.js` for Make Waves presentation.
+* **Browser extension:** English name and description in `extension/manifest.json`.
+* **Documentation:** README, MANUAL, DEPLOYMENT, and SUBMISSION_DRAFT updated — Xaman-first wallet flow, `USER_GUIDE.md` links.
+* **Deploy caching:** `vercel.json` disables HTML caching so UI updates reach browsers immediately.
+
+---
+
 ## [1.1.0] - 2026-07-02
 
 ### Added
