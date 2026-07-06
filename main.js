@@ -61,7 +61,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 /* ----------------------------------------------------
-   1. CONTROLADOR DE PESTAÑAS (TABS)
+   1. TAB CONTROLLER
    ---------------------------------------------------- */
 function initTabs() {
   const navButtons = document.querySelectorAll('.nav-btn');
@@ -71,14 +71,14 @@ function initTabs() {
     btn.addEventListener('click', () => {
       const targetTab = btn.getAttribute('data-tab');
 
-      // Parar cualquier audio corriendo al cambiar de pestaña
+      // Stop any playing audio when switching tabs
       stopMnemonicAudio();
 
-      // Alternar clases activas en botones
+      // Toggle active classes on buttons
       navButtons.forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
 
-      // Alternar paneles de contenido
+      // Toggle content panels
       panels.forEach(p => {
         if (p.id === targetTab) {
           p.classList.add('active');
@@ -93,7 +93,7 @@ function initTabs() {
 }
 
 /* ----------------------------------------------------
-   2. SECCIÓN: GENERADOR INDIVIDUAL
+   2. GENERATOR SECTION
    ---------------------------------------------------- */
 function initGenerator() {
   const addressInput = document.getElementById('address-input');
@@ -106,21 +106,21 @@ function initGenerator() {
   const fullHashCode = document.getElementById('full-hash-code');
 
   const updateGenerator = async () => {
-    // Parar audio si hay uno corriendo
+    // Stop audio if something is playing
     stopMnemonicAudio();
 
     const rawValue = addressInput.value.trim() || getAppConfig().sampleXrplAddress;
     
-    // 1. Obtener hash criptográfico
+    // 1. Compute cryptographic hash
     const hash = await sha256(rawValue);
     
-    // 2. Mostrar el hash hexadecimal en la interfaz
+    // 2. Display hex hash in the UI
     fullHashCode.textContent = bytesToHex(hash);
 
-    // 3. Determinar el modo cromático activo
+    // 3. Determine active chroma mode
     const chromaMode = document.querySelector('input[name="chroma-mode"]:checked').value;
     
-    // 4. Renderizar el SVG
+    // 4. Render SVG
     const svgString = generateSvg(hash, rawValue, {
       chaoticMode: (chromaMode === 'chaotic'),
       showOverlay: overlayCheckbox.checked,
@@ -128,7 +128,7 @@ function initGenerator() {
       gridSize: parseInt(gridSizeSelect.value) || 3
     });
 
-    // 5. Inyectar SVG
+    // 5. Inject SVG into preview
     previewContainer.innerHTML = svgString;
     if (document.activeElement === addressInput) {
       onAddressGenerated();
@@ -151,7 +151,7 @@ function initGenerator() {
     radio.addEventListener('change', updateGenerator);
   });
 
-  // Reproducir firma auditiva
+  // Play acoustic signature
   playAudioBtn.addEventListener('click', async () => {
     const rawValue = addressInput.value.trim() || getAppConfig().sampleXrplAddress;
     const hash = await sha256(rawValue);
@@ -162,12 +162,12 @@ function initGenerator() {
     });
   });
 
-  // Ejecución inicial
+  // Initial render
   updateGenerator();
 }
 
 /* ----------------------------------------------------
-   3. SECCIÓN: COMPARADOR CARA A CARA
+   3. SIDE-BY-SIDE COMPARATOR
    ---------------------------------------------------- */
 function initComparator() {
   const compareA = document.getElementById('compare-a-input');
@@ -184,7 +184,7 @@ function initComparator() {
   const statusMsg = document.getElementById('comparison-msg');
   const comparisonGrid = document.querySelector('.comparison-grid');
 
-  // Elementos de la UI de XRPL
+  // XRPL UI elements
   const xrplNetworkSelect = document.getElementById('xrpl-network-select');
   const xrplWalletSelect = document.getElementById('xrpl-wallet-select');
   const xrplConnStatus = document.getElementById('xrpl-connection-status');
@@ -206,13 +206,13 @@ function initComparator() {
   let isInitialLoad = true;
   let generatedSecret = null;
 
-    // Consola de logs en UI con soporte para links de transacciones
+    // UI log console with transaction link support
     const logToXrplConsole = (msg) => {
       const timestamp = new Date().toLocaleTimeString();
       const cleanMsg = msg.replace(/\[red\]/g, '').replace(/\[info\]/g, '');
       let finalMsg = cleanMsg;
       
-      // Si contiene "Hash de Tx: <hash>", agregar link del explorador
+      // If message contains "Tx Hash: <hash>", append explorer link
       const txHashMatch = cleanMsg.match(/Tx Hash:\s*([A-F0-9]+)/i);
       if (txHashMatch) {
         const txHash = txHashMatch[1];
@@ -227,7 +227,7 @@ function initComparator() {
     };
 
   const updateComparison = async (userTriggered = false) => {
-    // Parar audio activo al cambiar entradas
+    // Stop active audio when inputs change
     stopMnemonicAudio();
 
     const valA = compareA.value.trim();
@@ -235,14 +235,14 @@ function initComparator() {
     const gridSize = parseInt(compareGridSizeSelect.value) || 3;
     const netLabel = getXrplNetwork() === 'mainnet' ? 'Mainnet' : 'Testnet';
 
-    // Controlar vistas previas individuales
+    // Update individual previews
     if (valA) {
       const hashA = await sha256(valA);
       currentHashA = hashA;
       previewA.innerHTML = generateSvg(hashA, valA, { chaoticMode: false, showOverlay: true, showAnchors: true, gridSize });
       playAudioABtn.disabled = false;
       
-      // Consultar registro XRPL de forma asíncrona
+      // Query XRPL registration asynchronously
       checkAddressRegistration(valA, logToXrplConsole).then(isReg => {
         if (isReg) {
           xrplBadgeA.className = 'xrpl-badge-registered';
@@ -271,7 +271,7 @@ function initComparator() {
       previewB.innerHTML = generateSvg(hashB, valB, { chaoticMode: false, showOverlay: true, showAnchors: true, gridSize });
       playAudioBBtn.disabled = false;
 
-      // Consultar registro XRPL de forma asíncrona
+      // Query XRPL registration asynchronously
       checkAddressRegistration(valB, logToXrplConsole).then(isReg => {
         if (isReg) {
           xrplBadgeB.className = 'xrpl-badge-registered';
@@ -322,7 +322,7 @@ function initComparator() {
     isInitialLoad = false;
   };
 
-  // Manejador para entrada de semilla manual en Mainnet
+  // Handler for manual seed input on Mainnet (local demo only)
   const handleManualSecretInput = () => {
     const seed = xrplSecretOutput.value.trim();
     if (!seed) {
@@ -361,7 +361,7 @@ function initComparator() {
     const selectedNet = xrplNetworkSelect.value;
     const selectedWallet = xrplWalletSelect.value;
 
-    // Resetear estados al cambiar opciones
+    // Reset state when options change
     xrplConnStatus.className = 'disconnected';
     xrplConnStatus.textContent = '🔴 XRPL Disconnected';
     xrplRegisterMosaicoBtn.disabled = true;
@@ -406,7 +406,7 @@ function initComparator() {
         xrplSecretOutput.removeEventListener('input', handleManualSecretInput);
       }
     } else {
-      // Billeteras no custodias
+      // Non-custodial wallets
       xrplSecretContainer.style.display = 'none';
       xrplGenWalletBtn.style.display = 'none';
       xrplMainnetWarning.style.display = 'none';
@@ -468,7 +468,7 @@ function initComparator() {
     updateWalletUILayout();
   });
 
-  // Event Listeners del Panel XRPL
+  // XRPL panel event listeners
   xrplGenWalletBtn.addEventListener('click', async () => {
     xrplGenWalletBtn.disabled = true;
     xrplConnStatus.className = 'connecting';
@@ -551,7 +551,7 @@ function initComparator() {
     }
   });
 
-  // Eventos de entrada y botones generales del comparador
+  // Comparator input events and buttons
   compareA.addEventListener('input', () => updateComparison(true));
   compareB.addEventListener('input', () => updateComparison(true));
   compareGridSizeSelect.addEventListener('change', () => updateComparison(false));
@@ -585,12 +585,12 @@ function initComparator() {
     }
   });
 
-  // Ejecución inicial
+  // Initial wallet UI setup
   updateWalletUILayout();
 }
 
 /* ----------------------------------------------------
-   4. SECCIÓN: SIMULADOR DE PRUEBAS DE CAMPO
+   4. FIELD TESTING SIMULATOR
    ---------------------------------------------------- */
 function initTestingSuite() {
   const startBtn = document.getElementById('start-game-btn');
@@ -632,7 +632,7 @@ function initTestingSuite() {
     timerIntervalId = setInterval(() => {
       const elapsed = performance.now() - startTime;
       timerElement.textContent = (elapsed / 1000).toFixed(3);
-    }, 41); // ~24 FPS, ideal para animar milisegundos sin sobrecargar
+    }, 41); // ~24 FPS — smooth millisecond animation without overload
   };
 
   const stopLiveTimer = () => {
@@ -645,21 +645,21 @@ function initTestingSuite() {
   const updateStatsDisplay = () => {
     const stats = testSession.getStats();
     
-    // Render stats armónicas
+    // Render harmonious stats
     statHarmCount.textContent = stats.harmonious.total;
     statHarmSuccess.textContent = `${stats.harmonious.successRate}%`;
     statHarmTime.textContent = `${stats.harmonious.avgTime}s`;
 
-    // Render stats caóticas
+    // Render chaotic stats
     statChaoCount.textContent = stats.chaotic.total;
     statChaoSuccess.textContent = `${stats.chaotic.successRate}%`;
     statChaoTime.textContent = `${stats.chaotic.avgTime}s`;
 
-    // Render racha perfecta
+    // Render perfect streak
     statCurrentStreak.textContent = stats.currentStreak;
     statStreakAvgTime.textContent = stats.avgStreakTime !== null ? `${stats.avgStreakTime}s` : 'N/A';
     
-    // Añadir efecto visual si alcanzan racha de 5 o más
+    // Visual highlight when streak reaches 5+
     if (stats.currentStreak >= 5) {
       statCurrentStreak.style.color = 'var(--secondary)';
       statCurrentStreak.style.textShadow = '0 0 10px var(--secondary-glow)';
@@ -668,7 +668,7 @@ function initTestingSuite() {
       statCurrentStreak.style.textShadow = 'none';
     }
 
-    // Análisis automatizado
+    // Automated analysis text
     const h = stats.harmonious;
     const c = stats.chaotic;
     
@@ -697,22 +697,22 @@ function initTestingSuite() {
   };
 
   const startNextRound = async () => {
-    // Parar cualquier audio activo al pasar de ronda
+    // Stop any active audio when advancing rounds
     stopMnemonicAudio();
 
     isLockingInput = false;
     const mode = modeSelect.value; // 'harmonious' | 'chaotic'
     const gridSize = parseInt(gameGridSizeSelect.value) || 3;
     
-    // Iniciar prueba en lógica
+    // Start trial in session logic
     const trialData = testSession.startNewTrial(mode);
     const isChaotic = (trialData.mode === 'chaotic');
 
-    // Obtener hash del objetivo para renderizarlo
+    // Hash target address for rendering
     const targetHash = await sha256(trialData.targetAddress);
     currentTargetHash = targetHash;
 
-    // Pintar objetivo sin overlay de texto para forzar el reconocimiento del patrón puramente visual
+    // Render target without text overlay to force pure visual recognition
     targetPreview.innerHTML = generateSvg(targetHash, trialData.targetAddress, {
       chaoticMode: isChaotic,
       showOverlay: false,
@@ -720,10 +720,10 @@ function initTestingSuite() {
       gridSize
     });
 
-    // Limpiar contenedor de opciones
+    // Clear options container
     optionsContainer.innerHTML = '';
 
-    // Renderizar las 6 opciones
+    // Render 6 option cards
     for (const address of trialData.options) {
       const card = document.createElement('div');
       card.className = 'option-card';
@@ -733,7 +733,7 @@ function initTestingSuite() {
       const svgContainer = document.createElement('div');
       svgContainer.className = 'identicon-option-container';
       
-      // Renderizar la opción sin overlay para forzar la comparación visual pura
+      // Render option without overlay for pure visual comparison
       svgContainer.innerHTML = generateSvg(optHash, address, {
         chaoticMode: isChaotic,
         showOverlay: false,
@@ -743,10 +743,10 @@ function initTestingSuite() {
 
       const addrLabel = document.createElement('span');
       addrLabel.className = 'option-address';
-      // Truncar para mostrar
+      // Truncate address for display
       addrLabel.textContent = `${address.substring(0, 7)}...${address.substring(address.length - 4)}`;
 
-      // Botón para reproducir la firma acústica de esta opción específica (para comparación por oído)
+      // Play acoustic signature for this option (ear-based comparison)
       const playOptAudioBtn = document.createElement('button');
       playOptAudioBtn.className = 'btn-tiny';
       playOptAudioBtn.style.marginTop = '0.3rem';
@@ -758,7 +758,7 @@ function initTestingSuite() {
       playOptAudioBtn.innerHTML = '<span>🔊</span> Listen';
 
       playOptAudioBtn.addEventListener('click', (e) => {
-        e.stopPropagation(); // Prevenir que el click active la selección y termine el turno
+        e.stopPropagation(); // Prevent click from selecting the card and ending the round
         playMnemonicAudio(optHash, { gridSize, chaoticMode: isChaotic });
       });
 
@@ -766,19 +766,19 @@ function initTestingSuite() {
       card.appendChild(addrLabel);
       card.appendChild(playOptAudioBtn);
 
-      // Evento de clic en la tarjeta de opción
+      // Option card click handler
       card.addEventListener('click', () => {
         if (isLockingInput) return;
-        isLockingInput = true; // Bloquear clicks repetidos
+        isLockingInput = true; // Block duplicate clicks
         
-        // Detener el temporizador de inmediato
+        // Stop timer immediately
         stopLiveTimer();
         stopMnemonicAudio();
 
-        // Enviar respuesta
+        // Submit answer
         const result = testSession.submitAnswer(address);
         
-        // Mostrar el tiempo final congelado exacto
+        // Freeze exact final time on screen
         if (result) {
           timerElement.textContent = result.timeTakenSec.toFixed(3);
         }
@@ -792,7 +792,7 @@ function initTestingSuite() {
         } else {
           card.classList.add('wrong-flash');
           
-          // Resaltar la correcta para aprendizaje cognitivo
+          // Highlight correct option for cognitive learning
           const cards = optionsContainer.querySelectorAll('.option-card');
           cards.forEach(c => {
             if (c.dataset.address === trialData.targetAddress) {
@@ -810,7 +810,7 @@ function initTestingSuite() {
       optionsContainer.appendChild(card);
     }
     
-    // Iniciar temporizador visual en caliente
+    // Start live reaction timer
     startLiveTimer();
   };
 
@@ -840,14 +840,14 @@ function initTestingSuite() {
   });
 
   modeSelect.addEventListener('change', () => {
-    // Si la simulación está activa, reiniciar con el nuevo modo
+    // Restart round if simulation is active and mode changed
     if (activeScreen.classList.contains('active')) {
       startNextRound();
     }
   });
 
   gameGridSizeSelect.addEventListener('change', () => {
-    // Si la simulación está activa, reiniciar con la nueva grilla
+    // Restart round if simulation is active and grid size changed
     if (activeScreen.classList.contains('active')) {
       startNextRound();
     }
@@ -864,6 +864,6 @@ function initTestingSuite() {
     }
   });
 
-  // Ejecución inicial de pantalla de estadísticas
+  // Initial stats display
   updateStatsDisplay();
 }
