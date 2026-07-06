@@ -28,6 +28,7 @@
     "config": "node scripts/generate-config.js",
     "icons": "node scripts/generate-icons.mjs",
     "audit": "node scripts/audit-secrets.mjs",
+    "xumm:validate": "node scripts/validate-xumm-credentials.mjs",
     "vault:sync": "node scripts/sync-vault.mjs",
     "predeploy": "npm run audit && npm run build",
     "build": "npm run config && npm run icons",

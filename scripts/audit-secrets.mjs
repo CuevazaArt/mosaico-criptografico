@@ -6,6 +6,7 @@ import fs from 'fs';
 import path from 'path';
 import { execSync } from 'child_process';
 import { fileURLToPath } from 'url';
+import { validateXummCredentials } from './validate-xumm-credentials.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const rootDir = path.resolve(__dirname, '..');
@@ -48,7 +49,26 @@ try {
   console.log('[audit] OK: config.runtime.js is not tracked by git');
 }
 
-// 3. Client bundle must not contain secret key names or values from .env
+// 3b. XUMM credential format (reject XRPL address as API key)
+if (fs.existsSync(envPath)) {
+  const env = {};
+  for (const line of fs.readFileSync(envPath, 'utf8').split(/\r?\n/)) {
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith('#')) continue;
+    const eq = trimmed.indexOf('=');
+    if (eq === -1) continue;
+    env[trimmed.slice(0, eq).trim()] = trimmed.slice(eq + 1).trim();
+  }
+  for (const issue of validateXummCredentials(env)) {
+    console.error(`[audit] FAIL: ${issue}`);
+    failed = true;
+  }
+  if (!failed) {
+    console.log('[audit] OK: XUMM credential format looks valid');
+  }
+}
+
+// 4. Client bundle must not contain secret key names or values from .env
 const envPath = path.join(rootDir, '.env');
 const envSecrets = {};
 if (fs.existsSync(envPath)) {
@@ -86,7 +106,7 @@ if (!failed) {
   console.log('[audit] OK: client files contain no secret values');
 }
 
-// 4. Required production keys present in .env (names only)
+// 5. Required production keys present in .env (names only)
 const required = ['DEPLOYMENT_MODE', 'XUMM_API_KEY', 'XUMM_API_SECRET'];
 if (fs.existsSync(envPath)) {
   const envText = fs.readFileSync(envPath, 'utf8');
@@ -106,7 +126,7 @@ if (failed) {
   process.exit(1);
 }
 
-// 5. .vercelignore must block local .env from upload
+// 6. .vercelignore must block local .env from upload
 const vercelIgnore = readIfExists('.vercelignore');
 if (!vercelIgnore.includes('.env')) {
   console.error('[audit] FAIL: .vercelignore must exclude .env from Vercel uploads');

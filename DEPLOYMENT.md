@@ -126,6 +126,9 @@ Chrome → `chrome://extensions` → Developer mode → Load unpacked → `/exte
 | Issue | Fix |
 |-------|-----|
 | Xaman "not configured" | Set `XUMM_API_KEY` in `.env` → `npm run config` |
+| `XUMM_API_KEY` is an `r...` address | Wrong value — use the UUID API Key from [apps.xumm.dev](https://apps.xumm.dev/), not your wallet address |
+| Secret split across multiple lines | Put `XUMM_API_SECRET` on a single line in `.env`, then `npm run vault:sync` |
+| Validate credentials locally | `npm run xumm:validate` (format check + Xumm API ping) |
 | `/api/xumm/payload` 500 | Run `npm run vault:sync` to push `XUMM_API_SECRET` |
 | Gem Wallet not found | Install from gemwallet.app (Chrome/Brave) |
 | `tecINSUFFICIENT_RESERVE` | Fund wallet with ≥ 12 XRP |
