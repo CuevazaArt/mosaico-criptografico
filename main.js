@@ -246,10 +246,10 @@ function initComparator() {
       checkAddressRegistration(valA, logToXrplConsole).then(isReg => {
         if (isReg) {
           xrplBadgeA.className = 'xrpl-badge-registered';
-          xrplBadgeA.innerHTML = `🛡️ Registrada (${netLabel})`;
+          xrplBadgeA.innerHTML = `🛡️ Registered (${netLabel})`;
         } else {
           xrplBadgeA.className = 'xrpl-badge-unregistered';
-          xrplBadgeA.innerHTML = '❓ Sin registrar';
+          xrplBadgeA.innerHTML = '❓ Unregistered';
         }
       });
     } else {
@@ -262,7 +262,7 @@ function initComparator() {
       `;
       playAudioABtn.disabled = true;
       xrplBadgeA.className = 'xrpl-badge-unregistered';
-      xrplBadgeA.innerHTML = '❓ Sin registrar';
+      xrplBadgeA.innerHTML = '❓ Unregistered';
     }
 
     if (valB) {
@@ -275,10 +275,10 @@ function initComparator() {
       checkAddressRegistration(valB, logToXrplConsole).then(isReg => {
         if (isReg) {
           xrplBadgeB.className = 'xrpl-badge-registered';
-          xrplBadgeB.innerHTML = `🛡️ Registrada (${netLabel})`;
+          xrplBadgeB.innerHTML = `🛡️ Registered (${netLabel})`;
         } else {
           xrplBadgeB.className = 'xrpl-badge-unregistered';
-          xrplBadgeB.innerHTML = '❓ Sin registrar';
+          xrplBadgeB.innerHTML = '❓ Unregistered';
         }
       });
     } else {
@@ -291,7 +291,7 @@ function initComparator() {
       `;
       playAudioBBtn.disabled = true;
       xrplBadgeB.className = 'xrpl-badge-unregistered';
-      xrplBadgeB.innerHTML = '❓ Sin registrar';
+      xrplBadgeB.innerHTML = '❓ Unregistered';
     }
 
     if (userTriggered) {
@@ -299,22 +299,22 @@ function initComparator() {
         if (valA === valB) {
           playMatchSequence();
           statusBadge.className = 'status-badge match';
-          statusBadge.innerText = '✓ COINCIDEN';
-          statusMsg.innerText = 'Las firmas visual y acústica son idénticas. Puedes proceder con cautela.';
+          statusBadge.innerText = '✓ MATCH';
+          statusMsg.innerText = 'Visual and acoustic signatures are identical. You may proceed with caution.';
           comparisonGrid.classList.remove('mismatch-detected');
           onComparisonResult(true);
         } else {
           playMismatchSequence();
           statusBadge.className = 'status-badge mismatch';
-          statusBadge.innerText = '⚠️ DISCREPANCIA';
-          statusMsg.innerText = '¡Alerta! Los mosaicos difieren. Posible phishing o dirección corrupta — no firmes.';
+          statusBadge.innerText = '⚠️ MISMATCH';
+          statusMsg.innerText = 'Alert! Mosaics differ. Possible phishing or corrupted address — do not sign.';
           comparisonGrid.classList.add('mismatch-detected');
           onComparisonResult(false);
         }
       } else {
         statusBadge.className = 'status-badge neutral';
-        statusBadge.innerText = 'ESPERANDO ENTRADAS';
-        statusMsg.innerText = 'Pega dos direcciones para comparar sus firmas sensoriales al instante.';
+        statusBadge.innerText = 'AWAITING INPUT';
+        statusMsg.innerText = 'Paste two addresses to compare their sensory signatures instantly.';
         comparisonGrid.classList.remove('mismatch-detected');
       }
     }
@@ -356,7 +356,7 @@ function initComparator() {
     }
   };
 
-  // Función unificada para actualizar el diseño de la interfaz de billeteras
+  // Unified function to update wallet interface layout
   const updateWalletUILayout = () => {
     const selectedNet = xrplNetworkSelect.value;
     const selectedWallet = xrplWalletSelect.value;
@@ -417,17 +417,17 @@ function initComparator() {
 
       const walletName = selectedWallet === 'gem' ? 'Gem Wallet' : (selectedWallet === 'crossmark' ? 'Crossmark' : 'Xaman');
       const connectLabels = {
-        xaman: '📱 Conectar Xaman (móvil / QR)',
-        gem: '💎 Conectar Gem Wallet',
-        crossmark: '🔗 Conectar Crossmark'
+        xaman: '📱 Connect Xaman (mobile / QR)',
+        gem: '💎 Connect Gem Wallet',
+        crossmark: '🔗 Connect Crossmark'
       };
-      xrplConnectWalletBtn.textContent = connectLabels[selectedWallet] || `🔗 Conectar ${walletName}`;
+      xrplConnectWalletBtn.textContent = connectLabels[selectedWallet] || `🔗 Connect ${walletName}`;
 
-      xrplAddressLabel.textContent = `Dirección vinculada vía ${walletName}`;
+      xrplAddressLabel.textContent = `Address linked via ${walletName}`;
       xrplAddressOutput.value = "";
       xrplAddressOutput.placeholder = selectedWallet === 'xaman'
-        ? 'Pulsa "Conectar Xaman" y autoriza en tu móvil...'
-        : `Pulsa conectar ${walletName}...`;
+        ? 'Press "Connect Xaman" and authorize on your phone...'
+        : `Press connect ${walletName}...`;
     }
     updateComparison(false);
   };
@@ -439,7 +439,7 @@ function initComparator() {
   const setWalletType = (type) => {
     if (xrplWalletSelect.querySelector(`option[value="${type}"]`)) {
       xrplWalletSelect.value = type;
-      logToXrplConsole(`[info] Billetera seleccionada: ${type}.`);
+      logToXrplConsole(`[info] Wallet selected: ${type}.`);
       updateWalletUILayout();
     }
   };
@@ -455,7 +455,7 @@ function initComparator() {
     connectWallet: triggerWalletConnect
   });
 
-  // Event Listeners para selectores de configuración de billetera
+  // Event listeners for wallet configuration selectors
   xrplNetworkSelect.addEventListener('change', () => {
     const selectedNet = xrplNetworkSelect.value;
     setXrplNetwork(selectedNet);
@@ -574,7 +574,7 @@ function initComparator() {
     if (compareA.value) {
       compareB.value = generateSimilarAddress(compareA.value.trim(), 1);
       updateComparison(true);
-      showToast('Simulación de phishing: un carácter del centro fue alterado. Observa el cambio en el mosaico.', 'warn', 5500);
+      showToast('Phishing simulation: one center character was altered. Watch the mosaic change.', 'warn', 5500);
     }
   });
 

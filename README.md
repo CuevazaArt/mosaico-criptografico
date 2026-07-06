@@ -107,7 +107,7 @@ For Xaman API routes locally: `npx vercel dev`
 
 | Document | Audience | What you'll find |
 |----------|----------|------------------|
-| [GUIA_USUARIO.md](GUIA_USUARIO.md) | **New users (ES)** | Step-by-step: what you need, costs, daily usage, on-chain registration |
+| [USER_GUIDE.md](USER_GUIDE.md) | **New users** | Step-by-step: what you need, costs, daily usage, on-chain registration |
 | [SUBMISSION_DRAFT.md](SUBMISSION_DRAFT.md) | Hackathon judges | Ready-to-paste Devpost story + judging criteria answers |
 | [DEPLOYMENT.md](DEPLOYMENT.md) | Developers / DevOps | Mainnet deploy, vault sync, 5-min pitch script |
 | [NARRATIVE.md](NARRATIVE.md) | End-users + devs | Simple keychain analogy + technical pipeline |

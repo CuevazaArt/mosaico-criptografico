@@ -1,6 +1,6 @@
 # User Manual and Verification Protocol
 
-> **New user?** Start with the step-by-step Spanish guide: **[GUIA_USUARIO.md](GUIA_USUARIO.md)**  
+> **New user?** Start with the step-by-step guide: **[USER_GUIDE.md](USER_GUIDE.md)**  
 > (What you need, costs, daily usage, and on-chain registration explained from scratch.)
 
 **Live demo:** https://mosaico-criptografico.vercel.app
@@ -73,7 +73,7 @@ Before signing in your wallet, paste both addresses into Comparator. If mosaics 
 | NFT owner reserve | 2 XRP (recoverable) |
 | New account activation | 10 XRP base reserve (recoverable) |
 
-See [GUIA_USUARIO.md](GUIA_USUARIO.md) for a full cost breakdown in Spanish.
+See [USER_GUIDE.md](USER_GUIDE.md) for a full cost breakdown.
 
 ---
 
@@ -81,7 +81,7 @@ See [GUIA_USUARIO.md](GUIA_USUARIO.md) for a full cost breakdown in Spanish.
 
 | Document | Audience |
 |----------|----------|
-| [GUIA_USUARIO.md](GUIA_USUARIO.md) | New users (Spanish, step-by-step) |
+| [USER_GUIDE.md](USER_GUIDE.md) | New users (step-by-step) |
 | [NARRATIVE.md](NARRATIVE.md) | Keychain analogy + technical pipeline |
 | [SECURITY.md](SECURITY.md) | Entropy model and credential policy |
 | [DEPLOYMENT.md](DEPLOYMENT.md) | Mainnet deploy and hackathon pitch |

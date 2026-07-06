@@ -13,51 +13,51 @@ let setWalletTypeCallback = null;
 const TAB_GUIDES = {
   'generator-tab': {
     icon: '⚡',
-    title: 'Generador — Conoce tu llavero visual',
-    summary: 'Pega cualquier dirección XRPL y obtén al instante su mosaico único y su melodía.',
+    title: 'Generator — Meet your visual keychain',
+    summary: 'Paste any XRPL address and instantly get its unique mosaic and melody.',
     steps: [
-      'Pega tu dirección (empieza con r) en el campo de la izquierda.',
-      'Observa el mosaico generado: colores, formas y posición del ancla central.',
-      'Pulsa 🔊 para escuchar la firma acústica — es otra forma de reconocer la dirección.',
-      'Memoriza 2 o 3 detalles simples (ej.: "azul, estrella arriba-derecha").'
+      'Paste your address (starts with r) in the field on the left.',
+      'Study the generated mosaic: colors, shapes, and central anchor position.',
+      'Click 🔊 to hear the acoustic signature — another way to recognize the address.',
+      'Memorize 2–3 simple details (e.g., "blue tones, star top-right").'
     ]
   },
   'comparator-tab': {
     icon: '⚖️',
-    title: 'Comparador — Verifica antes de firmar',
-    summary: 'Compara dos direcciones lado a lado. Para registrar tu identidad on-chain, empieza con Xaman (móvil) o Gem Wallet (alternativa).',
+    title: 'Comparator — Verify before signing',
+    summary: 'Compare two addresses side by side. To register on-chain, start with Xaman (mobile) or Gem Wallet (alternative).',
     steps: [
-      'Address A: la dirección que esperas (de confianza).',
-      'Address B: la que acabas de copiar o pegar en tu billetera.',
-      'Badge verde ✅ = seguro · Badge rojo ⚠️ = posible phishing — no firmes.',
-      'Primer abordaje: conecta Xaman → mintea NFT Soulbound → verifica badge verde.'
+      'Address A: the address you expect (trusted source).',
+      'Address B: the one you just copied or pasted from your wallet.',
+      'Green badge ✅ = safe · Red badge ⚠️ = possible phishing — do not sign.',
+      'First approach: connect Xaman → mint Soulbound NFT → verify green badge.'
     ]
   },
   'testing-tab': {
     icon: '🎯',
-    title: 'Simulador — Entrena tu ojo',
-    summary: 'Juego de 6 opciones: 5 son trampas de phishing. ¿Puedes encontrar el mosaico correcto?',
+    title: 'Simulator — Train your eye',
+    summary: 'Six-option game: 5 are phishing traps. Can you spot the correct mosaic?',
     steps: [
-      'Elige tamaño de cuadrícula y modo de color.',
-      'Pulsa "Start Simulation" y memoriza el mosaico objetivo.',
-      'Selecciona entre las 6 opciones la que coincide visualmente.',
-      'Revisa tus estadísticas a la derecha: tiempo de reacción y racha.'
+      'Choose grid size and color mode.',
+      'Click "Start Simulation" and memorize the target mosaic.',
+      'Pick the option that matches visually among the six cards.',
+      'Check your stats on the right: reaction time and streak.'
     ]
   }
 };
 
 const ELEMENT_TIPS = {
-  'address-input': 'Tu dirección pública XRPL. Nunca pegues aquí tu clave secreta (seed).',
-  'random-address-btn': 'Genera una dirección de prueba para explorar cómo cambia el mosaico.',
-  'play-audio-btn': 'Reproduce 4 notas únicas derivadas del hash de tu dirección.',
-  'compare-a-input': 'Dirección de confianza — la que guardaste o conoces de antemano.',
-  'compare-b-input': 'Dirección a verificar — la que vas a usar en la transacción real.',
-  'simulate-phishing-btn': 'Demostración: altera un carácter para ver cómo cambia el mosaico.',
-  'force-match-btn': 'Copia Address A en B para ver el badge verde de coincidencia perfecta.',
-  'xrpl-register-mosaico-btn': 'Mintea un NFT Soulbound en XRPL (~2 XRP de reserva recuperable en Mainnet).',
-  'xaman-connect-btn': 'Abre Xaman en tu móvil, autoriza la conexión y firma el NFT con QR.',
-  'gem-connect-btn': 'Alternativa: extensión Gem Wallet en Chrome o Brave.',
-  'start-game-btn': 'Inicia el reto de detección visual contra direcciones falsificadas.'
+  'address-input': 'Your public XRPL address. Never paste your secret key (seed) here.',
+  'random-address-btn': 'Generate a sample address to explore how the mosaic changes.',
+  'play-audio-btn': 'Plays 4 unique notes derived from your address hash.',
+  'compare-a-input': 'Trusted address — one you saved or know in advance.',
+  'compare-b-input': 'Address to verify — the one you will use in the real transaction.',
+  'simulate-phishing-btn': 'Demo: alters one character to show how the mosaic changes.',
+  'force-match-btn': 'Copies Address A into B to show the green perfect-match badge.',
+  'xrpl-register-mosaico-btn': 'Mint a Soulbound NFT on XRPL (~2 XRP recoverable reserve on Mainnet).',
+  'xaman-connect-btn': 'Open Xaman on your phone, authorize, and sign the NFT via QR.',
+  'gem-connect-btn': 'Alternative: Gem Wallet browser extension on Chrome or Brave.',
+  'start-game-btn': 'Start the visual detection challenge against fake addresses.'
 };
 
 export function registerWalletApproachHandlers({ switchToComparator, setWalletType, connectWallet }) {
@@ -75,7 +75,7 @@ export function startXamanApproach(autoConnect = false) {
   switchToComparatorCallback?.();
   setWalletTypeCallback?.('xaman');
   scrollToWalletApproach();
-  showToast('Abordaje con Xaman: autoriza en tu móvil → conecta → mintea el NFT Soulbound.', 'info', 6500);
+  showToast('Xaman flow: authorize on your phone → connect → mint the Soulbound NFT.', 'info', 6500);
   if (autoConnect) {
     setTimeout(() => connectWalletCallback?.(), 400);
   }
@@ -86,7 +86,7 @@ export function startGemApproach(autoConnect = false) {
   switchToComparatorCallback?.();
   setWalletTypeCallback?.('gem');
   scrollToWalletApproach();
-  showToast('Alternativa Gem Wallet: instala la extensión y pulsa Conectar.', 'info', 5500);
+  showToast('Gem Wallet alternative: install the extension and click Connect.', 'info', 5500);
   if (autoConnect) {
     setTimeout(() => connectWalletCallback?.(), 400);
   }
@@ -96,7 +96,6 @@ function dismissWalletApproachPanel() {
   localStorage.setItem(STORAGE_WALLET_APPROACH, '1');
   document.getElementById('wallet-approach-panel')?.classList.add('collapsed');
 }
-
 
 let toastTimer = null;
 
@@ -181,7 +180,7 @@ function dismissWelcome() {
   localStorage.setItem(STORAGE_WELCOME, '1');
   const banner = document.getElementById('welcome-banner');
   if (banner) banner.classList.add('hidden');
-  showToast('¡Bienvenido! Usa el botón ❓ Ayuda en cualquier momento.', 'success');
+  showToast('Welcome! Use the ❓ Help button anytime.', 'success');
 }
 
 function detectHostPlatform() {
@@ -201,14 +200,14 @@ function showHostNotice() {
     notice.style.display = 'flex';
     notice.innerHTML = `
       <span>📄</span>
-      <span>Estás en <strong>GitHub Pages</strong> (modo visual). Para mintear NFTs en Mainnet usa la
-      <a href="https://mosaico-criptografico.vercel.app" target="_blank" rel="noopener">demo completa en Vercel</a>.</span>
+      <span>You are on <strong>GitHub Pages</strong> (visual mode). For Mainnet NFT minting use the
+      <a href="https://mosaico-criptografico.vercel.app" target="_blank" rel="noopener">full demo on Vercel</a>.</span>
     `;
   } else if (platform === 'vercel') {
     notice.style.display = 'flex';
     notice.innerHTML = `
       <span>🌊</span>
-      <span>Versión completa con registro XRPL en Mainnet. Primer abordaje: <strong>Xaman</strong> (móvil) o Gem Wallet (alternativa).</span>
+      <span>Full version with XRPL Mainnet registration. First approach: <strong>Xaman</strong> (mobile) or Gem Wallet (alternative).</span>
     `;
   }
 }
@@ -259,7 +258,7 @@ export function initOnboarding() {
 
   if (!localStorage.getItem(STORAGE_TOUR)) {
     setTimeout(() => {
-      showToast('Tip: primer abordaje con 📱 Xaman (móvil) o alternativa 💎 Gem Wallet en el Comparador.', 'info', 7500);
+      showToast('Tip: first approach with 📱 Xaman (mobile) or alternative 💎 Gem Wallet in the Comparator.', 'info', 7500);
     }, 1200);
   }
 
@@ -277,13 +276,13 @@ export function onTabChanged(tabId) {
 }
 
 export function onAddressGenerated() {
-  showToast('Mosaico actualizado. Si cambias un solo carácter de la dirección, el dibujo cambia por completo.', 'info');
+  showToast('Mosaic updated. Change a single character and the entire drawing changes.', 'info');
 }
 
 export function onComparisonResult(isMatch) {
   if (isMatch) {
-    showToast('Las direcciones coinciden — los mosaicos son idénticos. Puedes proceder con cautela.', 'success');
+    showToast('Addresses match — mosaics are identical. You may proceed with caution.', 'success');
   } else {
-    showToast('¡Atención! Las direcciones difieren — revisa posible phishing antes de firmar.', 'warn', 6000);
+    showToast('Warning! Addresses differ — check for phishing before signing.', 'warn', 6000);
   }
 }
