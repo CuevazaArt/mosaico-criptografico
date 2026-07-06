@@ -255,7 +255,9 @@ XRPL confirma en ~4 segundos. Verás el hash en la consola de la dApp.
 
 | Recurso | Enlace |
 |---------|--------|
-| Demo en vivo | https://mosaico-criptografico.vercel.app |
+| Demo completa (Mainnet + NFT) | https://mosaico-criptografico.vercel.app |
+| Demo visual (GitHub Pages) | https://cuevazaart.github.io/mosaico-criptografico/ |
+| Guía en la app | Botón **❓ Ayuda** dentro de la herramienta |
 | Manual técnico (inglés) | [MANUAL.md](MANUAL.md) |
 | Explicación simple + técnica | [NARRATIVE.md](NARRATIVE.md) |
 | Seguridad y credenciales | [SECURITY.md](SECURITY.md) |

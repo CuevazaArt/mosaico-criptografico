@@ -4,7 +4,8 @@
 
 | | |
 |---|---|
-| **Live Demo** | [mosaico-criptografico.vercel.app](https://mosaico-criptografico.vercel.app) |
+| **Live Demo (Vercel)** | [mosaico-criptografico.vercel.app](https://mosaico-criptografico.vercel.app) |
+| **GitHub Pages** | [cuevazaart.github.io/mosaico-criptografico](https://cuevazaart.github.io/mosaico-criptografico/) |
 | **Repository** | [github.com/CuevazaArt/mosaico-criptografico](https://github.com/CuevazaArt/mosaico-criptografico) |
 | **NPM Package** | [`cryptographic_mosaic_keychain`](https://www.npmjs.com/package/cryptographic_mosaic_keychain) |
 | **Hackathon** | Make Waves on XRPL — Security & Usability track |

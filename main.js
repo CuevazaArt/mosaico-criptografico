@@ -4,6 +4,7 @@ import { playMnemonicAudio, stopMnemonicAudio, playMismatchSequence, playMatchSe
 import { CognitiveTestSession, generateRandomAddress, generateSimilarAddress } from './src/web/testing.js';
 import { checkAddressRegistration, registerMnemonicNft, generateFaucetWallet, setXrplNetwork, getXrplNetwork, connectWallet, registerMnemonicNftNonCustodial } from './src/core/xrpl.js';
 import { getAppConfig, isLocalDemoEnabled } from './src/app-config.js';
+import { initOnboarding, onTabChanged, onAddressGenerated, onComparisonResult, showToast } from './src/web/onboarding.js';
 
 const testSession = new CognitiveTestSession();
 
@@ -52,6 +53,7 @@ function applyDeploymentSettings() {
 
 document.addEventListener('DOMContentLoaded', () => {
   applyDeploymentSettings();
+  initOnboarding();
   initTabs();
   initGenerator();
   initComparator();
@@ -84,6 +86,8 @@ function initTabs() {
           p.classList.remove('active');
         }
       });
+
+      onTabChanged(targetTab);
     });
   });
 }
@@ -126,6 +130,9 @@ function initGenerator() {
 
     // 5. Inyectar SVG
     previewContainer.innerHTML = svgString;
+    if (document.activeElement === addressInput) {
+      onAddressGenerated();
+    }
   };
 
   // Event Listeners
@@ -239,10 +246,10 @@ function initComparator() {
       checkAddressRegistration(valA, logToXrplConsole).then(isReg => {
         if (isReg) {
           xrplBadgeA.className = 'xrpl-badge-registered';
-          xrplBadgeA.innerHTML = `🛡️ Registered (${netLabel})`;
+          xrplBadgeA.innerHTML = `🛡️ Registrada (${netLabel})`;
         } else {
           xrplBadgeA.className = 'xrpl-badge-unregistered';
-          xrplBadgeA.innerHTML = '❓ Unregistered';
+          xrplBadgeA.innerHTML = '❓ Sin registrar';
         }
       });
     } else {
@@ -255,7 +262,7 @@ function initComparator() {
       `;
       playAudioABtn.disabled = true;
       xrplBadgeA.className = 'xrpl-badge-unregistered';
-      xrplBadgeA.innerHTML = '❓ Unregistered';
+      xrplBadgeA.innerHTML = '❓ Sin registrar';
     }
 
     if (valB) {
@@ -268,10 +275,10 @@ function initComparator() {
       checkAddressRegistration(valB, logToXrplConsole).then(isReg => {
         if (isReg) {
           xrplBadgeB.className = 'xrpl-badge-registered';
-          xrplBadgeB.innerHTML = `🛡️ Registered (${netLabel})`;
+          xrplBadgeB.innerHTML = `🛡️ Registrada (${netLabel})`;
         } else {
           xrplBadgeB.className = 'xrpl-badge-unregistered';
-          xrplBadgeB.innerHTML = '❓ Unregistered';
+          xrplBadgeB.innerHTML = '❓ Sin registrar';
         }
       });
     } else {
@@ -284,29 +291,30 @@ function initComparator() {
       `;
       playAudioBBtn.disabled = true;
       xrplBadgeB.className = 'xrpl-badge-unregistered';
-      xrplBadgeB.innerHTML = '❓ Unregistered';
+      xrplBadgeB.innerHTML = '❓ Sin registrar';
     }
 
-    // Efecto de feedback auditivo al pegar/escribir direcciones
     if (userTriggered) {
       if (valA && valB) {
         if (valA === valB) {
           playMatchSequence();
           statusBadge.className = 'status-badge match';
-          statusBadge.innerText = '✓ PERFECT MATCH';
-          statusMsg.innerText = 'Both cryptographic and acoustic signatures are identical. Safe to proceed.';
+          statusBadge.innerText = '✓ COINCIDEN';
+          statusMsg.innerText = 'Las firmas visual y acústica son idénticas. Puedes proceder con cautela.';
           comparisonGrid.classList.remove('mismatch-detected');
+          onComparisonResult(true);
         } else {
           playMismatchSequence();
           statusBadge.className = 'status-badge mismatch';
-          statusBadge.innerText = '⚠️ DISCREPANCY DETECTED';
-          statusMsg.innerText = 'Warning! Visual and audio signatures differ. Possible phishing attack or corrupted address.';
+          statusBadge.innerText = '⚠️ DISCREPANCIA';
+          statusMsg.innerText = '¡Alerta! Los mosaicos difieren. Posible phishing o dirección corrupta — no firmes.';
           comparisonGrid.classList.add('mismatch-detected');
+          onComparisonResult(false);
         }
       } else {
         statusBadge.className = 'status-badge neutral';
-        statusBadge.innerText = 'WAITING FOR INPUTS';
-        statusMsg.innerText = 'Enter or paste two addresses to instantly compare their sensory signature.';
+        statusBadge.innerText = 'ESPERANDO ENTRADAS';
+        statusMsg.innerText = 'Pega dos direcciones para comparar sus firmas sensoriales al instante.';
         comparisonGrid.classList.remove('mismatch-detected');
       }
     }
@@ -536,6 +544,7 @@ function initComparator() {
     if (compareA.value) {
       compareB.value = generateSimilarAddress(compareA.value.trim(), 1);
       updateComparison(true);
+      showToast('Simulación de phishing: un carácter del centro fue alterado. Observa el cambio en el mosaico.', 'warn', 5500);
     }
   });
 
