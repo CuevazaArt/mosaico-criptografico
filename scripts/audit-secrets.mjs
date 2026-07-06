@@ -10,6 +10,7 @@ import { validateXummCredentials } from './validate-xumm-credentials.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const rootDir = path.resolve(__dirname, '..');
+const envPath = path.join(rootDir, '.env');
 
 const SENSITIVE_KEYS = ['XUMM_API_SECRET', 'VERCEL_TOKEN'];
 const CLIENT_FILES = [
@@ -69,7 +70,6 @@ if (fs.existsSync(envPath)) {
 }
 
 // 4. Client bundle must not contain secret key names or values from .env
-const envPath = path.join(rootDir, '.env');
 const envSecrets = {};
 if (fs.existsSync(envPath)) {
   for (const line of fs.readFileSync(envPath, 'utf8').split(/\r?\n/)) {

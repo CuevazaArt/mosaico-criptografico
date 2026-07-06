@@ -70,19 +70,23 @@ async function pingXumm(apiKey, apiSecret) {
   return { ok: response.ok, status: response.status, data };
 }
 
-const env = parseEnv(envPath);
-const issues = validateXummCredentials(env);
+const isCli = process.argv[1] && path.resolve(process.argv[1]) === path.resolve(fileURLToPath(import.meta.url));
 
-if (issues.length) {
-  console.error('[xumm] Credential validation FAILED:');
-  for (const issue of issues) console.error(`  - ${issue}`);
-  process.exit(1);
+if (isCli) {
+  const env = parseEnv(envPath);
+  const issues = validateXummCredentials(env);
+
+  if (issues.length) {
+    console.error('[xumm] Credential validation FAILED:');
+    for (const issue of issues) console.error(`  - ${issue}`);
+    process.exit(1);
+  }
+
+  const { ok, status, data } = await pingXumm(env.XUMM_API_KEY, env.XUMM_API_SECRET);
+  if (!ok) {
+    console.error(`[xumm] API ping failed (${status}): ${data?.error?.message || data?.message || 'unknown error'}`);
+    process.exit(1);
+  }
+
+  console.log('[xumm] Credentials format OK and Xumm API ping succeeded.');
 }
-
-const { ok, status, data } = await pingXumm(env.XUMM_API_KEY, env.XUMM_API_SECRET);
-if (!ok) {
-  console.error(`[xumm] API ping failed (${status}): ${data?.error?.message || data?.message || 'unknown error'}`);
-  process.exit(1);
-}
-
-console.log('[xumm] Credentials format OK and Xumm API ping succeeded.');
