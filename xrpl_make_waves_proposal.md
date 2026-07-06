@@ -1,5 +1,7 @@
 # Technical Proposal: Cryptographic Mosaic on XRPL (Make Waves Challenge)
 
+**Live demo:** https://mosaico-criptografico.vercel.app
+
 This proposal details the technical specification, architecture, and 90-day action plan for deploying the **Cryptographic Mosaic (Identicons & Acoustic Keys)** standard on the **XRPL Mainnet**, designed to compete in the real-world adoption program *Make Waves on XRPL*.
 
 ---

@@ -17,6 +17,7 @@ yarn-error.log*
 .env.test
 .env.production
 .env.*.local
+config.runtime.js
 
 # Vercel Deployment
 .vercel/
@@ -32,3 +33,9 @@ yarn-error.log*
 .project
 .classpath
 .settings/
+
+.vercel
+.env
+.env.local
+.env.*.local
+!.env.example

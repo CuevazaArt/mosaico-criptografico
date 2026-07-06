@@ -1,68 +1,87 @@
 # User Manual and Verification Protocol
 
-This manual describes the operation of the interactive **Cryptographic Mosaic** dApp and establishes the step-by-step protocol for secure manual verification of addresses and hashes in Web3 environments.
+> **New user?** Start with the step-by-step Spanish guide: **[GUIA_USUARIO.md](GUIA_USUARIO.md)**  
+> (What you need, costs, daily usage, and on-chain registration explained from scratch.)
+
+**Live demo:** https://mosaico-criptografico.vercel.app
+
+This document covers the technical interface and the 3-step verification protocol for XRPL addresses.
 
 ---
 
-## 1. Interface User Guide
+## 1. Interface overview
 
-The application is split into three main sections accessible from the tab navigation bar in the header:
+Three tabs in the header:
 
-### A. Generator Panel (Individual Visualization)
-Allows you to inspect in detail how a mosaic is composed from any text input.
-1. **Address Input:** Type or paste any public key, private key, or contract address into the text field. You can use the die button (🎲) to generate random mock addresses.
-2. **Chroma Mode:**
-   * **Harmonious (Recommended for daily use):** Groups cells under a complementary color palette. This reduces cognitive fatigue and makes it easy to remember the "visual identity" of an address as a whole.
-   * **Chaotic (Recommended for maximum entropy):** Generates independent colors in each cell. It is visually louder but maximizes visual differences between similar hashes.
-3. **Security and Scalability Controls:**
-   * **Grid Size:** Set the grid to **3x3** (default), **4x4**, or **5x5** sectors. Larger grids exponentially increase spatial complexity and are recommended for signing high-value contracts.
-   * **Text Overlay:** Toggle the bottom bar displaying the readable characters of the address.
-   * **Topological Anchors:** Show/hide countable vertices on the central glyph.
-4. **Seed Breakdown:** The bottom of the page displays the derived SHA-256 hexadecimal hash of your input.
+| Tab | Purpose |
+|-----|---------|
+| **Generator** | Inspect how any address becomes a mosaic |
+| **Comparator** | Side-by-side verification + XRPL NFT registry |
+| **Field Testing** | Phishing simulator with reaction-time metrics |
 
-### B. Comparator Panel (Face-to-Face Verification)
-Designed for immediate visual comparison of two addresses before sending funds or signing transactions.
-1. Paste the expected address (Address A) into the left box.
-2. Paste the copied address or the one displayed in your transaction interface (Address B) into the right box.
-3. Observe the generated mosaics:
-   * **Green Badge (✅):** The addresses and their identicons match 100%. It is safe to proceed.
-   * **Red Badge (⚠️):** There is a discrepancy. The mosaics will look markedly different in colors and shape arrangement. **Stop the transaction immediately!**
-4. Click **"Phishing"** to see how a single-character change in Address B completely alters the layout and colors of its mosaic.
+### Generator
 
-### C. Simulator Panel (Cognitive Field Testing)
-An interactive environment to train and evaluate the human eye's capacity to recognize cryptographic patterns.
-1. Select the visual mode to evaluate (Harmonious or Chaotic).
-2. Click **"Start Simulation"**.
-3. A **Target Mosaic** will be presented at the top, along with 6 option cards below.
-4. 5 of the cards contain fake addresses mimicking the start and end of the target address (phishing). Only 1 is identical.
-5. Click the mosaic you believe matches the target.
-6. The right panel will record your success rate and average reaction time in seconds. Click **"Reset"** to clear the history.
+1. Paste an XRPL address (starts with `r`) or use 🎲 for a random sample.
+2. **Chroma Mode:** Harmonious (daily use) or Chaotic (max entropy).
+3. **Grid Size:** 3×3 (default), 4×4, or 5×5.
+4. **🔊 Listen to Acoustic Key** — plays the 4-note signature.
+
+### Comparator
+
+1. **Address A** — trusted / expected destination.
+2. **Address B** — pasted from clipboard or wallet UI.
+3. Badges: ✅ match · ⚠️ phishing detected · ❓ no on-chain NFT.
+4. XRPL panel below — connect wallet and mint Soulbound identity NFT.
+
+### Field Testing
+
+1. Choose grid size and chroma mode.
+2. **Start Simulation** — find the correct mosaic among 6 options.
+3. Right panel tracks success rate, reaction time, and streaks.
 
 ---
 
-## 2. Manual Address Verification Protocol (Step-by-Step)
-
-To integrate this security layer into your daily Web3 operations, implement this 3-step protocol:
+## 2. Three-step verification protocol
 
 ```
 [ STEP 1: Generate ] ──► [ STEP 2: Compare ] ──► [ STEP 3: Confirm ]
-   Paste address            Observe the Mosaic       Verify Anchors
-   in the comparator        (Colors in position?)    (Match number of points?)
+   Paste trusted addr       Side-by-side mosaics     Audio + anchors OK?
 ```
 
-### Step 1: Secure Copy and Generation
-Before sending funds to a contract or wallet:
-1. Copy the recipient's address from a trusted source (e.g., the official token site or your saved address book).
-2. Paste it into your dApp or wallet integrating the Cryptographic Mosaic renderer. Memorize the resulting mosaic.
+### Step 1 — Secure copy
 
-### Step 2: Layout and Color Comparison
-When confirming the transaction in the wallet interface (e.g., the signing confirmation popup):
-1. Look at the mosaic rendered by the wallet and compare it with the one you memorized in Step 1.
-2. Verify the **general distribution of the cells**: Is the star in the same cell? Do the truchet (labyrinth) and wave patterns occupy the same physical positions in the 3x3 grid?
-3. If the colors do not match or a cell has a different pattern, abort.
+Copy the recipient address from a **trusted source** (official site, address book). Paste into Generator and memorize 2–3 visual cues (color family, anchor position, pattern shape).
 
-### Step 3: Anchor and Overlay Validation
-As a final check:
-1. Locate the geometric anchor cell in the center. Count the number of vertices or white dots (e.g., *"it is a pentagon with 5 vertices"*).
-2. Read the printed characters in the bottom overlay of the image. Verify that they correspond to the start and end of your destination address.
-3. If all checks match, you can sign the transaction with peace of mind, knowing you are not a victim of clipboard hijacking or a malicious vanity address.
+### Step 2 — Layout comparison
+
+Before signing in your wallet, paste both addresses into Comparator. If mosaics differ in color, cell layout, or anchor shape → **abort the transaction**.
+
+### Step 3 — Anchor and audio check
+
+1. Count vertices on the central anchor glyph (e.g., 5-pointed star).
+2. Optionally play acoustic keys A and B — melodies must match.
+3. If all checks pass → sign in your wallet.
+
+---
+
+## 3. Cost reference (XRPL Mainnet)
+
+| Action | Cost |
+|--------|------|
+| Generator / Comparator / Simulator | **Free** |
+| `NFTokenMint` network fee | ~0.000012 XRP |
+| NFT owner reserve | 2 XRP (recoverable) |
+| New account activation | 10 XRP base reserve (recoverable) |
+
+See [GUIA_USUARIO.md](GUIA_USUARIO.md) for a full cost breakdown in Spanish.
+
+---
+
+## 4. Related documentation
+
+| Document | Audience |
+|----------|----------|
+| [GUIA_USUARIO.md](GUIA_USUARIO.md) | New users (Spanish, step-by-step) |
+| [NARRATIVE.md](NARRATIVE.md) | Keychain analogy + technical pipeline |
+| [SECURITY.md](SECURITY.md) | Entropy model and credential policy |
+| [DEPLOYMENT.md](DEPLOYMENT.md) | Mainnet deploy and hackathon pitch |

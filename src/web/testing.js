@@ -3,17 +3,36 @@
  * Manages the spoofing (phishing) simulation and measures human visual performance.
  */
 
+const XRPL_BASE58 = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
+
 /**
- * Generates a mock cryptographic address (Ethereum/EVM style) randomly.
- * @returns {string} Fictional 42-character hexadecimal address.
+ * Generates a mock XRPL address (base58, starts with 'r').
+ * @returns {string} Fictional XRPL-style address (34 chars).
  */
-export function generateRandomAddress() {
-  const chars = '0123456789abcdef';
-  let address = '0x';
-  for (let i = 0; i < 40; i++) {
-    address += chars[Math.floor(Math.random() * 16)];
+export function generateRandomXrplAddress() {
+  let address = 'r';
+  for (let i = 0; i < 33; i++) {
+    address += XRPL_BASE58[Math.floor(Math.random() * XRPL_BASE58.length)];
   }
   return address;
+}
+
+/**
+ * Generates a mock cryptographic address for cognitive testing.
+ * Defaults to XRPL format; pass 'evm' for Ethereum-style addresses.
+ * @param {'xrpl'|'evm'} format
+ * @returns {string}
+ */
+export function generateRandomAddress(format = 'xrpl') {
+  if (format === 'evm') {
+    const chars = '0123456789abcdef';
+    let address = '0x';
+    for (let i = 0; i < 40; i++) {
+      address += chars[Math.floor(Math.random() * 16)];
+    }
+    return address;
+  }
+  return generateRandomXrplAddress();
 }
 
 /**
@@ -24,8 +43,20 @@ export function generateRandomAddress() {
  * @returns {string} Mutated address.
  */
 export function generateSimilarAddress(address, level = 2) {
+  if (address.startsWith('r') && address.length >= 15) {
+    const prefix = address.substring(0, 6);
+    const suffix = address.substring(address.length - 4);
+    const middle = address.substring(6, address.length - 4).split('');
+    for (let i = 0; i < level; i++) {
+      const pos = Math.floor(Math.random() * middle.length);
+      const current = middle[pos];
+      const idx = XRPL_BASE58.indexOf(current);
+      middle[pos] = XRPL_BASE58[(idx + 1 + Math.floor(Math.random() * 5)) % XRPL_BASE58.length];
+    }
+    return prefix + middle.join('') + suffix;
+  }
+
   if (!address.startsWith('0x') || address.length < 15) {
-    // If not standard address, mutate text generically
     const arr = address.split('');
     const pos = Math.floor(Math.random() * (arr.length - 2)) + 1;
     arr[pos] = String.fromCharCode(arr[pos].charCodeAt(0) + 1);
@@ -33,8 +64,8 @@ export function generateSimilarAddress(address, level = 2) {
   }
 
   const hexChars = '0123456789abcdef';
-  const prefix = address.substring(0, 7); // Keeps "0x" and 5 characters
-  const suffix = address.substring(address.length - 4); // Keeps the last 4 characters
+  const prefix = address.substring(0, 7);
+  const suffix = address.substring(address.length - 4);
   const middle = address.substring(7, address.length - 4).split('');
 
   // Mutate 'level' amount of random characters in the middle section

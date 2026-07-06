@@ -1,0 +1,6 @@
+# Never upload local secrets or generated runtime config to Vercel.
+# Build regenerates config.runtime.js from encrypted vault env vars.
+.env
+.env.*
+!.env.example
+config.runtime.js

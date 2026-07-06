@@ -7,16 +7,16 @@ This document provides two complementary perspectives on the use, validation, an
 ## PART 1: Simple Guide for the End-User (Non-Technical)
 
 ### 💡 The Keychain Analogy
-Imagine that crypto addresses (like `0x71c8...3a9`) are extremely long passwords written in a foreign language. Since humans cannot memorize them, **the Cryptographic Mosaic takes that address and turns it into a unique "color key" in the form of a mosaic.**
+Imagine that XRPL addresses (like `rG1QQv2dh2...HsGQE`) are extremely long passwords written in a foreign language. Since humans cannot memorize them, **the Cryptographic Mosaic takes that address and turns it into a unique "color key" in the form of a mosaic.**
 
-Each address has its own immutable key. If a single letter or number in the address changes, the key changes its design and color completely.
+Each address has its own immutable key. If a single character in the address changes, the key changes its design and color completely.
 
 ```
-[ Your Crypto Address ] ──────────► [ Your Unique Color Mosaic ]
-(Example: 0x71c8...3a9)              (Shapes and colors in place)
+[ Your XRPL Address ] ──────────► [ Your Unique Color Mosaic ]
+(Example: rG1QQ...HsGQE)          (Shapes and colors in place)
 
 [ Fake/Cloned Address ] ──────────► [ COMPLETELY Different Mosaic ]
-(Example: 0x71c8...3a8)              (Colors change and shapes move)
+(Example: rG1QQ...HsGQf)            (Colors change and shapes move)
 ```
 
 ### 🔍 How to use it in your daily routine?

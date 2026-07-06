@@ -1,75 +1,171 @@
-# Cryptographic Mosaic (3x3 Identicons)
+# Cryptographic Mosaic — Sensory 2FA for XRPL
 
-A decentralized, deterministic, and immutable tool to generate visual identifiers in a 3x3 mosaic format from cryptographic addresses and keys. Its purpose is to mitigate spoofing (phishing) and clipboard hijacking attacks through high-entropy visual recognition.
+> **Every XRPL address gets a unique visual fingerprint.** If the address changes by one character, the mosaic changes completely — so you catch phishing and clipboard attacks before you sign.
 
----
-
-## 📖 Additional Documentation
-
-To dive deeper into the technical design, theory, and integration of the tool, refer to the following documents:
-* **[SECURITY.md](file:///c:/Users/Dell/Desktop/llavero%20mnemonico/SECURITY.md):** Security Justification, Entropy Model, and advanced attack resistance analysis.
-* **[MANUAL.md](file:///c:/Users/Dell/Desktop/llavero%20mnemonico/MANUAL.md):** User Manual and step-by-step instructions for the 3-Step Manual Verification Protocol.
-* **[AUDIO_PROPOSAL.md](file:///c:/Users/Dell/Desktop/llavero%20mnemonico/AUDIO_PROPOSAL.md):** Specification of the acoustic sensory layer and hardware mitigations.
-* **[CRITIQUE.md](file:///c:/Users/Dell/Desktop/llavero%20mnemonico/CRITIQUE.md):** Cognitive usability, calibration, and ergonomics audit report.
-* **[DISCUSSION.md](file:///c:/Users/Dell/Desktop/llavero%20mnemonico/DISCUSSION.md):** Threat modeling and technical integration in wallets and exchanges.
-* **[xrpl_make_waves_proposal.md](file:///c:/Users/Dell/Desktop/llavero%20mnemonico/xrpl_make_waves_proposal.md):** XLS-20 Immutable Registry technical architecture and 90-day Action Plan for the *Make Waves* program.
-* **[XLS_PROPOSAL_DRAFT.md](file:///c:/Users/Dell/Desktop/llavero%20mnemonico/XLS_PROPOSAL_DRAFT.md):** Technical standard draft for the XRP Ledger ecosystem.
-* **[SUBMISSION_DRAFT.md](file:///c:/Users/Dell/Desktop/llavero%20mnemonico/SUBMISSION_DRAFT.md):** Pitch and description draft ready for Devpost/Make Waves challenge submission.
+| | |
+|---|---|
+| **Live Demo** | [mosaico-criptografico.vercel.app](https://mosaico-criptografico.vercel.app) |
+| **Repository** | [github.com/CuevazaArt/mosaico-criptografico](https://github.com/CuevazaArt/mosaico-criptografico) |
+| **NPM Package** | [`cryptographic_mosaic_keychain`](https://www.npmjs.com/package/cryptographic_mosaic_keychain) |
+| **Hackathon** | Make Waves on XRPL — Security & Usability track |
 
 ---
 
-## ✨ Main Features
+## The idea in 30 seconds
 
-* **Scalable Mosaics:** Native support for **3x3, 4x4, and 5x5** grids to scale visual entropy on demand.
-* **Deterministic Fisher-Yates Shuffle (Layout Shuffling):** Complete random reorganization based on the address hash to break visual symmetries.
-* **Topological Anchors:** Central glyph with white countable vertices and satellites to facilitate visual memory.
-* **Snappy Acoustic Signature:** Quick deterministic melodic arpeggios (4 notes of 160ms) to prevent listener ear fatigue.
-* **Orchestrated Audio Sequences:** Harmonious success sequences (Do Major ascending bell chime) or dissonant sawtooth dual-oscillator alarms (phishing alerts) for distinct audio feedback.
-* **Immutable Registry on XRPL (XLS-20):** Integrated interactive panel supporting Testnet and Mainnet, allowing users to mint and validate immutable **Soulbound (non-transferable NFTs)** visual identity keys on the XRP Ledger non-custodially (Gem Wallet, Crossmark, Xaman).
-* **Premium & Responsive Design:** Rounded cell corners at 16px, vertical pixel-perfect alignment, and glassmorphism styling.
+XRPL addresses like `rG1QQv2dh2AGTf5gZUXyZEaXcRmGRHsGQE` are impossible to verify by eye. Most people only check the first and last few characters — exactly what scammers exploit.
 
----
+**Cryptographic Mosaic** solves this with a **sensory second factor**:
 
-## 🚀 How to run the project locally?
+1. **See it** — A deterministic 3×3 (or 4×4 / 5×5) SVG mosaic derived from the address hash.
+2. **Hear it** — A 4-note acoustic signature unique to each address.
+3. **Anchor it on-chain** — Mint a Soulbound NFT (XLS-20, taxon `1001`) on XRPL as immutable proof of identity.
 
-This is a **zero-server** and **zero-dependency** project at its core.
-
-If you want to run it quickly:
-1. Install dependencies and run integrity tests:
-   ```bash
-   npm install
-   npm test
-   ```
-2. Start the local static development server:
-   ```bash
-   npm run dev
-   ```
-3. Visit `http://localhost:3000` (or the port shown in console) in your web browser.
+Copy the wrong address? The mosaic **looks and sounds completely different**. No need to read 34 characters one by one.
 
 ---
 
-## 🌐 Autonomous Architecture and Security (For everyone)
+## Why this fits Make Waves
 
-### Simple Explanation (Non-Technical)
-This project is designed to be **eternal and self-sustaining**. Once published online (e.g., on Vercel):
-* **No maintenance required:** There is no 24/7 central server that can crash, get infected, or require costly software updates.
-* **No central database:** We do not store your address or keys in a private database. Your visual identity is saved immutably on the **XRP Ledger** (Ripple's public decentralized network).
-* **Absolute security:** The application never knows or stores your private keys; when signing, you do so directly through your own secure, isolated wallet (Gem Wallet, Crossmark, or Xaman).
+Make Waves rewards projects that drive **real usage on the XRP Ledger**. Cryptographic Mosaic does exactly that:
 
-### Architectural Detail (Technical)
-* **100% Client-Side Architecture:** Mathematical calculations for Fisher-Yates layout shuffling, SHA-256 hashing, and SVG vector rendering run entirely on the user's browser CPU.
-* **Security Headers (vercel.json):** The deployment configuration sets strict **Content Security Policy (CSP)** rules, limiting external scripts and network connections exclusively to public, redundant XRPL WebSockets (`wss://xrplcluster.com`, `wss://s1.ripple.com`, etc.).
-* **Zero System Administration (Zero-Sysadmin):** By avoiding databases, Docker containers, or active backend processes, the infrastructure maintenance cost is $0, eliminating the need for a perpetual administrator. Code updates are pushed via GitHub and automatically deployed using CI/CD pipelines.
+| XRPL capability | How we use it |
+|-----------------|---------------|
+| **XLS-20 NFTs** | Soulbound identity mint (`NFTokenMint`, taxon `1001`) |
+| **Mainnet + Testnet** | Live registration and on-chain verification |
+| **Non-custodial wallets** | Gem Wallet, Crossmark, Xaman (Xumm) signing |
+| **On-chain queries** | `account_nfts` to verify self-issued identity |
+
+**Ecosystem growth path:** Every XRPL user who adopts the standard mints 1 identity NFT. If integrated into Xaman, Gem, or Crossmark natively, millions of `account_nfts` verification calls could run before every outbound payment — turning security into recurring on-chain activity.
 
 ---
 
-## 🛠️ Code Structure
+## Try it now (3-minute judge walkthrough)
 
-* `index.html`: Structure of the dApp control panel (Dashboard).
-* `styles.css`: CSS stylesheet featuring a dark premium look and glassmorphism.
-* `main.js`: UI event orchestration and interface logic.
-* `src/core/crypto.js`: Native deterministic hashing module (SHA-256).
-* `src/core/generator.js`: SVG generator engine with cell layout shuffling.
-* `src/core/audio.js`: Mnemonic acoustic synthesis engine (Audio Web API).
-* `src/core/xrpl.js`: Non-custodial signature integration and network adapters.
-* `src/web/testing.js`: Interactive usability and phishing field simulator.
+1. Open the **[live demo](https://mosaico-criptografico.vercel.app)** → tab **Comparator**.
+2. Notice Address A and B look similar in text but produce **radically different mosaics** (red badge = phishing detected).
+3. Switch to **Generator** → paste any XRPL address → click **Listen to Acoustic Key**.
+4. In the Comparator panel, select **Mainnet** → connect **Gem Wallet** → **Mint Mosaic Key**.
+5. Watch the ledger console for your `NFTokenMint` transaction hash.
+6. Load the **browser extension** (`/extension` folder) on [xrpl.org](https://xrpl.org) to see live mosaic badges beside addresses.
+
+---
+
+## Main features
+
+* **Scalable mosaics** — 3×3, 4×4, and 5×5 grids with Fisher-Yates layout shuffling.
+* **Topological anchors** — Countable central glyphs that stick in human memory.
+* **Acoustic signatures** — Deterministic 4-note arpeggios plus match/mismatch alert sequences.
+* **XRPL Soulbound registry** — Self-issued NFT proof (`Issuer == Owner`) prevents identity impersonation.
+* **Cognitive testing suite** — Gamified phishing simulator with reaction-time metrics.
+* **Browser extension** — Injects mini-mosaics next to XRPL addresses on block explorers.
+* **Zero-server core** — SHA-256, SVG, and audio run 100% in the browser; $0 maintenance cost.
+
+---
+
+## Security model
+
+Your private keys **never touch this application**. All Mainnet signing goes through your own wallet.
+
+| Asset | Where it lives | In git? |
+|-------|----------------|---------|
+| `.env` (local credentials) | Your machine only | **Never** |
+| `XUMM_API_SECRET` | Vercel encrypted vault | **Never** |
+| `XUMM_API_KEY` | Public OAuth key in `config.runtime.js` | Generated at build (public by design) |
+| `config.runtime.js` | Auto-generated per deploy | **Never** committed |
+
+Before every deploy:
+
+```bash
+npm run audit        # verifies no secrets leak into client bundles
+npm run vault:sync   # pushes credentials to Vercel encrypted env vars
+npm run deploy       # audit → build → production deploy
+```
+
+See [DEPLOYMENT.md](DEPLOYMENT.md) for the full Mainnet deployment guide.
+
+---
+
+## Quick start (local development)
+
+```bash
+git clone https://github.com/CuevazaArt/mosaico-criptografico.git
+cd mosaico-criptografico
+cp .env.example .env    # fill credentials locally — never commit this file
+npm install
+npm run config          # generates config.runtime.js from .env
+npm test
+npm run dev             # http://localhost:3000
+```
+
+For Xaman API routes locally: `npx vercel dev`
+
+---
+
+## Documentation map
+
+| Document | Audience | What you'll find |
+|----------|----------|------------------|
+| [GUIA_USUARIO.md](GUIA_USUARIO.md) | **New users (ES)** | Step-by-step: what you need, costs, daily usage, on-chain registration |
+| [SUBMISSION_DRAFT.md](SUBMISSION_DRAFT.md) | Hackathon judges | Ready-to-paste Devpost story + judging criteria answers |
+| [DEPLOYMENT.md](DEPLOYMENT.md) | Developers / DevOps | Mainnet deploy, vault sync, 5-min pitch script |
+| [NARRATIVE.md](NARRATIVE.md) | End-users + devs | Simple keychain analogy + technical pipeline |
+| [MANUAL.md](MANUAL.md) | End-users | 3-step verification protocol |
+| [SECURITY.md](SECURITY.md) | Security reviewers | Entropy model, attack resistance, credential policy |
+| [xrpl_make_waves_proposal.md](xrpl_make_waves_proposal.md) | XRPL ecosystem | 90-day adoption plan for Make Waves |
+| [XLS_PROPOSAL_DRAFT.md](XLS_PROPOSAL_DRAFT.md) | Standards committee | XLS draft for wallet-native identicons |
+| [DISCUSSION.md](DISCUSSION.md) | Integrators | Threat model + wallet integration paths |
+| [INTEGRATION.md](INTEGRATION.md) | Wallet teams | Embedding mosaics in existing dApps |
+| [AUDIO_PROPOSAL.md](AUDIO_PROPOSAL.md) | UX researchers | Acoustic layer specification |
+| [CRITIQUE.md](CRITIQUE.md) | UX auditors | Cognitive ergonomics analysis |
+| [CHANGELOG.md](CHANGELOG.md) | Contributors | Version history |
+
+---
+
+## Architecture
+
+```
+┌─────────────────┐    SHA-256     ┌──────────────┐    Fisher-Yates    ┌─────────────────┐
+│  XRPL Address   ├───────────────►│  32-byte hash ├──────────────────►│  SVG Mosaic     │
+└─────────────────┘                └──────┬───────┘                    └─────────────────┘
+                                          │
+                                          ▼
+                                 ┌─────────────────┐
+                                 │ 4-note acoustic │
+                                 │   signature     │
+                                 └────────┬────────┘
+                                          │
+                                          ▼
+                                 ┌─────────────────┐
+                                 │ NFTokenMint     │
+                                 │ Soulbound NFT   │
+                                 │ (taxon 1001)    │
+                                 └─────────────────┘
+```
+
+* **Client-side:** `src/core/crypto.js`, `generator.js`, `audio.js`
+* **XRPL layer:** `src/core/xrpl.js` — wallet connectors + on-chain verification
+* **Serverless (Xaman only):** `api/xumm/payload.js` — secret never leaves Vercel vault
+* **Extension:** `extension/` — DOM scanner for XRPL addresses on explorers
+
+---
+
+## Code structure
+
+| File | Role |
+|------|------|
+| `index.html` | dApp dashboard (Generator, Comparator, Field Testing) |
+| `main.js` | UI orchestration and XRPL panel logic |
+| `styles.css` | Premium dark UI with glassmorphism |
+| `src/core/crypto.js` | SHA-256 hashing (Web Crypto API) |
+| `src/core/generator.js` | Deterministic SVG mosaic engine |
+| `src/core/audio.js` | Web Audio API mnemonic synthesis |
+| `src/core/xrpl.js` | Non-custodial wallet + XLS-20 minting |
+| `src/web/testing.js` | Cognitive phishing simulator |
+| `scripts/` | Config generation, vault sync, security audit |
+
+---
+
+## License
+
+MIT — open source, deterministic, and built to last on the XRP Ledger.

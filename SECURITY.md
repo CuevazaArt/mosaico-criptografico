@@ -6,10 +6,9 @@ This document details the theoretical justification, cryptographic analysis, and
 
 ## 1. The Problem: The Human Factor in Web3
 
-In decentralized systems, identities and contracts are represented by long hexadecimal hashes (e.g., 40-character EVM addresses like `0x71c81857e1519509f0750854d15f20a2b18b3a9`).
-* **Cognitive Load:** Human working memory can only hold between 4 and 7 chunks of information at a time (Miller's Law). Comparing two 40-character strings exceeds this limit.
+In decentralized systems, identities are represented by long alphanumeric strings. On the XRP Ledger, addresses like `rG1QQv2dh2AGTf5gZUXyZEaXcRmGRHsGQE` span 25–35 Base58 characters — far beyond what human working memory can reliably compare (Miller's Law: 4–7 chunks).
 * **The "Vanity Address" Phishing Attack:** Scammers use GPU clusters to generate malicious addresses that match the first 6 and last 4 characters of a known legitimate address (e.g., a USDT contract or an exchange wallet). Since humans typically only check the ends, these malicious addresses are accepted by mistake, resulting in loss of funds.
-* **Visual Saturation and Fatigue:** Repeatedly reading hexadecimal plain text fatigues the eyes, increasing the probability of ignoring character discrepancies in repetitive transactions.
+* **Visual Saturation and Fatigue:** Repeatedly reading long Base58 strings fatigues the eyes, increasing the probability of ignoring character discrepancies in repetitive transactions.
 
 ---
 
@@ -81,3 +80,27 @@ The design of the Cryptographic Mosaic has been conceived under universal design
 ### C. Mitigation for Dyslexia
 * **The Visual Paradigm as a Primary Solution:** Dyslexia makes reading, transposing, and decoding alphanumeric characters difficult (where confusing `b` with `d` or altering the order of numbers in a long hash is common). By translating the text string into a **spatial geometric mosaic**, the dyslexic user completely bypasses the alphanumeric processing pathway and uses the brain's spatial/visual processing pathway, which is immune to the distortions of classic dyslexia.
 * **Backup Typography:** The text overlay uses high-spacing monospaced fonts and fixed uppercase characters, minimizing letter rotation or transposition.
+
+---
+
+## 4. Deployment Credential Policy
+
+This project separates **public configuration** from **secret credentials** to keep the hackathon demo safe for judges and users.
+
+| Asset | Classification | Storage | Committed to git? |
+|-------|---------------|---------|-------------------|
+| `XUMM_API_KEY` | Public OAuth client ID | `config.runtime.js` (build output) | No — generated at deploy |
+| `XUMM_API_SECRET` | Secret | Vercel encrypted vault only | **Never** |
+| `.env` | Local developer secrets | Developer machine | **Never** |
+| `config.runtime.js` | Public runtime config | Generated per deploy | **Never** |
+| Private keys / seeds | User-controlled | User's wallet only | **Never** |
+
+**Enforcement mechanisms:**
+
+1. `.gitignore` blocks `.env`, `.env.*`, and `config.runtime.js`.
+2. `.vercelignore` prevents local `.env` from being uploaded during deploy.
+3. `npm run audit` scans client bundles for secret values before every production deploy.
+4. `npm run vault:sync` pushes credentials to Vercel's encrypted environment variables.
+5. Production mode (`DEPLOYMENT_MODE=production`) disables all seed/secret input fields in the UI.
+
+**What judges should verify:** Open `config.runtime.js` on the live demo — it contains the public Xumm API key and deployment settings only. The API secret is accessible exclusively to the serverless route `api/xumm/payload.js` at runtime on Vercel's infrastructure.

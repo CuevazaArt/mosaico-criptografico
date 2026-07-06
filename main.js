@@ -3,11 +3,55 @@ import { generateSvg } from './src/core/generator.js';
 import { playMnemonicAudio, stopMnemonicAudio, playMismatchSequence, playMatchSequence } from './src/core/audio.js';
 import { CognitiveTestSession, generateRandomAddress, generateSimilarAddress } from './src/web/testing.js';
 import { checkAddressRegistration, registerMnemonicNft, generateFaucetWallet, setXrplNetwork, getXrplNetwork, connectWallet, registerMnemonicNftNonCustodial } from './src/core/xrpl.js';
+import { getAppConfig, isLocalDemoEnabled } from './src/app-config.js';
 
-// Instanciar la sesión global de pruebas
 const testSession = new CognitiveTestSession();
 
+function applyDeploymentSettings() {
+  const config = getAppConfig();
+  const sample = config.sampleXrplAddress;
+
+  const addressInput = document.getElementById('address-input');
+  const compareA = document.getElementById('compare-a-input');
+  const compareB = document.getElementById('compare-b-input');
+  if (addressInput) addressInput.value = sample;
+  if (compareA) compareA.value = sample;
+  if (compareB) {
+    compareB.value = generateSimilarAddress(sample, 1);
+  }
+
+  const xrplNetworkSelect = document.getElementById('xrpl-network-select');
+  const xrplWalletSelect = document.getElementById('xrpl-wallet-select');
+  const localOption = xrplWalletSelect?.querySelector('option[value="local"]');
+
+  if (!isLocalDemoEnabled() && localOption) {
+    localOption.remove();
+  }
+
+  if (xrplNetworkSelect) {
+    xrplNetworkSelect.value = config.defaultNetwork;
+    setXrplNetwork(config.defaultNetwork);
+  }
+
+  if (xrplWalletSelect) {
+    const hasOption = Array.from(xrplWalletSelect.options).some(o => o.value === config.defaultWallet);
+    xrplWalletSelect.value = hasOption ? config.defaultWallet : 'gem';
+  }
+
+  const prodBanner = document.getElementById('production-mode-banner');
+  if (prodBanner && config.deploymentMode === 'production') {
+    prodBanner.style.display = 'flex';
+  }
+
+  const xrplConsole = document.getElementById('xrpl-console-log');
+  if (xrplConsole) {
+    const netLabel = config.defaultNetwork === 'mainnet' ? 'Mainnet' : 'Testnet';
+    xrplConsole.textContent = `[info] ${config.deploymentMode} mode — ${netLabel} ready. Connect a wallet to mint your Soulbound identity NFT.`;
+  }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
+  applyDeploymentSettings();
   initTabs();
   initGenerator();
   initComparator();
@@ -61,7 +105,7 @@ function initGenerator() {
     // Parar audio si hay uno corriendo
     stopMnemonicAudio();
 
-    const rawValue = addressInput.value.trim() || '0x0000000000000000000000000000000000000000';
+    const rawValue = addressInput.value.trim() || getAppConfig().sampleXrplAddress;
     
     // 1. Obtener hash criptográfico
     const hash = await sha256(rawValue);
@@ -102,7 +146,7 @@ function initGenerator() {
 
   // Reproducir firma auditiva
   playAudioBtn.addEventListener('click', async () => {
-    const rawValue = addressInput.value.trim() || '0x0000000000000000000000000000000000000000';
+    const rawValue = addressInput.value.trim() || getAppConfig().sampleXrplAddress;
     const hash = await sha256(rawValue);
     const chromaMode = document.querySelector('input[name="chroma-mode"]:checked').value;
     playMnemonicAudio(hash, {
@@ -390,7 +434,7 @@ function initComparator() {
   xrplGenWalletBtn.addEventListener('click', async () => {
     xrplGenWalletBtn.disabled = true;
     xrplConnStatus.className = 'connecting';
-    xrplConnStatus.textContent = '🟡 Conectando...';
+    xrplConnStatus.textContent = '🟡 Connecting...';
     
     try {
       const walletData = await generateFaucetWallet(logToXrplConsole);
@@ -400,12 +444,12 @@ function initComparator() {
       generatedSecret = walletData.seed;
       
       xrplConnStatus.className = 'connected';
-      xrplConnStatus.textContent = '🟢 XRPL Conectado';
+      xrplConnStatus.textContent = '🟢 XRPL Connected';
       xrplRegisterMosaicoBtn.disabled = false;
     } catch (err) {
-      logToXrplConsole(`[error] Falla de conexión o faucet: ${err.message}`);
+      logToXrplConsole(`[error] Connection or faucet failure: ${err.message}`);
       xrplConnStatus.className = 'disconnected';
-      xrplConnStatus.textContent = '🔴 Conexión Fallida';
+      xrplConnStatus.textContent = '🔴 Connection Failed';
     } finally {
       xrplGenWalletBtn.disabled = false;
     }
@@ -414,7 +458,7 @@ function initComparator() {
   xrplConnectWalletBtn.addEventListener('click', async () => {
     xrplConnectWalletBtn.disabled = true;
     xrplConnStatus.className = 'connecting';
-    xrplConnStatus.textContent = '🟡 Conectando...';
+    xrplConnStatus.textContent = '🟡 Connecting...';
     
     const walletType = xrplWalletSelect.value;
     const walletName = walletType === 'gem' ? 'Gem Wallet' : (walletType === 'crossmark' ? 'Crossmark' : 'Xaman');
@@ -424,14 +468,14 @@ function initComparator() {
       
       xrplAddressOutput.value = address;
       xrplConnStatus.className = 'connected';
-      xrplConnStatus.textContent = '🟢 XRPL Conectado';
+      xrplConnStatus.textContent = '🟢 XRPL Connected';
       xrplRegisterMosaicoBtn.disabled = false;
       
-      logToXrplConsole(`[info] Billetera ${walletName} conectada con dirección: ${address}`);
+      logToXrplConsole(`[info] ${walletName} wallet connected: ${address}`);
     } catch (err) {
-      logToXrplConsole(`[error] Error conectando wallet: ${err.message}`);
+      logToXrplConsole(`[error] Wallet connection error: ${err.message}`);
       xrplConnStatus.className = 'disconnected';
-      xrplConnStatus.textContent = '🔴 Conexión Fallida';
+      xrplConnStatus.textContent = '🔴 Connection Failed';
       xrplAddressOutput.value = "";
       xrplRegisterMosaicoBtn.disabled = true;
     } finally {
@@ -448,22 +492,22 @@ function initComparator() {
       let res;
       if (walletType === 'local') {
         if (!generatedSecret) return;
-        logToXrplConsole(`[info] Enviando minteo XLS-20 (Soulbound NFT) en ${netName}...`);
+        logToXrplConsole(`[info] Submitting XLS-20 Soulbound NFT mint on ${netName}...`);
         res = await registerMnemonicNft(generatedSecret, logToXrplConsole);
       } else {
         const address = xrplAddressOutput.value.trim();
         if (!address) {
-          throw new Error("No hay dirección de billetera conectada.");
+          throw new Error("No connected wallet address.");
         }
         res = await registerMnemonicNftNonCustodial(address, walletType, logToXrplConsole);
       }
       
       if (res && res.success) {
-        logToXrplConsole(`[info] ¡Registro inmutable en ${netName} verificado!`);
+        logToXrplConsole(`[info] Immutable ${netName} registration verified!`);
         updateComparison(false);
       }
     } catch (err) {
-      logToXrplConsole(`[error] Error al registrar: ${err.message}`);
+      logToXrplConsole(`[error] Registration error: ${err.message}`);
     } finally {
       xrplRegisterMosaicoBtn.disabled = false;
     }

@@ -25,8 +25,15 @@
     "./xrpl": "./src/core/xrpl.js"
   },
   "scripts": {
+    "config": "node scripts/generate-config.js",
+    "icons": "node scripts/generate-icons.mjs",
+    "audit": "node scripts/audit-secrets.mjs",
+    "vault:sync": "node scripts/sync-vault.mjs",
+    "predeploy": "npm run audit && npm run build",
+    "build": "npm run config && npm run icons",
     "test": "node --test tests/**/*.test.js",
-    "dev": "npx -y serve ."
+    "dev": "npm run config && npx -y serve .",
+    "deploy": "npm run predeploy && npx vercel --prod --yes"
   },
   "keywords": [
     "xrpl",
