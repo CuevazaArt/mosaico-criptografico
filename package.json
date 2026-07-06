@@ -31,7 +31,7 @@
     "vault:sync": "node scripts/sync-vault.mjs",
     "predeploy": "npm run audit && npm run build",
     "build": "npm run config && npm run icons",
-    "test": "node --test tests/**/*.test.js",
+    "test": "node --test tests/app-config.test.js tests/mosaico.test.js",
     "dev": "npm run config && npx -y serve .",
     "deploy": "npm run predeploy && npx vercel --prod --yes"
   },
