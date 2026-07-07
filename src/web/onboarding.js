@@ -236,10 +236,20 @@ export function showToast(message, type = 'info', durationMs = 4500) {
   }, durationMs);
 }
 
+function placeTabGuidePanel(tabId) {
+  const panel = document.getElementById('tab-guide-panel');
+  const slot = document.querySelector(`#${tabId} .tab-guide-slot`);
+  if (panel && slot && panel.parentElement !== slot) {
+    slot.appendChild(panel);
+  }
+}
+
 function updateTabGuide(tabId) {
   const guide = TAB_GUIDES[tabId];
   const panel = document.getElementById('tab-guide-panel');
   if (!panel || !guide) return;
+
+  placeTabGuidePanel(tabId);
 
   panel.innerHTML = `
     <div class="tab-guide-header">
@@ -420,6 +430,7 @@ export function initOnboarding() {
   document.getElementById('wallet-approach-dismiss')?.addEventListener('click', dismissWalletApproachPanel);
 
   document.getElementById('help-open-btn')?.addEventListener('click', openHelpModal);
+  document.getElementById('header-register-btn')?.addEventListener('click', openRegisterTab);
   document.getElementById('help-close-btn')?.addEventListener('click', closeHelpModal);
   document.getElementById('help-modal-backdrop')?.addEventListener('click', closeHelpModal);
 
