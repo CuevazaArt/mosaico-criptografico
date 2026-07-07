@@ -4,7 +4,8 @@ import { playMnemonicAudio, stopMnemonicAudio, playMismatchSequence, playMatchSe
 import { CognitiveTestSession, generateRandomAddress, generateSimilarAddress } from './src/web/testing.js';
 import { checkAddressRegistration, registerMnemonicNft, generateFaucetWallet, setXrplNetwork, getXrplNetwork, connectWallet, registerMnemonicNftNonCustodial } from './src/core/xrpl.js';
 import { getAppConfig, isLocalDemoEnabled } from './src/app-config.js';
-import { initOnboarding, onTabChanged, onAddressGenerated, onComparisonResult, showToast, registerWalletApproachHandlers, hasAcceptedTerms } from './src/web/onboarding.js';
+import { initOnboarding, onTabChanged, onComparisonResult, showToast, registerWalletApproachHandlers, hasAcceptedTerms } from './src/web/onboarding.js';
+import { initKeychainWizard } from './src/web/keychain-wizard.js';
 
 const testSession = new CognitiveTestSession();
 
@@ -54,6 +55,7 @@ function applyDeploymentSettings() {
 document.addEventListener('DOMContentLoaded', () => {
   applyDeploymentSettings();
   initOnboarding();
+  initKeychainWizard();
   initTabs();
   initGenerator();
   initComparator();
@@ -130,9 +132,6 @@ function initGenerator() {
 
     // 5. Inject SVG into preview
     previewContainer.innerHTML = svgString;
-    if (document.activeElement === addressInput) {
-      onAddressGenerated();
-    }
   };
 
   // Event Listeners

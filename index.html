@@ -81,9 +81,9 @@
         <button type="button" id="help-open-btn" class="btn-secondary" style="font-size: 0.78rem; padding: 6px 14px; border-radius: 20px; display: inline-flex; align-items: center; gap: 0.4rem; cursor: pointer;">
           <span>❓</span> Help / Tool map
         </button>
-        <a href="https://github.com/CuevazaArt/mosaico-criptografico/blob/main/KEYCHAIN_REGISTRATION_GUIDE.md" target="_blank" rel="noopener" class="btn-secondary" style="font-size: 0.78rem; padding: 6px 14px; text-decoration: none; border-radius: 20px; display: inline-flex; align-items: center; gap: 0.4rem;">
+        <button type="button" id="open-wizard-btn" class="btn-secondary" style="font-size: 0.78rem; padding: 6px 14px; border-radius: 20px; display: inline-flex; align-items: center; gap: 0.4rem; cursor: pointer;">
           <span>🔑</span> Register your keychain
-        </a>
+        </button>
         <a href="https://github.com/CuevazaArt/mosaico-criptografico/blob/main/USER_GUIDE.md" target="_blank" rel="noopener" class="btn-secondary" style="font-size: 0.78rem; padding: 6px 14px; text-decoration: none; border-radius: 20px; display: inline-flex; align-items: center; gap: 0.4rem;">
           <span>📘</span> Step-by-step guide
         </a>
@@ -97,13 +97,16 @@
       
       <!-- Tab Navigation -->
       <nav class="tab-navigation" aria-label="Main sections">
-        <button class="nav-btn active" data-tab="generator-tab" aria-controls="generator-tab" title="Step 1: Generate and memorize an address mosaic">
+        <button class="nav-btn active" data-tab="register-tab" aria-controls="register-tab" title="Guided setup: register your keychain NFT on XRPL">
+          <span class="btn-icon">🔑</span> Register
+        </button>
+        <button class="nav-btn" data-tab="generator-tab" aria-controls="generator-tab" title="Generate and memorize an address mosaic">
           <span class="btn-icon">⚡</span> Generator
         </button>
-        <button class="nav-btn" data-tab="comparator-tab" aria-controls="comparator-tab" title="Step 2: Compare two addresses before sending XRP">
+        <button class="nav-btn" data-tab="comparator-tab" aria-controls="comparator-tab" title="Compare two addresses before sending XRP">
           <span class="btn-icon">⚖️</span> Comparator
         </button>
-        <button class="nav-btn" data-tab="testing-tab" aria-controls="testing-tab" title="Step 3: Train your eye against simulated phishing">
+        <button class="nav-btn" data-tab="testing-tab" aria-controls="testing-tab" title="Train your eye against simulated phishing">
           <span class="btn-icon">🎯</span> Simulator
         </button>
       </nav>
@@ -116,7 +119,7 @@
         <div>
           <strong>First time here?</strong> This tool turns XRPL addresses into unique color drawings.
           If someone alters the address, the drawing changes completely — so you spot scams instantly.
-          <span class="welcome-flow">Recommended flow: <em>Generator → Comparator → Simulator</em></span>
+          <span class="welcome-flow">Recommended flow: <em>Register → Generator → Comparator</em></span>
         </div>
       </div>
       <div class="welcome-banner-actions">
@@ -134,9 +137,73 @@
     <section id="tab-guide-panel" class="tab-guide-panel" aria-live="polite" aria-label="Active section guide"></section>
 
     <main class="app-content">
+
+      <!-- ================= TAB: REGISTER WIZARD (novice flow) ================= -->
+      <section id="register-tab" class="tab-panel active" aria-labelledby="register-heading">
+        <div class="keychain-wizard card glass-panel">
+          <header class="wizard-header">
+            <h2 id="register-heading">Register your XRPL keychain</h2>
+            <p class="wizard-intro">Follow each step — paste your address, preview your mosaic, connect Xaman, and mint your Soulbound NFT (~2 XRP reserve on Mainnet).</p>
+          </header>
+
+          <ol class="wizard-progress" aria-label="Registration progress">
+            <li class="wizard-progress-step active" data-step="1"><span>1</span> Address</li>
+            <li class="wizard-progress-step" data-step="2"><span>2</span> Mosaic</li>
+            <li class="wizard-progress-step" data-step="3"><span>3</span> Wallet</li>
+            <li class="wizard-progress-step" data-step="4"><span>4</span> Mint</li>
+            <li class="wizard-progress-step" data-step="5"><span>5</span> Done</li>
+          </ol>
+
+          <div class="wizard-step active" data-step="1">
+            <h3>Step 1 — Paste your public XRPL address</h3>
+            <p>From your Xaman app: copy your address (starts with <code>r</code>). <strong>Never</strong> paste your secret key.</p>
+            <div class="form-group">
+              <label for="wizard-address-input">Your XRPL address</label>
+              <input type="text" id="wizard-address-input" class="form-input" placeholder="r..." autocomplete="off">
+              <p id="wizard-address-error" class="field-error" role="alert"></p>
+            </div>
+          </div>
+
+          <div class="wizard-step" data-step="2">
+            <h3>Step 2 — Meet your visual keychain</h3>
+            <p>This pattern is unique to your address. Memorize 2–3 details (colors, central shape, corners).</p>
+            <div id="wizard-mosaic-preview" class="identicon-medium-container wizard-mosaic"></div>
+            <button type="button" id="wizard-audio-btn" class="btn-secondary btn-sm">🔊 Listen to acoustic signature</button>
+          </div>
+
+          <div class="wizard-step" data-step="3">
+            <h3>Step 3 — Connect Xaman on Mainnet</h3>
+            <p>Install <a href="https://xaman.app" target="_blank" rel="noopener">Xaman</a> on your phone. You need ~2 XRP free for the NFT reserve.</p>
+            <p id="wizard-wallet-status" class="wizard-status idle">Not connected yet</p>
+            <button type="button" id="wizard-connect-btn" class="btn-xaman-primary">📱 Connect with Xaman</button>
+          </div>
+
+          <div class="wizard-step" data-step="4">
+            <h3>Step 4 — Mint your Soulbound NFT</h3>
+            <p>Sign the transaction in Xaman. This anchors your mosaic identity on the XRP Ledger (taxon 1001, non-transferable).</p>
+            <button type="button" id="wizard-mint-btn" class="btn-register">🛡️ Mint Mosaic Key (Soulbound NFT)</button>
+            <pre id="wizard-console" class="wizard-console" aria-live="polite"></pre>
+          </div>
+
+          <div class="wizard-step" data-step="5">
+            <h3>Step 5 — You're registered!</h3>
+            <p>Your keychain is on-chain. Use the Comparator daily before sending XRP.</p>
+            <ul class="wizard-success-list">
+              <li><strong>Address:</strong> <code id="wizard-success-address">—</code></li>
+              <li><strong>Transaction:</strong> <code id="wizard-tx-hash">—</code></li>
+            </ul>
+          </div>
+
+          <footer class="wizard-footer">
+            <button type="button" id="wizard-back-btn" class="btn-secondary" disabled>← Back</button>
+            <button type="button" id="wizard-next-btn" class="btn-primary">Next →</button>
+            <button type="button" id="wizard-finish-btn" class="btn-primary hidden">Open Comparator</button>
+          </footer>
+        </div>
+      </section>
       
       <!-- ================= TAB: GENERATOR ================= -->
-      <section id="generator-tab" class="tab-panel active" aria-labelledby="generator-heading">
+      <section id="generator-tab" class="tab-panel" aria-labelledby="generator-heading">
         <div class="grid-2col">
           <div class="card glass-panel">
             <h2 id="generator-heading" class="card-title">① Input configuration</h2>
@@ -690,6 +757,6 @@
     <p class="footer-copy">© 2025–2026 CuevazaArt · Open source under MIT</p>
   </footer>
 
-  <script type="module" src="main.js?v=3.1.6"></script>
+  <script type="module" src="main.js?v=3.1.7"></script>
 </body>
 </html>

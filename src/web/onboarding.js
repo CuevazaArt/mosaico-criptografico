@@ -13,6 +13,17 @@ let connectWalletCallback = null;
 let setWalletTypeCallback = null;
 
 const TAB_GUIDES = {
+  'register-tab': {
+    icon: '🔑',
+    title: 'Register — Guided keychain setup',
+    summary: 'Step-by-step: address → mosaic → Xaman → mint Soulbound NFT on Mainnet.',
+    steps: [
+      'Paste your public XRPL address (never your secret key).',
+      'Preview and memorize your unique mosaic pattern.',
+      'Connect Xaman on Mainnet (~2 XRP reserve for the NFT).',
+      'Sign the mint transaction — your identity is anchored on-chain.'
+    ]
+  },
   'generator-tab': {
     icon: '⚡',
     title: 'Generator — Meet your visual keychain',
@@ -66,6 +77,10 @@ export function registerWalletApproachHandlers({ switchToComparator, setWalletTy
   switchToComparatorCallback = switchToComparator;
   setWalletTypeCallback = setWalletType;
   connectWalletCallback = connectWallet;
+}
+
+export function openRegisterTab() {
+  document.querySelector('.nav-btn[data-tab="register-tab"]')?.click();
 }
 
 function scrollToWalletApproach() {
@@ -168,12 +183,10 @@ export function hasAcceptedTerms() {
 
 export function startXamanApproach(autoConnect = false) {
   localStorage.setItem(STORAGE_WALLET_APPROACH, '1');
-  switchToComparatorCallback?.();
-  setWalletTypeCallback?.('xaman');
-  scrollToWalletApproach();
-  showToast('Xaman flow: authorize on your phone → connect → mint the Soulbound NFT.', 'info', 6500);
+  openRegisterTab();
+  showToast('Follow the steps: address → mosaic → connect Xaman → mint NFT.', 'info', 6500);
   if (autoConnect) {
-    setTimeout(() => connectWalletCallback?.(), 400);
+    setTimeout(() => document.getElementById('wizard-connect-btn')?.click(), 800);
   }
 }
 
@@ -203,6 +216,8 @@ export function showToast(message, type = 'info', durationMs = 4500) {
     container.className = 'ui-toast-container';
     document.body.appendChild(container);
   }
+
+  container.replaceChildren();
 
   const toast = document.createElement('div');
   toast.className = `ui-toast ui-toast--${type}`;
@@ -314,7 +329,7 @@ export function initOnboarding() {
   bindTooltips();
   showHostNotice();
 
-  const activeTab = document.querySelector('.tab-panel.active')?.id || 'generator-tab';
+  const activeTab = document.querySelector('.tab-panel.active')?.id || 'register-tab';
   updateTabGuide(activeTab);
 
   const welcome = document.getElementById('welcome-banner');
@@ -355,9 +370,10 @@ export function initOnboarding() {
   });
 
   if (termsOk && !localStorage.getItem(STORAGE_TOUR)) {
+    localStorage.setItem(STORAGE_TOUR, '1');
     setTimeout(() => {
-      showToast('Tip: first approach with 📱 Xaman (mobile) or alternative 💎 Gem Wallet in the Comparator.', 'info', 7500);
-    }, 1200);
+      showToast('New here? Open the 🔑 Register tab for a step-by-step keychain setup.', 'info', 6000);
+    }, 1500);
   }
 
   if (termsOk && !localStorage.getItem(STORAGE_WALLET_APPROACH)) {
@@ -367,14 +383,10 @@ export function initOnboarding() {
 
 export function onTabChanged(tabId) {
   updateTabGuide(tabId);
-  const guide = TAB_GUIDES[tabId];
-  if (guide) {
-    showToast(`${guide.icon} ${guide.title}`, 'info', 3200);
-  }
 }
 
 export function onAddressGenerated() {
-  showToast('Mosaic updated. Change a single character and the entire drawing changes.', 'info');
+  /* Mosaic updates silently — hint stays in the field label */
 }
 
 export function onComparisonResult(isMatch) {
