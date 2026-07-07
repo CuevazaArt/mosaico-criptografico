@@ -50,7 +50,7 @@ const TAB_GUIDES = {
   },
   'testing-tab': {
     icon: '🎯',
-    title: 'Simulator — Train your eye',
+    title: 'Keychain comparison training',
     summary: 'Six-option game: 5 are phishing traps. Can you spot the correct mosaic?',
     steps: [
       'Choose grid size and color mode.',
