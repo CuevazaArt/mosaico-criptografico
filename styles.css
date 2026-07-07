@@ -155,17 +155,6 @@ body {
   flex: 1;
 }
 
-.header-register-btn {
-  font-size: 0.82rem !important;
-  padding: 7px 16px !important;
-  border-radius: 20px !important;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  font-weight: 700;
-  box-shadow: 0 0 18px rgba(56, 189, 248, 0.25);
-}
-
 .header-link-btn {
   font-size: 0.78rem;
   padding: 6px 14px;

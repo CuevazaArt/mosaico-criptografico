@@ -420,7 +420,6 @@ export function initOnboarding() {
   document.getElementById('wallet-approach-dismiss')?.addEventListener('click', dismissWalletApproachPanel);
 
   document.getElementById('help-open-btn')?.addEventListener('click', openHelpModal);
-  document.getElementById('header-register-btn')?.addEventListener('click', openRegisterTab);
   document.getElementById('help-close-btn')?.addEventListener('click', closeHelpModal);
   document.getElementById('help-modal-backdrop')?.addEventListener('click', closeHelpModal);
 
