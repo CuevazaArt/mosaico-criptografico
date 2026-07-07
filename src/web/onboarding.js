@@ -5,8 +5,10 @@
 const STORAGE_WELCOME = 'mosaico_welcome_dismissed';
 const STORAGE_TOUR = 'mosaico_tour_completed';
 const STORAGE_WALLET_APPROACH = 'mosaico_wallet_approach_seen';
+const STORAGE_HOST_NOTICE = 'mosaico_host_notice_dismissed';
 const STORAGE_TERMS = 'mosaico_terms_accepted';
 const TERMS_VERSION = '1.0';
+const BUG_REPORT_BASE = 'https://github.com/CuevazaArt/mosaico-criptografico/issues/new';
 
 let switchToComparatorCallback = null;
 let connectWalletCallback = null;
@@ -302,31 +304,87 @@ function detectHostPlatform() {
   return 'unknown';
 }
 
+function dismissHostNotice() {
+  const platform = detectHostPlatform();
+  localStorage.setItem(STORAGE_HOST_NOTICE, platform);
+  const notice = document.getElementById('host-platform-notice');
+  if (notice) {
+    notice.classList.add('hidden');
+    notice.style.display = 'none';
+    notice.innerHTML = '';
+  }
+}
+
+export function getBugReportUrl() {
+  const config = window.__APP_CONFIG__ || {};
+  const body = [
+    '**Describe the bug**',
+    '',
+    '**Steps to reproduce**',
+    '1.',
+    '',
+    '**Expected behavior**',
+    '',
+    '**What happened instead**',
+    '',
+    '**Environment**',
+    `- URL: ${window.location.href}`,
+    `- Browser: ${navigator.userAgent}`,
+    `- App version: ${config.version || 'unknown'}`,
+    `- Network: ${config.defaultNetwork || 'unknown'}`
+  ].join('\n');
+
+  const params = new URLSearchParams({
+    labels: 'bug',
+    title: 'Bug: ',
+    body
+  });
+  return `${BUG_REPORT_BASE}?${params.toString()}`;
+}
+
+function bindBugReportLinks() {
+  const url = getBugReportUrl();
+  ['report-bug-header-link', 'report-bug-footer-link', 'report-bug-help-link', 'report-bug-legal-link'].forEach(id => {
+    const link = document.getElementById(id);
+    if (link) link.href = url;
+  });
+}
+
 function showHostNotice() {
   const platform = detectHostPlatform();
+  if (localStorage.getItem(STORAGE_HOST_NOTICE) === platform) return;
+
   const notice = document.getElementById('host-platform-notice');
   if (!notice) return;
 
+  let message = '';
+  let icon = '🌊';
+
   if (platform === 'github-pages') {
-    notice.style.display = 'flex';
-    notice.innerHTML = `
-      <span>📄</span>
-      <span>You are on <strong>GitHub Pages</strong> (visual mode). For Mainnet NFT minting use the
-      <a href="https://mosaico-criptografico.vercel.app" target="_blank" rel="noopener">full Mainnet app on Vercel</a>.</span>
-    `;
+    icon = '📄';
+    message = `You are on <strong>GitHub Pages</strong> (visual mode). For Mainnet NFT minting use the
+      <a href="https://mosaico-criptografico.vercel.app" target="_blank" rel="noopener">full Mainnet app on Vercel</a>.`;
   } else if (platform === 'vercel') {
-    notice.style.display = 'flex';
-    notice.innerHTML = `
-      <span>🌊</span>
-      <span>Full version with XRPL Mainnet registration. First approach: <strong>Xaman</strong> (mobile) or Gem Wallet (alternative).</span>
-    `;
+    message = 'Full version with XRPL Mainnet registration. First approach: <strong>Xaman</strong> (mobile) or Gem Wallet (alternative).';
+  } else {
+    return;
   }
+
+  notice.innerHTML = `
+    <span class="host-notice-icon" aria-hidden="true">${icon}</span>
+    <span class="host-notice-text">${message}</span>
+    <button type="button" class="host-notice-close" aria-label="Dismiss notice">✕</button>
+  `;
+  notice.style.display = 'flex';
+  notice.classList.remove('hidden');
+  notice.querySelector('.host-notice-close')?.addEventListener('click', dismissHostNotice);
 }
 
 export function initOnboarding() {
   const termsOk = initTermsAcceptance();
 
   bindTooltips();
+  bindBugReportLinks();
   showHostNotice();
 
   const activeTab = document.querySelector('.tab-panel.active')?.id || 'register-tab';
@@ -362,6 +420,7 @@ export function initOnboarding() {
   document.getElementById('wallet-approach-dismiss')?.addEventListener('click', dismissWalletApproachPanel);
 
   document.getElementById('help-open-btn')?.addEventListener('click', openHelpModal);
+  document.getElementById('header-register-btn')?.addEventListener('click', openRegisterTab);
   document.getElementById('help-close-btn')?.addEventListener('click', closeHelpModal);
   document.getElementById('help-modal-backdrop')?.addEventListener('click', closeHelpModal);
 

@@ -77,22 +77,27 @@
       <p class="header-subtitle">
         Turn every XRPL address into a unique <strong>visual and acoustic keychain</strong>. Detect phishing and clipboard hijacking before signing — without reading 34 characters one by one.
       </p>
-      <div style="display: flex; gap: 0.75rem; margin-top: 0.5rem; justify-content: center; flex-wrap: wrap; z-index: 10;">
-        <button type="button" id="help-open-btn" class="btn-secondary" style="font-size: 0.78rem; padding: 6px 14px; border-radius: 20px; display: inline-flex; align-items: center; gap: 0.4rem; cursor: pointer;">
+      <div class="header-quick-actions">
+        <button type="button" id="help-open-btn" class="btn-secondary header-help-btn">
           <span>❓</span> Help / Tool map
         </button>
-        <button type="button" id="open-wizard-btn" class="btn-secondary" style="font-size: 0.78rem; padding: 6px 14px; border-radius: 20px; display: inline-flex; align-items: center; gap: 0.4rem; cursor: pointer;">
-          <span>🔑</span> Register your keychain
-        </button>
-        <a href="https://github.com/CuevazaArt/mosaico-criptografico/blob/main/USER_GUIDE.md" target="_blank" rel="noopener" class="btn-secondary" style="font-size: 0.78rem; padding: 6px 14px; text-decoration: none; border-radius: 20px; display: inline-flex; align-items: center; gap: 0.4rem;">
-          <span>📘</span> Step-by-step guide
-        </a>
-        <a href="https://github.com/CuevazaArt/mosaico-criptografico" target="_blank" rel="noopener" class="btn-secondary" style="font-size: 0.78rem; padding: 6px 14px; text-decoration: none; border-radius: 20px; display: inline-flex; align-items: center; gap: 0.4rem;">
-          <span>💻</span> GitHub
-        </a>
-        <a href="https://www.npmjs.com/package/cryptographic_mosaic_keychain" target="_blank" rel="noopener" class="btn-secondary" style="font-size: 0.78rem; padding: 6px 14px; text-decoration: none; border-radius: 20px; display: inline-flex; align-items: center; gap: 0.4rem;">
-          <span>📦</span> NPM
-        </a>
+        <div class="header-primary-actions">
+          <button type="button" id="header-register-btn" class="btn-primary header-register-btn">
+            <span>🔑</span> Register keychain
+          </button>
+          <a href="https://github.com/CuevazaArt/mosaico-criptografico/issues/new" id="report-bug-header-link" target="_blank" rel="noopener" class="btn-secondary header-link-btn">
+            <span>🐛</span> Report a bug
+          </a>
+          <a href="https://github.com/CuevazaArt/mosaico-criptografico/blob/main/USER_GUIDE.md" target="_blank" rel="noopener" class="btn-secondary header-link-btn">
+            <span>📘</span> Step-by-step guide
+          </a>
+          <a href="https://github.com/CuevazaArt/mosaico-criptografico" target="_blank" rel="noopener" class="btn-secondary header-link-btn">
+            <span>💻</span> GitHub
+          </a>
+          <a href="https://www.npmjs.com/package/cryptographic_mosaic_keychain" target="_blank" rel="noopener" class="btn-secondary header-link-btn">
+            <span>📦</span> NPM
+          </a>
+        </div>
       </div>
       
       <!-- Tab Navigation -->
@@ -130,8 +135,8 @@
       </div>
     </aside>
 
-    <!-- Host platform notice -->
-    <div id="host-platform-notice" class="host-platform-notice" style="display: none;" role="status"></div>
+    <!-- Host platform notice (dismissible) -->
+    <div id="host-platform-notice" class="host-platform-notice hidden" role="status" aria-live="polite"></div>
 
     <!-- Contextual tab guide -->
     <section id="tab-guide-panel" class="tab-guide-panel" aria-live="polite" aria-label="Active section guide"></section>
@@ -653,6 +658,8 @@
         <a href="https://mosaico-criptografico.vercel.app" target="_blank" style="color: #38bdf8; text-decoration: none;">Mainnet app</a>
         &nbsp;·&nbsp;
         <a href="https://github.com/CuevazaArt/mosaico-criptografico" target="_blank" style="color: #38bdf8; text-decoration: none;">GitHub</a>
+        &nbsp;·&nbsp;
+        <a href="https://github.com/CuevazaArt/mosaico-criptografico/issues/new" id="report-bug-footer-link" target="_blank" rel="noopener" style="color: #38bdf8; text-decoration: none;">🐛 Report a bug</a>
       </p>
     </footer>
   </div>
@@ -749,6 +756,11 @@
           <span class="help-map-cost">Free · Daily use</span>
         </article>
       </div>
+      <section class="help-bug-report" aria-labelledby="help-bug-title">
+        <h3 id="help-bug-title">🐛 Report a bug</h3>
+        <p>Found something broken? Open a GitHub issue with your browser, steps, and what you expected. Include screenshots if you can.</p>
+        <a href="https://github.com/CuevazaArt/mosaico-criptografico/issues/new" id="report-bug-help-link" target="_blank" rel="noopener" class="btn-secondary">Open bug report on GitHub</a>
+      </section>
       <div class="help-modal-footer">
         <a href="https://github.com/CuevazaArt/mosaico-criptografico/blob/main/USER_GUIDE.md" target="_blank" rel="noopener" class="btn-primary">📘 Full step-by-step guide</a>
         <a href="https://mosaico-criptografico.vercel.app" target="_blank" rel="noopener" class="btn-secondary">🌊 Mainnet app</a>
@@ -822,10 +834,11 @@
       <a href="https://github.com/CuevazaArt/mosaico-criptografico/blob/main/LEGAL.md" target="_blank" rel="noopener">Legal &amp; Disclaimer</a>
       <a href="https://github.com/CuevazaArt/mosaico-criptografico/blob/main/LICENSE" target="_blank" rel="noopener">MIT License</a>
       <a href="https://github.com/CuevazaArt/mosaico-criptografico/blob/main/NOTICES.md" target="_blank" rel="noopener">Third-party notices</a>
+      <a href="https://github.com/CuevazaArt/mosaico-criptografico/issues/new" id="report-bug-legal-link" target="_blank" rel="noopener">Report a bug</a>
     </nav>
     <p class="footer-copy">© 2025–2026 CuevazaArt · Open source under MIT</p>
   </footer>
 
-  <script type="module" src="main.js?v=3.2.0"></script>
+  <script type="module" src="main.js?v=3.2.2"></script>
 </body>
 </html>

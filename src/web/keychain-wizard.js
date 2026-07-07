@@ -546,10 +546,6 @@ export async function initKeychainWizard() {
   $('wizard-connect-btn')?.addEventListener('click', handleConnect);
   $('wizard-mint-btn')?.addEventListener('click', handleMint);
   $('wizard-unmint-btn')?.addEventListener('click', handleUnmint);
-  $('open-wizard-btn')?.addEventListener('click', (e) => {
-    e.preventDefault();
-    openRegisterTab();
-  });
 
   $('wizard-audio-btn')?.addEventListener('click', async () => {
     if (!wizardHash) await renderWizardMosaic();
