@@ -4,7 +4,7 @@ import { playMnemonicAudio, stopMnemonicAudio, playMismatchSequence, playMatchSe
 import { CognitiveTestSession, generateRandomAddress, generateSimilarAddress } from './src/web/testing.js';
 import { checkAddressRegistration, registerMnemonicNft, generateFaucetWallet, setXrplNetwork, getXrplNetwork, connectWallet, registerMnemonicNftNonCustodial } from './src/core/xrpl.js';
 import { getAppConfig, isLocalDemoEnabled } from './src/app-config.js';
-import { initOnboarding, onTabChanged, onAddressGenerated, onComparisonResult, showToast, registerWalletApproachHandlers } from './src/web/onboarding.js';
+import { initOnboarding, onTabChanged, onAddressGenerated, onComparisonResult, showToast, registerWalletApproachHandlers, hasAcceptedTerms } from './src/web/onboarding.js';
 
 const testSession = new CognitiveTestSession();
 
@@ -432,7 +432,14 @@ function initComparator() {
     updateComparison(false);
   };
 
+  const requireTermsAccepted = () => {
+    if (hasAcceptedTerms()) return true;
+    showToast('Accept the Terms of Use before connecting a wallet or signing on-chain.', 'warn', 6000);
+    return false;
+  };
+
   const triggerWalletConnect = () => {
+    if (!requireTermsAccepted()) return;
     xrplConnectWalletBtn.click();
   };
 
@@ -494,6 +501,7 @@ function initComparator() {
   });
 
   xrplConnectWalletBtn.addEventListener('click', async () => {
+    if (!requireTermsAccepted()) return;
     xrplConnectWalletBtn.disabled = true;
     xrplConnStatus.className = 'connecting';
     xrplConnStatus.textContent = '🟡 Connecting...';
@@ -522,6 +530,7 @@ function initComparator() {
   });
 
   xrplRegisterMosaicoBtn.addEventListener('click', async () => {
+    if (!requireTermsAccepted()) return;
     xrplRegisterMosaicoBtn.disabled = true;
     const walletType = xrplWalletSelect.value;
     const netName = getXrplNetwork() === 'mainnet' ? 'Mainnet' : 'Testnet';

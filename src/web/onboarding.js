@@ -5,6 +5,8 @@
 const STORAGE_WELCOME = 'mosaico_welcome_dismissed';
 const STORAGE_TOUR = 'mosaico_tour_completed';
 const STORAGE_WALLET_APPROACH = 'mosaico_wallet_approach_seen';
+const STORAGE_TERMS = 'mosaico_terms_accepted';
+const TERMS_VERSION = '1.0';
 
 let switchToComparatorCallback = null;
 let connectWalletCallback = null;
@@ -68,6 +70,100 @@ export function registerWalletApproachHandlers({ switchToComparator, setWalletTy
 
 function scrollToWalletApproach() {
   document.getElementById('wallet-approach-panel')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+function readTermsAcceptance() {
+  try {
+    const raw = localStorage.getItem(STORAGE_TERMS);
+    if (!raw) return null;
+    const data = JSON.parse(raw);
+    if (data?.version === TERMS_VERSION && data?.acceptedAt) return data;
+  } catch {
+    /* ignore corrupt storage */
+  }
+  return null;
+}
+
+function saveTermsAcceptance() {
+  localStorage.setItem(STORAGE_TERMS, JSON.stringify({
+    version: TERMS_VERSION,
+    acceptedAt: new Date().toISOString()
+  }));
+}
+
+function setTermsUiState(state) {
+  const modal = document.getElementById('terms-modal');
+  const declined = document.getElementById('terms-declined-screen');
+  const app = document.querySelector('.app-container');
+  const root = document.documentElement;
+
+  if (state === 'accepted') {
+    root.dataset.termsAccepted = '1';
+    document.body.classList.remove('terms-locked', 'terms-declined');
+    modal?.classList.remove('open');
+    modal?.setAttribute('aria-hidden', 'true');
+    declined?.classList.add('hidden');
+    app?.removeAttribute('inert');
+    return;
+  }
+
+  if (state === 'declined') {
+    document.body.classList.add('terms-declined');
+    document.body.classList.remove('terms-locked');
+    modal?.classList.remove('open');
+    modal?.setAttribute('aria-hidden', 'true');
+    declined?.classList.remove('hidden');
+    app?.setAttribute('inert', '');
+    return;
+  }
+
+  document.body.classList.add('terms-locked');
+  document.body.classList.remove('terms-declined');
+  modal?.classList.add('open');
+  modal?.setAttribute('aria-hidden', 'false');
+  declined?.classList.add('hidden');
+  app?.setAttribute('inert', '');
+}
+
+function initTermsAcceptance() {
+  if (readTermsAcceptance()) {
+    setTermsUiState('accepted');
+    return true;
+  }
+
+  setTermsUiState('pending');
+
+  const checkbox = document.getElementById('terms-checkbox');
+  const acceptBtn = document.getElementById('terms-accept-btn');
+  const declineBtn = document.getElementById('terms-decline-btn');
+  const reviewBtn = document.getElementById('terms-review-btn');
+
+  checkbox?.addEventListener('change', () => {
+    if (acceptBtn) acceptBtn.disabled = !checkbox.checked;
+  });
+
+  acceptBtn?.addEventListener('click', () => {
+    if (!checkbox?.checked) return;
+    saveTermsAcceptance();
+    setTermsUiState('accepted');
+    showToast('Terms accepted. Use this experimental tool at your own risk.', 'info', 5000);
+  });
+
+  declineBtn?.addEventListener('click', () => {
+    setTermsUiState('declined');
+  });
+
+  reviewBtn?.addEventListener('click', () => {
+    if (checkbox) checkbox.checked = false;
+    if (acceptBtn) acceptBtn.disabled = true;
+    setTermsUiState('pending');
+  });
+
+  return false;
+}
+
+export function hasAcceptedTerms() {
+  return Boolean(readTermsAcceptance());
 }
 
 export function startXamanApproach(autoConnect = false) {
@@ -213,6 +309,8 @@ function showHostNotice() {
 }
 
 export function initOnboarding() {
+  const termsOk = initTermsAcceptance();
+
   bindTooltips();
   showHostNotice();
 
@@ -220,7 +318,7 @@ export function initOnboarding() {
   updateTabGuide(activeTab);
 
   const welcome = document.getElementById('welcome-banner');
-  if (welcome && !localStorage.getItem(STORAGE_WELCOME)) {
+  if (termsOk && welcome && !localStorage.getItem(STORAGE_WELCOME)) {
     welcome.classList.remove('hidden');
   }
 
@@ -256,13 +354,13 @@ export function initOnboarding() {
     if (e.key === 'Escape') closeHelpModal();
   });
 
-  if (!localStorage.getItem(STORAGE_TOUR)) {
+  if (termsOk && !localStorage.getItem(STORAGE_TOUR)) {
     setTimeout(() => {
       showToast('Tip: first approach with 📱 Xaman (mobile) or alternative 💎 Gem Wallet in the Comparator.', 'info', 7500);
     }, 1200);
   }
 
-  if (!localStorage.getItem(STORAGE_WALLET_APPROACH)) {
+  if (termsOk && !localStorage.getItem(STORAGE_WALLET_APPROACH)) {
     document.getElementById('wallet-approach-panel')?.classList.remove('collapsed');
   }
 }

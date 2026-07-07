@@ -133,3 +133,14 @@ Chrome → `chrome://extensions` → Developer mode → Load unpacked → `/exte
 | Gem Wallet not found | Install from gemwallet.app (Chrome/Brave) |
 | `tecINSUFFICIENT_RESERVE` | Fund wallet with ≥ 12 XRP |
 | Wrong `appUrl` in production | Update `APP_URL` in Vercel vault → redeploy |
+
+---
+
+## 10. Legal & redistribution
+
+If you deploy a fork or production instance:
+
+- Include [LICENSE](LICENSE) (MIT), [TERMS.md](TERMS.md), and [LEGAL.md](LEGAL.md) for end users.
+- Do **not** imply official XRPL, Xaman, or Make Waves endorsement.
+- You are the **operator** of your deployment; credential misconfiguration is your liability.
+- Third-party attributions: [NOTICES.md](NOTICES.md).

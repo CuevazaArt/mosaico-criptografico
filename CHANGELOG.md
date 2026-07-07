@@ -4,6 +4,37 @@ All notable changes to the **Cryptographic Mosaic** project are documented in th
 
 ---
 
+## [3.1.5] - 2026-07-07
+
+### Added
+* **KEYCHAIN_REGISTRATION_GUIDE.md:** Standard end-user journey — prepare wallet, discover mosaic, register Soulbound NFT on XRPL, daily use.
+
+---
+
+## [3.1.4] - 2026-07-06
+
+### Added
+* **TERMS.md:** Binding Terms of Use — experimental tool, user sole responsibility, liability limits.
+* **Terms acceptance modal:** Web app blocks usage until the user checks accept and continues (stored in `localStorage`, version `1.0`).
+
+### Changed
+* **LEGAL.md, README, USER_GUIDE, MANUAL:** Reference mandatory Terms of Use acceptance.
+
+---
+
+## [3.1.3] - 2026-07-06
+
+### Added
+* **LICENSE:** Full MIT license text (Copyright CuevazaArt).
+* **LEGAL.md:** Permissions, disclaimers, liability limits, indemnification, and non-affiliation notices.
+* **NOTICES.md:** Third-party license attributions (sharp, CDN libs, hosting).
+* **Site footer:** In-app legal disclaimer with links to GitHub legal docs.
+
+### Changed
+* **Documentation:** README, USER_GUIDE, MANUAL, DEPLOYMENT, and SECURITY now reference legal terms.
+
+---
+
 ## [3.1.2] - 2026-07-06
 
 ### Added

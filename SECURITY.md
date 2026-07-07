@@ -104,3 +104,9 @@ This project separates **public configuration** from **secret credentials** to k
 5. Production mode (`DEPLOYMENT_MODE=production`) disables all seed/secret input fields in the UI.
 
 **What judges should verify:** Open `config.runtime.js` on the live demo — it contains the public Xumm API key and deployment settings only. The API secret is accessible exclusively to the serverless route `api/xumm/payload.js` at runtime on Vercel's infrastructure.
+
+---
+
+## Legal disclaimer
+
+Security analysis in this document describes **design intent and threat modeling**, not a formal audit or certification. For permissions, liability limits, and end-user disclaimers, see [LEGAL.md](LEGAL.md).

@@ -107,6 +107,7 @@ For Xaman API routes locally: `npx vercel dev`
 
 | Document | Audience | What you'll find |
 |----------|----------|------------------|
+| [KEYCHAIN_REGISTRATION_GUIDE.md](KEYCHAIN_REGISTRATION_GUIDE.md) | **New users** | **Standard journey:** prepare wallet → discover mosaic → register on XRPL |
 | [USER_GUIDE.md](USER_GUIDE.md) | **New users** | Step-by-step: what you need, costs, daily usage, on-chain registration |
 | [SUBMISSION_DRAFT.md](SUBMISSION_DRAFT.md) | Hackathon judges | Ready-to-paste Devpost story + judging criteria answers |
 | [DEPLOYMENT.md](DEPLOYMENT.md) | Developers / DevOps | Mainnet deploy, vault sync, 5-min pitch script |
@@ -120,6 +121,10 @@ For Xaman API routes locally: `npx vercel dev`
 | [AUDIO_PROPOSAL.md](AUDIO_PROPOSAL.md) | UX researchers | Acoustic layer specification |
 | [CRITIQUE.md](CRITIQUE.md) | UX auditors | Cognitive ergonomics analysis |
 | [CHANGELOG.md](CHANGELOG.md) | Contributors | Version history |
+| [LEGAL.md](LEGAL.md) | **All users** | Permissions, disclaimers, liability limits |
+| [TERMS.md](TERMS.md) | **End users** | **Terms of Use** — acceptance required for the web demo |
+| [LICENSE](LICENSE) | Contributors | MIT open-source license (full text) |
+| [NOTICES.md](NOTICES.md) | Redistributors | Third-party licenses and attributions |
 
 ---
 
@@ -167,6 +172,15 @@ For Xaman API routes locally: `npx vercel dev`
 
 ---
 
-## License
+## License & legal
 
-MIT — open source, deterministic, and built to last on the XRP Ledger.
+| Document | Purpose |
+|----------|---------|
+| [LICENSE](LICENSE) | **MIT License** — use, modify, and distribute the source code freely |
+| [TERMS.md](TERMS.md) | **Terms of Use** — binding agreement; **must be accepted** in the web app |
+| [LEGAL.md](LEGAL.md) | **Permissions, disclaimers, and liability limits** — read before using the demo or signing on-chain |
+| [NOTICES.md](NOTICES.md) | Third-party libraries and trademark attributions |
+
+**Summary:** The code is open source (MIT). **End users must accept [TERMS.md](TERMS.md)** before using the web demo. The service is **experimental**; use and on-chain actions are **your sole responsibility**. CuevazaArt is not affiliated with Ripple, XRPL Foundation, Xaman, or Make Waves.
+
+See [TERMS.md](TERMS.md) and [LEGAL.md](LEGAL.md) for full terms.

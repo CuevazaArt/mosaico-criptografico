@@ -4,6 +4,8 @@
 
 This guide is for someone who has **never used the tool before**. No programming knowledge required.
 
+> **Want the full standard journey in one document?** See **[KEYCHAIN_REGISTRATION_GUIDE.md](KEYCHAIN_REGISTRATION_GUIDE.md)** — prepare wallet → discover mosaic → register on XRPL → daily use.
+
 ---
 
 ## What is this in one sentence?
@@ -257,6 +259,7 @@ XRPL confirms in ~4 seconds. You'll see the hash in the dApp console.
 
 | Resource | Link |
 |---------|--------|
+| **Standard registration journey** | [KEYCHAIN_REGISTRATION_GUIDE.md](KEYCHAIN_REGISTRATION_GUIDE.md) |
 | Full demo (Mainnet + NFT) | https://mosaico-criptografico.vercel.app |
 | Visual demo (GitHub Pages) | https://cuevazaart.github.io/mosaico-criptografico/ |
 | In-app guide | **❓ Help** button inside the tool |
@@ -264,7 +267,14 @@ XRPL confirms in ~4 seconds. You'll see the hash in the dApp console.
 | Simple + technical narrative | [NARRATIVE.md](NARRATIVE.md) |
 | Security and credentials | [SECURITY.md](SECURITY.md) |
 | Developer deployment | [DEPLOYMENT.md](DEPLOYMENT.md) |
+| **Legal & disclaimer** | [LEGAL.md](LEGAL.md) |
+| **Terms of Use (required)** | [TERMS.md](TERMS.md) |
+| Open-source license | [LICENSE](LICENSE) |
 
 ---
+
+## Legal notice
+
+**You must accept the [Terms of Use](TERMS.md) before using the web demo.** Cryptographic Mosaic is **experimental, non-custodial software** provided **"AS IS"** without warranty. Visual mosaics are a **helper tool**, not a guarantee against phishing or fund loss. **You alone** are responsible for how you use this tool and for every transaction you sign in your wallet. See [TERMS.md](TERMS.md) and [LEGAL.md](LEGAL.md).
 
 *Cryptographic Mosaic — Your visual keychain for the XRP Ledger. Verify with your eyes, not 34 characters.*

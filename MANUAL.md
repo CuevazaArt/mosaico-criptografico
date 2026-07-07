@@ -1,7 +1,7 @@
 # User Manual and Verification Protocol
 
-> **New user?** Start with the step-by-step guide: **[USER_GUIDE.md](USER_GUIDE.md)**  
-> (What you need, costs, daily usage, and on-chain registration explained from scratch.)
+> **New user?** Start with the standard journey: **[KEYCHAIN_REGISTRATION_GUIDE.md](KEYCHAIN_REGISTRATION_GUIDE.md)**  
+> Or the full guide: **[USER_GUIDE.md](USER_GUIDE.md)** — what you need, costs, daily usage, and on-chain registration from scratch.
 
 **Live demo:** https://mosaico-criptografico.vercel.app
 
@@ -85,3 +85,10 @@ See [USER_GUIDE.md](USER_GUIDE.md) for a full cost breakdown.
 | [NARRATIVE.md](NARRATIVE.md) | Keychain analogy + technical pipeline |
 | [SECURITY.md](SECURITY.md) | Entropy model and credential policy |
 | [DEPLOYMENT.md](DEPLOYMENT.md) | Mainnet deploy and hackathon pitch |
+| [LEGAL.md](LEGAL.md) | Permissions, disclaimers, and liability limits |
+
+---
+
+## Legal notice
+
+**Acceptance of [TERMS.md](TERMS.md) is required** to use the web demo. This tool does **not** hold your keys or guarantee transaction safety. Use and application are **your sole responsibility**. Full terms: [TERMS.md](TERMS.md) · [LEGAL.md](LEGAL.md).

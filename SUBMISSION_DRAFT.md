@@ -167,6 +167,8 @@ Even one prevented phishing attack (often worth thousands of XRP) justifies the 
 - `.env` and `config.runtime.js` are gitignored and blocked from Vercel uploads via `.vercelignore`.
 - `npm run audit` runs automatically before every production deploy.
 
+**Legal:** Open-source under [MIT](LICENSE). End users **must accept** [TERMS.md](TERMS.md) in the web app. Disclaimers and liability limits in [LEGAL.md](LEGAL.md). Not affiliated with Ripple, XRPL Foundation, or wallet vendors.
+
 ---
 
 ## Links checklist for submission form

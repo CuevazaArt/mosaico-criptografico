@@ -5,6 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Turn XRPL addresses into unique visual mosaics. Detect phishing and clipboard hijacking before you sign.">
   <title>Cryptographic Mosaic - XRPL Visual Identifiers</title>
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Cryptographic Mosaic — XRPL Visual Identifiers">
+  <meta property="og:description" content="Turn XRPL addresses into unique visual mosaics. Detect phishing and clipboard hijacking before you sign.">
+  <meta property="og:image" content="https://mosaico-criptografico.vercel.app/assets/og-image.png">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:image" content="https://mosaico-criptografico.vercel.app/assets/og-image.png">
   <!-- Google Fonts for premium typography -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -21,16 +30,36 @@
       enableLocalDemo: true,
       defaultWallet: 'xaman',
       sampleXrplAddress: 'rG1QQv2dh2AGTf5gZUXyZEaXcRmGRHsGQE',
-      version: '3.1.2'
+      version: '3.1.5'
     };
   </script>
   <script src="config.runtime.js" onerror="console.info('[config] Using inline fallback — run npm run config for full setup.')"></script>
+  <script>
+    (function () {
+      try {
+        var raw = localStorage.getItem('mosaico_terms_accepted');
+        if (!raw) return;
+        var data = JSON.parse(raw);
+        if (data && data.version === '1.0' && data.acceptedAt) {
+          document.documentElement.dataset.termsAccepted = '1';
+          document.addEventListener('DOMContentLoaded', function () {
+            document.body.classList.remove('terms-locked');
+            var modal = document.getElementById('terms-modal');
+            if (modal) {
+              modal.classList.remove('open');
+              modal.setAttribute('aria-hidden', 'true');
+            }
+          });
+        }
+      } catch (e) { /* ignore */ }
+    })();
+  </script>
   <!-- Official XRP Ledger JavaScript SDK for on-chain transactions -->
   <script src="https://unpkg.com/xrpl"></script>
   <!-- Xaman (Xumm) browser SDK — API key injected via config.runtime.js -->
   <script src="https://xumm.app/assets/cdn/xumm.min.js"></script>
 </head>
-<body>
+<body class="terms-locked">
   <!-- Production deployment indicator (shown when DEPLOYMENT_MODE=production) -->
   <div id="production-mode-banner" style="display: none; position: fixed; top: 0; left: 0; right: 0; z-index: 9999; background: linear-gradient(90deg, #1e3a5f, #312e81); color: #e0f2fe; font-size: 0.78rem; padding: 6px 16px; text-align: center; font-weight: 600; letter-spacing: 0.3px; border-bottom: 1px solid rgba(56, 189, 248, 0.3);">
     🌊 Production · XRPL Mainnet · Non-custodial wallet signing only
@@ -42,7 +71,7 @@
   <div class="app-container">
     <header class="app-header">
       <div class="header-logo">
-        <span class="logo-icon">💠</span>
+        <img src="assets/logo.png" alt="" class="logo-img" width="48" height="48" decoding="async">
         <h1>Cryptographic Mosaic</h1>
       </div>
       <p class="header-subtitle">
@@ -52,6 +81,9 @@
         <button type="button" id="help-open-btn" class="btn-secondary" style="font-size: 0.78rem; padding: 6px 14px; border-radius: 20px; display: inline-flex; align-items: center; gap: 0.4rem; cursor: pointer;">
           <span>❓</span> Help / Tool map
         </button>
+        <a href="https://github.com/CuevazaArt/mosaico-criptografico/blob/main/KEYCHAIN_REGISTRATION_GUIDE.md" target="_blank" rel="noopener" class="btn-secondary" style="font-size: 0.78rem; padding: 6px 14px; text-decoration: none; border-radius: 20px; display: inline-flex; align-items: center; gap: 0.4rem;">
+          <span>🔑</span> Register your keychain
+        </a>
         <a href="https://github.com/CuevazaArt/mosaico-criptografico/blob/main/USER_GUIDE.md" target="_blank" rel="noopener" class="btn-secondary" style="font-size: 0.78rem; padding: 6px 14px; text-decoration: none; border-radius: 20px; display: inline-flex; align-items: center; gap: 0.4rem;">
           <span>📘</span> Step-by-step guide
         </a>
@@ -80,7 +112,7 @@
     <!-- Welcome banner (first visit) -->
     <aside id="welcome-banner" class="welcome-banner hidden" role="region" aria-label="Welcome">
       <div class="welcome-banner-content">
-        <span class="welcome-icon">👋</span>
+        <img src="assets/logo.png" alt="" class="welcome-logo" width="40" height="40" decoding="async">
         <div>
           <strong>First time here?</strong> This tool turns XRPL addresses into unique color drawings.
           If someone alters the address, the drawing changes completely — so you spot scams instantly.
@@ -529,6 +561,8 @@
     <footer class="app-footer-info">
       <p>Cryptographic Mosaic is an open-source, deterministic, and immutable standard. Developed locally in a decentralized and serverless manner.</p>
       <p style="margin-top: 0.5rem; font-size: 0.82rem;">
+        <a href="https://github.com/CuevazaArt/mosaico-criptografico/blob/main/TERMS.md" target="_blank" rel="noopener" style="color: #38bdf8; text-decoration: none;">⚖️ Terms of Use</a>
+        &nbsp;·&nbsp;
         <a href="https://github.com/CuevazaArt/mosaico-criptografico/blob/main/USER_GUIDE.md" target="_blank" rel="noopener" style="color: #38bdf8; text-decoration: none;">📘 User guide (step by step)</a>
         &nbsp;·&nbsp;
         <a href="https://mosaico-criptografico.vercel.app" target="_blank" style="color: #38bdf8; text-decoration: none;">Live Demo</a>
@@ -538,12 +572,71 @@
     </footer>
   </div>
 
+  </div>
+
+  <!-- Terms of Use — must accept before using the app -->
+  <div id="terms-modal" class="terms-modal open" aria-hidden="false" role="dialog" aria-modal="true" aria-labelledby="terms-modal-title">
+    <div class="terms-modal-panel">
+      <header class="terms-modal-header">
+        <img src="assets/logo.png" alt="" class="brand-logo-sm" width="36" height="36" decoding="async">
+        <div>
+          <h2 id="terms-modal-title">Terms of Use</h2>
+          <p class="terms-modal-version">Version 1.0 · Experimental software</p>
+        </div>
+      </header>
+
+      <div class="terms-modal-body" tabindex="0">
+        <p class="terms-lead">
+          <strong>Cryptographic Mosaic is an experimental tool.</strong>
+          Its use, interpretation, and application — including any XRPL transaction you sign — are
+          <strong>entirely your responsibility</strong>, not CuevazaArt's.
+        </p>
+        <ul class="terms-points">
+          <li>Provided <strong>"AS IS"</strong> without warranty; not financial, legal, or security advice.</li>
+          <li><strong>Non-custodial:</strong> we never hold your private keys or seed phrases.</li>
+          <li>Visual mosaics <strong>assist</strong> verification; they do not guarantee safety of funds.</li>
+          <li>On-chain actions (NFT mint, transfers) are <strong>irreversible</strong> — confirm in your wallet.</li>
+          <li>Not affiliated with Ripple, XRPL Foundation, Xaman, Gem Wallet, or Make Waves.</li>
+          <li>CuevazaArt's liability is limited to the <strong>maximum extent permitted by law</strong> (typically US&nbsp;$0).</li>
+        </ul>
+        <p class="terms-full-link">
+          Read the full binding terms:
+          <a href="https://github.com/CuevazaArt/mosaico-criptografico/blob/main/TERMS.md" target="_blank" rel="noopener">TERMS.md</a>
+          ·
+          <a href="https://github.com/CuevazaArt/mosaico-criptografico/blob/main/LEGAL.md" target="_blank" rel="noopener">LEGAL.md</a>
+        </p>
+      </div>
+
+      <label class="terms-checkbox-label">
+        <input type="checkbox" id="terms-checkbox" autocomplete="off">
+        <span>I have read and <strong>accept the Terms of Use</strong>. I understand this is experimental software and I use it at my own risk.</span>
+      </label>
+
+      <div class="terms-modal-actions">
+        <button type="button" id="terms-accept-btn" class="btn-primary" disabled>Accept and continue</button>
+        <button type="button" id="terms-decline-btn" class="btn-secondary">Decline</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="terms-declined-screen" class="terms-declined-screen hidden" role="alert">
+    <div class="terms-declined-panel">
+      <h2>Terms not accepted</h2>
+      <p>You must accept the Terms of Use to use this experimental demo. CuevazaArt is not responsible for use without acceptance.</p>
+      <button type="button" id="terms-review-btn" class="btn-primary">Review terms again</button>
+      <a href="https://github.com/CuevazaArt/mosaico-criptografico" class="btn-secondary" style="text-decoration:none;text-align:center;">Leave to GitHub</a>
+    </div>
+  </div>
+
   <!-- Help modal: section map -->
   <div id="help-modal" class="help-modal" aria-hidden="true" role="dialog" aria-labelledby="help-modal-title">
     <div id="help-modal-backdrop" class="help-modal-backdrop"></div>
     <div class="help-modal-content">
       <button type="button" id="help-close-btn" class="help-modal-close" aria-label="Close help">✕</button>
-      <h2 id="help-modal-title">Tool map</h2>
+      <h2 id="help-modal-title" class="help-modal-title">
+        <img src="assets/logo.png" alt="" class="brand-logo-sm" width="32" height="32" decoding="async">
+        Tool map
+      </h2>
       <p class="help-modal-intro">Cryptographic Mosaic turns XRPL addresses into visual keychains. Follow this flow:</p>
       <div class="help-map">
         <article class="help-map-card">
@@ -575,10 +668,28 @@
         <a href="https://github.com/CuevazaArt/mosaico-criptografico/blob/main/USER_GUIDE.md" target="_blank" rel="noopener" class="btn-primary">📘 Full step-by-step guide</a>
         <a href="https://mosaico-criptografico.vercel.app" target="_blank" rel="noopener" class="btn-secondary">🌊 Demo Mainnet (Vercel)</a>
         <a href="https://cuevazaart.github.io/mosaico-criptografico/" target="_blank" rel="noopener" class="btn-secondary">📄 GitHub Pages</a>
+        <a href="https://github.com/CuevazaArt/mosaico-criptografico/blob/main/TERMS.md" target="_blank" rel="noopener" class="btn-secondary">⚖️ Terms</a>
+        <a href="https://github.com/CuevazaArt/mosaico-criptografico/blob/main/LEGAL.md" target="_blank" rel="noopener" class="btn-secondary">Legal</a>
       </div>
     </div>
   </div>
 
-  <script type="module" src="main.js?v=3.1.2"></script>
+  <footer class="app-footer" role="contentinfo">
+    <p class="footer-disclaimer">
+      Cryptographic Mosaic is experimental, non-custodial software provided <strong>"AS IS"</strong> without warranty.
+      Visual mosaics assist verification; they do not guarantee safety of funds or transactions.
+      You are solely responsible for wallet confirmations before signing.
+      Not affiliated with Ripple, XRPL Foundation, Xaman, or Make Waves.
+    </p>
+    <nav class="footer-legal" aria-label="Legal">
+      <a href="https://github.com/CuevazaArt/mosaico-criptografico/blob/main/TERMS.md" target="_blank" rel="noopener">Terms of Use</a>
+      <a href="https://github.com/CuevazaArt/mosaico-criptografico/blob/main/LEGAL.md" target="_blank" rel="noopener">Legal &amp; Disclaimer</a>
+      <a href="https://github.com/CuevazaArt/mosaico-criptografico/blob/main/LICENSE" target="_blank" rel="noopener">MIT License</a>
+      <a href="https://github.com/CuevazaArt/mosaico-criptografico/blob/main/NOTICES.md" target="_blank" rel="noopener">Third-party notices</a>
+    </nav>
+    <p class="footer-copy">© 2025–2026 CuevazaArt · Open source under MIT</p>
+  </footer>
+
+  <script type="module" src="main.js?v=3.1.5"></script>
 </body>
 </html>
