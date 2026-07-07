@@ -11,7 +11,7 @@ const DEFAULTS = {
   enableLocalDemo: true,
   defaultWallet: 'xaman',
   sampleXrplAddress: 'rG1QQv2dh2AGTf5gZUXyZEaXcRmGRHsGQE',
-  version: '3.1.1'
+  version: '3.1.6'
 };
 
 export function getAppConfig() {

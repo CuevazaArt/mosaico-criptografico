@@ -132,7 +132,8 @@ Chrome → `chrome://extensions` → Developer mode → Load unpacked → `/exte
 | `/api/xumm/payload` 500 | Run `npm run vault:sync` to push `XUMM_API_SECRET` |
 | Gem Wallet not found | Install from gemwallet.app (Chrome/Brave) |
 | `tecINSUFFICIENT_RESERVE` | Fund wallet with ≥ 12 XRP |
-| Wrong `appUrl` in production | Update `APP_URL` in Vercel vault → redeploy |
+| `vercel dev` fails with "yarn not recognized" (Windows) | Install yarn: `npm install -g yarn`, then `npm run dev:mainnet` |
+| Local Xaman signing unavailable | Use production URL or `npm run dev:mainnet` (not plain `npm run dev`) |
 
 ---
 

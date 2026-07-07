@@ -4,6 +4,19 @@ All notable changes to the **Cryptographic Mosaic** project are documented in th
 
 ---
 
+## [3.1.6] - 2026-07-07
+
+### Fixed
+* **GitHub Pages CI:** `npm ci` before icon generation; remove `node_modules` from Pages artifact.
+* **CI cache:** Test workflow uses `package-lock.json` for dependency cache.
+* **Version sync:** `config.runtime.github.js`, `app-config.js`, and `generate-config.js` aligned to 3.1.5.
+
+### Added
+* **`npm run dev:mainnet`:** Local Vercel dev server with Xaman API routes (requires `yarn` on Windows).
+* **`installCommand`** in `vercel.json` for npm-based installs.
+
+---
+
 ## [3.1.5] - 2026-07-07
 
 ### Added

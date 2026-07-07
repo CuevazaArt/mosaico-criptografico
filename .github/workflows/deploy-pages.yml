@@ -31,9 +31,11 @@ jobs:
 
       - name: Prepare static site
         run: |
+          npm ci
           npm run icons
           cp config.runtime.github.js config.runtime.js
           touch .nojekyll
+          rm -rf node_modules
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3

@@ -10,5 +10,5 @@ window.__APP_CONFIG__ = {
   "defaultWallet": "xaman",
   "sampleXrplAddress": "rG1QQv2dh2AGTf5gZUXyZEaXcRmGRHsGQE",
   "hostPlatform": "github-pages",
-  "version": "3.1.2"
+  "version": "3.1.6"
 };

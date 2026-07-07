@@ -99,7 +99,12 @@ npm test
 npm run dev             # http://localhost:3000
 ```
 
-For Xaman API routes locally: `npx vercel dev`
+For Xaman API routes locally: `npm run dev:mainnet` (requires [Vercel CLI](https://vercel.com/cli) and `yarn` on Windows for `vercel dev`).
+
+```bash
+npm run dev:mainnet   # http://localhost:3000+ — full Mainnet + /api/xumm/payload
+npm run dev           # static UI only (no Xaman signing)
+```
 
 ---
 
