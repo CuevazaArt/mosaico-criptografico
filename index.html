@@ -77,36 +77,40 @@
       <p class="header-subtitle">
         Turn every XRPL address into a unique <strong>visual and acoustic keychain</strong>. Detect phishing and clipboard hijacking before signing — without reading 34 characters one by one.
       </p>
-      <div class="header-toolbar">
-        <div class="header-toolbar-left">
-          <button type="button" id="header-register-btn" class="btn-primary header-register-btn">
-            <span>🔑</span> Register My Keychain
+      <div class="header-action-bar" role="toolbar" aria-label="Main actions">
+        <button type="button" id="header-register-btn" class="header-chip header-chip--primary">
+          <span class="header-chip-icon" aria-hidden="true">🔑</span>
+          <span class="header-chip-label">Register My Keychain</span>
+        </button>
+
+        <div class="header-chip-group" aria-label="Quick links">
+          <a href="https://github.com/CuevazaArt/mosaico-criptografico/issues/new" id="report-bug-header-link" target="_blank" rel="noopener" class="header-chip">
+            <span class="header-chip-icon" aria-hidden="true">🐛</span>
+            <span class="header-chip-label">Report a bug</span>
+          </a>
+          <a href="https://github.com/CuevazaArt/mosaico-criptografico/blob/main/USER_GUIDE.md" target="_blank" rel="noopener" class="header-chip">
+            <span class="header-chip-icon" aria-hidden="true">📘</span>
+            <span class="header-chip-label">Step-by-step guide</span>
+          </a>
+          <button type="button" id="header-burn-btn" class="header-chip header-chip--warn" title="Burn your Soulbound NFT and reclaim the XRP owner reserve">
+            <span class="header-chip-icon" aria-hidden="true">🔥</span>
+            <span class="header-chip-label">Burn &amp; reclaim XRP</span>
           </button>
+          <span class="header-chip-sep" aria-hidden="true"></span>
+          <a href="https://github.com/CuevazaArt/mosaico-criptografico" target="_blank" rel="noopener" class="header-chip">
+            <span class="header-chip-icon" aria-hidden="true">💻</span>
+            <span class="header-chip-label">GitHub</span>
+          </a>
+          <a href="https://www.npmjs.com/package/cryptographic_mosaic_keychain" target="_blank" rel="noopener" class="header-chip">
+            <span class="header-chip-icon" aria-hidden="true">📦</span>
+            <span class="header-chip-label">NPM</span>
+          </a>
         </div>
 
-        <nav class="header-toolbar-center" aria-label="Quick links">
-          <a href="https://github.com/CuevazaArt/mosaico-criptografico/issues/new" id="report-bug-header-link" target="_blank" rel="noopener" class="btn-secondary header-link-btn">
-            <span>🐛</span> Report a bug
-          </a>
-          <a href="https://github.com/CuevazaArt/mosaico-criptografico/blob/main/USER_GUIDE.md" target="_blank" rel="noopener" class="btn-secondary header-link-btn">
-            <span>📘</span> Step-by-step guide
-          </a>
-          <button type="button" id="header-burn-btn" class="btn-secondary header-burn-btn" title="Burn your Soulbound NFT and reclaim the XRP owner reserve">
-            <span>🔥</span> Burn &amp; reclaim XRP
-          </button>
-          <a href="https://github.com/CuevazaArt/mosaico-criptografico" target="_blank" rel="noopener" class="btn-secondary header-link-btn">
-            <span>💻</span> GitHub
-          </a>
-          <a href="https://www.npmjs.com/package/cryptographic_mosaic_keychain" target="_blank" rel="noopener" class="btn-secondary header-link-btn">
-            <span>📦</span> NPM
-          </a>
-        </nav>
-
-        <div class="header-toolbar-right">
-          <button type="button" id="help-open-btn" class="btn-secondary header-help-btn">
-            <span>❓</span> Help / Tool map
-          </button>
-        </div>
+        <button type="button" id="help-open-btn" class="header-chip">
+          <span class="header-chip-icon" aria-hidden="true">❓</span>
+          <span class="header-chip-label">Help / Tool map</span>
+        </button>
       </div>
       
       <!-- Tab Navigation -->
@@ -852,6 +856,6 @@
     <p class="footer-copy">© 2025–2026 CuevazaArt · Open source under MIT</p>
   </footer>
 
-  <script type="module" src="main.js?v=3.2.8"></script>
+  <script type="module" src="main.js?v=3.2.9"></script>
 </body>
 </html>
