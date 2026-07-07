@@ -116,6 +116,8 @@ npm run dev           # static UI only (no Xaman signing)
 | [USER_GUIDE.md](USER_GUIDE.md) | **New users** | Step-by-step: what you need, costs, daily usage, on-chain registration |
 | [SUBMISSION_DRAFT.md](SUBMISSION_DRAFT.md) | Hackathon judges | Ready-to-paste Devpost story + judging criteria answers |
 | [DEPLOYMENT.md](DEPLOYMENT.md) | Developers / DevOps | Mainnet deploy, vault sync, 5-min pitch script |
+| [XAMAN_DEVELOPER_SETUP.md](XAMAN_DEVELOPER_SETUP.md) | **Xaman app config** | OAuth redirect URIs, legal URLs, webhook policy |
+| [XAMAN_WEBHOOK.md](XAMAN_WEBHOOK.md) | Xaman reviewers | Why webhooks are intentionally not used |
 | [NARRATIVE.md](NARRATIVE.md) | End-users + devs | Simple keychain analogy + technical pipeline |
 | [MANUAL.md](MANUAL.md) | End-users | 3-step verification protocol |
 | [SECURITY.md](SECURITY.md) | Security reviewers | Entropy model, attack resistance, credential policy |
