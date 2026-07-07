@@ -270,3 +270,44 @@ export function playMatchSequence(hashA, hashB, options = {}) {
   // 3. Destination key sound
   scheduleMnemonicAudio(hashB, options, time);
 }
+
+/**
+ * Triumphant registration fanfare — major ascending chord + sparkle notes.
+ */
+export function playRegistrationSuccessFanfare() {
+  stopMnemonicAudio();
+  if (!audioCtx) {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  }
+  if (audioCtx.state === 'suspended') {
+    audioCtx.resume();
+  }
+
+  const notes = [
+    { freq: 523.25, time: 0, dur: 0.28, gain: 0.18 },
+    { freq: 659.25, time: 0.12, dur: 0.28, gain: 0.16 },
+    { freq: 783.99, time: 0.24, dur: 0.32, gain: 0.16 },
+    { freq: 1046.5, time: 0.38, dur: 0.55, gain: 0.2 },
+    { freq: 1318.5, time: 0.52, dur: 0.22, gain: 0.1 },
+    { freq: 1568.0, time: 0.6, dur: 0.35, gain: 0.12 }
+  ];
+
+  const base = audioCtx.currentTime + 0.03;
+  notes.forEach(({ freq, time, dur, gain: peak }) => {
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    const start = base + time;
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(freq, start);
+    gain.gain.setValueAtTime(0, start);
+    gain.gain.linearRampToValueAtTime(peak, start + 0.025);
+    gain.gain.exponentialRampToValueAtTime(0.001, start + dur);
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    try {
+      osc.start(start);
+      osc.stop(start + dur + 0.05);
+    } catch (e) { /* ignore */ }
+    activeOscillators.push(osc);
+  });
+}

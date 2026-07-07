@@ -143,7 +143,7 @@
         <div class="keychain-wizard card glass-panel">
           <header class="wizard-header">
             <h2 id="register-heading">Register your XRPL keychain</h2>
-            <p class="wizard-intro">Follow each step — paste your address, preview your mosaic, connect Xaman, and mint your Soulbound NFT (~2 XRP reserve on Mainnet).</p>
+            <p class="wizard-intro">Follow each step — paste your address, preview your mosaic, connect Xaman, and mint your Soulbound NFT. Costs are fetched live from the ledger before you confirm.</p>
           </header>
 
           <ol class="wizard-progress" aria-label="Registration progress">
@@ -173,7 +173,7 @@
 
           <div class="wizard-step" data-step="3">
             <h3>Step 3 — Connect Xaman on Mainnet</h3>
-            <p>Install <a href="https://xaman.app" target="_blank" rel="noopener">Xaman</a> on your phone. You need ~2 XRP free for the NFT reserve.</p>
+            <p>Install <a href="https://xaman.app" target="_blank" rel="noopener">Xaman</a> on your phone. Ensure enough free XRP for the NFT owner reserve (shown before mint).</p>
             <p id="wizard-wallet-status" class="wizard-status idle">Not connected yet</p>
             <button type="button" id="wizard-connect-btn" class="btn-xaman-primary">📱 Connect with Xaman</button>
           </div>
@@ -186,18 +186,33 @@
           </div>
 
           <div class="wizard-step" data-step="5">
-            <h3>Step 5 — You're registered!</h3>
-            <p>Your keychain is on-chain. Use the Comparator daily before sending XRP.</p>
+            <div id="wizard-celebrate-confetti" class="wizard-celebrate-confetti" aria-hidden="true"></div>
+            <div class="wizard-success-banner" id="wizard-success-banner">
+              <span class="wizard-success-icon" aria-hidden="true">🎉</span>
+              <h3>Congratulations — you're registered!</h3>
+              <p class="wizard-success-lead">Your mosaic keychain is now anchored on XRPL Mainnet as a Soulbound NFT. You did it!</p>
+            </div>
             <ul class="wizard-success-list">
               <li><strong>Address:</strong> <code id="wizard-success-address">—</code></li>
               <li><strong>Transaction:</strong> <code id="wizard-tx-hash">—</code></li>
             </ul>
+            <div class="wizard-unmint-section">
+              <p class="wizard-unmint-note">Need to reclaim your XRP owner reserve? Burn the NFT — costs are fetched live from the ledger before you confirm.</p>
+              <button type="button" id="wizard-unmint-btn" class="btn-secondary btn-sm">🔥 Burn keychain &amp; reclaim XRP</button>
+            </div>
+          </div>
+
+          <div id="wizard-return-overlay" class="wizard-return-overlay hidden" aria-live="polite">
+            <div class="wizard-return-card">
+              <p><strong>✅ Transaction signed in Xaman</strong></p>
+              <p>Return to your original tab to finish registration. This window will close automatically.</p>
+            </div>
           </div>
 
           <footer class="wizard-footer">
             <button type="button" id="wizard-back-btn" class="btn-secondary" disabled>← Back</button>
             <button type="button" id="wizard-next-btn" class="btn-primary">Next →</button>
-            <button type="button" id="wizard-finish-btn" class="btn-primary hidden">Open Comparator</button>
+            <button type="button" id="wizard-finish-btn" class="btn-primary hidden">Start first-use tour →</button>
           </footer>
         </div>
       </section>
@@ -466,6 +481,9 @@
 
                 <button type="button" id="xrpl-register-mosaico-btn" class="btn-register" data-tip="xrpl-register-mosaico-btn" disabled>
                   🛡️ Mint Mosaic Key (Soulbound NFT)
+                </button>
+                <button type="button" id="xrpl-unmint-mosaico-btn" class="btn-secondary btn-sm" style="display: none; margin-top: 0.5rem;" disabled>
+                  🔥 Burn keychain &amp; reclaim XRP reserve
                 </button>
               </div>
 
@@ -741,6 +759,57 @@
     </div>
   </div>
 
+  <!-- Live ledger cost confirmation (mint / burn) -->
+  <div id="cost-confirm-modal" class="cost-confirm-modal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="cost-confirm-title">
+    <div id="cost-confirm-modal-backdrop" class="cost-confirm-modal-backdrop"></div>
+    <div class="cost-confirm-panel">
+      <h2 id="cost-confirm-title">Confirm costs</h2>
+      <div id="cost-confirm-body" class="cost-confirm-body"></div>
+      <div class="cost-confirm-actions">
+        <button type="button" id="cost-confirm-accept-btn" class="btn-primary">Accept</button>
+        <button type="button" id="cost-confirm-cancel-btn" class="btn-secondary">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- First real-use guided tour (after registration) -->
+  <div id="first-use-modal" class="first-use-modal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="first-use-title">
+    <div id="first-use-modal-backdrop" class="first-use-modal-backdrop"></div>
+    <div class="first-use-panel">
+      <button type="button" id="first-use-modal-close" class="first-use-close" aria-label="Close">✕</button>
+      <h2 id="first-use-title">Your first real use</h2>
+      <p class="first-use-intro">You registered on-chain — now learn how to use your visual keychain every day.</p>
+      <ol class="first-use-progress" aria-label="First use progress">
+        <li class="first-use-progress-step active" data-step="1"><span>1</span> What happened</li>
+        <li class="first-use-progress-step" data-step="2"><span>2</span> Your keychain</li>
+        <li class="first-use-progress-step" data-step="3"><span>3</span> Try Comparator</li>
+        <li class="first-use-progress-step" data-step="4"><span>4</span> Daily habit</li>
+      </ol>
+      <div class="first-use-step active" data-step="1">
+        <h3>What you just did</h3>
+        <p>You minted a <strong>Soulbound NFT</strong> (taxon 1001) on XRPL Mainnet. It proves your mosaic identity on-chain — non-transferable, tied to your address forever until you burn it.</p>
+      </div>
+      <div class="first-use-step" data-step="2">
+        <h3>Your visual &amp; acoustic keychain</h3>
+        <p>Every XRPL address has a unique mosaic and melody. Memorize yours — you'll use it to spot phishing and clipboard swaps before signing.</p>
+        <div id="first-use-mosaic-preview" class="identicon-medium-container wizard-mosaic"></div>
+      </div>
+      <div class="first-use-step" data-step="3">
+        <h3>Try the Comparator now</h3>
+        <p>We will open the Comparator with <strong>your address</strong> on both sides — a perfect match. Next time, paste the destination from your wallet into slot B and compare before sending XRP.</p>
+      </div>
+      <div class="first-use-step" data-step="4">
+        <h3>Make it a daily habit</h3>
+        <p>Before every send: open Comparator → your address in A → destination in B → green match + same melody = safe. Red mismatch = stop and investigate.</p>
+      </div>
+      <footer class="first-use-footer">
+        <button type="button" id="first-use-back-btn" class="btn-secondary" disabled>← Back</button>
+        <button type="button" id="first-use-next-btn" class="btn-primary">Next →</button>
+        <button type="button" id="first-use-finish-btn" class="btn-primary hidden">Open Comparator</button>
+      </footer>
+    </div>
+  </div>
+
   <footer class="app-footer" role="contentinfo">
     <p class="footer-disclaimer">
       Cryptographic Mosaic is experimental, non-custodial software provided <strong>"AS IS"</strong> without warranty.
@@ -757,6 +826,6 @@
     <p class="footer-copy">© 2025–2026 CuevazaArt · Open source under MIT</p>
   </footer>
 
-  <script type="module" src="main.js?v=3.1.8"></script>
+  <script type="module" src="main.js?v=3.2.0"></script>
 </body>
 </html>

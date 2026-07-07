@@ -2,10 +2,12 @@ import { sha256, bytesToHex } from './src/core/crypto.js';
 import { generateSvg } from './src/core/generator.js';
 import { playMnemonicAudio, stopMnemonicAudio, playMismatchSequence, playMatchSequence } from './src/core/audio.js';
 import { CognitiveTestSession, generateRandomAddress, generateSimilarAddress } from './src/web/testing.js';
-import { checkAddressRegistration, registerMnemonicNft, generateFaucetWallet, setXrplNetwork, getXrplNetwork, connectWallet, registerMnemonicNftNonCustodial } from './src/core/xrpl.js';
+import { checkAddressRegistration, registerMnemonicNft, generateFaucetWallet, setXrplNetwork, getXrplNetwork, connectWallet, registerMnemonicNftNonCustodial, burnMnemonicNftNonCustodial, burnMnemonicNft, findMosaicNft } from './src/core/xrpl.js';
 import { getAppConfig, isLocalDemoEnabled } from './src/app-config.js';
 import { initOnboarding, onTabChanged, onComparisonResult, showToast, registerWalletApproachHandlers, hasAcceptedTerms } from './src/web/onboarding.js';
 import { initKeychainWizard } from './src/web/keychain-wizard.js';
+import { initCostConfirmModal, confirmMintCosts, confirmBurnCosts } from './src/web/cost-confirm.js';
+import { initFirstUseGuide } from './src/web/first-use-guide.js';
 
 const testSession = new CognitiveTestSession();
 
@@ -55,6 +57,8 @@ function applyDeploymentSettings() {
 document.addEventListener('DOMContentLoaded', () => {
   applyDeploymentSettings();
   initOnboarding();
+  initCostConfirmModal();
+  initFirstUseGuide();
   initKeychainWizard();
   initTabs();
   initGenerator();
@@ -196,6 +200,7 @@ function initComparator() {
   const xrplSecretBadge = document.getElementById('xrpl-secret-badge');
   const xrplSecretOutput = document.getElementById('xrpl-secret-output');
   const xrplRegisterMosaicoBtn = document.getElementById('xrpl-register-mosaico-btn');
+  const xrplUnmintMosaicoBtn = document.getElementById('xrpl-unmint-mosaico-btn');
   const xrplConsoleLog = document.getElementById('xrpl-console-log');
   const xrplBadgeA = document.getElementById('xrpl-badge-a');
   const xrplBadgeB = document.getElementById('xrpl-badge-b');
@@ -224,6 +229,31 @@ function initComparator() {
       xrplConsoleLog.innerText += `\n[${timestamp}] ${finalMsg}`;
       xrplConsoleLog.scrollTop = xrplConsoleLog.scrollHeight;
     };
+
+  const updateRegistryMintBurnButtons = async (address) => {
+    if (!xrplUnmintMosaicoBtn || !xrplRegisterMosaicoBtn) return;
+    if (!address || xrplWalletSelect.value === 'local') {
+      xrplUnmintMosaicoBtn.style.display = 'none';
+      xrplUnmintMosaicoBtn.disabled = true;
+      return;
+    }
+    try {
+      const nft = await findMosaicNft(address, () => {});
+      if (nft) {
+        xrplUnmintMosaicoBtn.style.display = 'block';
+        xrplUnmintMosaicoBtn.disabled = false;
+        xrplRegisterMosaicoBtn.disabled = true;
+      } else {
+        xrplUnmintMosaicoBtn.style.display = 'none';
+        xrplUnmintMosaicoBtn.disabled = true;
+        if (xrplAddressOutput.value.trim()) {
+          xrplRegisterMosaicoBtn.disabled = false;
+        }
+      }
+    } catch {
+      xrplUnmintMosaicoBtn.style.display = 'none';
+    }
+  };
 
   const updateComparison = async (userTriggered = false) => {
     // Stop active audio when inputs change
@@ -517,6 +547,7 @@ function initComparator() {
       xrplRegisterMosaicoBtn.disabled = false;
       
       logToXrplConsole(`[info] ${walletName} wallet connected: ${address}`);
+      updateRegistryMintBurnButtons(address);
     } catch (err) {
       logToXrplConsole(`[error] Wallet connection error: ${err.message}`);
       xrplConnStatus.className = 'disconnected';
@@ -533,7 +564,7 @@ function initComparator() {
     xrplRegisterMosaicoBtn.disabled = true;
     const walletType = xrplWalletSelect.value;
     const netName = getXrplNetwork() === 'mainnet' ? 'Mainnet' : 'Testnet';
-    
+
     try {
       let res;
       if (walletType === 'local') {
@@ -545,17 +576,57 @@ function initComparator() {
         if (!address) {
           throw new Error("No connected wallet address.");
         }
+        const accepted = await confirmMintCosts(address, logToXrplConsole);
+        if (!accepted) {
+          logToXrplConsole('[info] Mint cancelled by user.');
+          return;
+        }
         res = await registerMnemonicNftNonCustodial(address, walletType, logToXrplConsole);
       }
-      
+
       if (res && res.success) {
         logToXrplConsole(`[info] Immutable ${netName} registration verified!`);
         updateComparison(false);
+        updateRegistryMintBurnButtons(xrplAddressOutput.value.trim());
       }
     } catch (err) {
       logToXrplConsole(`[error] Registration error: ${err.message}`);
     } finally {
       xrplRegisterMosaicoBtn.disabled = false;
+      updateRegistryMintBurnButtons(xrplAddressOutput.value.trim());
+    }
+  });
+
+  xrplUnmintMosaicoBtn?.addEventListener('click', async () => {
+    if (!requireTermsAccepted()) return;
+    const walletType = xrplWalletSelect.value;
+    const address = xrplAddressOutput.value.trim();
+    if (!address || walletType === 'local') return;
+
+    const accepted = await confirmBurnCosts(address, logToXrplConsole);
+    if (!accepted) {
+      logToXrplConsole('[info] Burn cancelled by user.');
+      return;
+    }
+
+    xrplUnmintMosaicoBtn.disabled = true;
+    try {
+      let res;
+      if (walletType === 'local') {
+        res = await burnMnemonicNft(generatedSecret, logToXrplConsole);
+      } else {
+        res = await burnMnemonicNftNonCustodial(address, walletType, logToXrplConsole);
+      }
+      if (res?.success) {
+        logToXrplConsole('[info] NFT burned — owner reserve returned to your account.');
+        showToast('Reserve reclaimed. On-chain registration removed.', 'success', 6000);
+        updateComparison(false);
+      }
+    } catch (err) {
+      logToXrplConsole(`[error] Burn error: ${err.message}`);
+      showToast(err.message || 'Burn failed.', 'warn', 6000);
+    } finally {
+      updateRegistryMintBurnButtons(address);
     }
   });
 

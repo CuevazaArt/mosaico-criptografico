@@ -151,6 +151,19 @@ export async function generateFaucetWallet(logger = console.log) {
   };
 }
 
+export async function waitForXamanPayloadSignature(uuid, logger = console.log, timeoutMs = 300000) {
+  return pollXamanPayload(uuid, logger, timeoutMs);
+}
+
+export async function getConnectedXamanAccount() {
+  const xumm = getXummClient();
+  if (!xumm.authorized) {
+    return null;
+  }
+  const account = await xumm.user.account;
+  return account || null;
+}
+
 export async function connectWallet(walletType, logger = console.log) {
   if (walletType === 'gem') {
     if (typeof window.GemWallet === 'undefined') {
@@ -220,7 +233,7 @@ export async function registerMnemonicNft(seed, logger = console.log) {
   throw new Error(`Ledger error: ${response.result.meta.TransactionResult}`);
 }
 
-async function registerWithXamanBackend(txJson, logger) {
+async function signWithXamanBackend(txJson, logger, options = {}) {
   const response = await fetch('/api/xumm/payload', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -234,14 +247,14 @@ async function registerWithXamanBackend(txJson, logger) {
   if (!payload?.next?.always) {
     throw new Error("Xaman payload created but no signing URL was returned.");
   }
+  options.onPayloadCreated?.(payload.uuid);
   logger(`[red] Open Xaman to sign: ${payload.next.always}`);
   window.open(payload.next.always, '_blank', 'noopener,noreferrer');
   const txHash = await pollXamanPayload(payload.uuid, logger);
-  logger(`[red] Mosaic key registered with Xaman! Tx Hash: ${txHash}`);
   return { success: true, hash: txHash };
 }
 
-async function registerWithXamanSdk(txJson, logger) {
+async function signWithXamanSdk(txJson, logger, options = {}) {
   const xumm = getXummClient();
   if (!xumm.authorized) {
     await xumm.authorize();
@@ -250,6 +263,7 @@ async function registerWithXamanSdk(txJson, logger) {
   if (!payload?.next?.always) {
     throw new Error("Xaman payload created but no signing URL was returned.");
   }
+  options.onPayloadCreated?.(payload.uuid);
   logger(`[red] Open Xaman to sign: ${payload.next.always}`);
   window.open(payload.next.always, '_blank', 'noopener,noreferrer');
   const resolved = await payload.resolved();
@@ -257,11 +271,60 @@ async function registerWithXamanSdk(txJson, logger) {
     throw new Error("Transaction cancelled or failed in Xaman.");
   }
   const txHash = resolved.txid || payload.uuid;
-  logger(`[red] Mosaic key registered with Xaman! Tx Hash: ${txHash}`);
   return { success: true, hash: txHash };
 }
 
-export async function registerMnemonicNftNonCustodial(address, walletType, logger = console.log) {
+async function signWithXaman(txJson, logger, options = {}) {
+  const config = getAppConfig();
+  if (config.xummBackendEnabled) {
+    return signWithXamanBackend(txJson, logger, options);
+  }
+  return signWithXamanSdk(txJson, logger, options);
+}
+
+function buildBurnTxJson(address, nftTokenId) {
+  return {
+    TransactionType: "NFTokenBurn",
+    Account: address,
+    NFTokenID: nftTokenId
+  };
+}
+
+export async function findMosaicNft(address, logger = () => {}) {
+  const client = await getXrplClient(logger);
+  const response = await client.request({
+    command: "account_nfts",
+    account: address,
+    ledger_index: "validated"
+  });
+  const nfts = response.result.account_nfts || [];
+  return nfts.find(nft => nft.NFTokenTaxon === NFT_TAXON_MOSAICO && nft.Issuer === address) || null;
+}
+
+export async function getMintCostEstimateForAddress(address, logger = () => {}) {
+  const { getMintCostEstimate } = await import('./xrpl-reserves.js');
+  return getMintCostEstimate(address, buildMintTxJson, logger);
+}
+
+export async function getBurnCostEstimateForAddress(address, logger = () => {}) {
+  const { getBurnRecoveryEstimate } = await import('./xrpl-reserves.js');
+  return getBurnRecoveryEstimate(address, async (addr, client) => {
+    const response = await client.request({
+      command: "account_nfts",
+      account: addr,
+      ledger_index: "validated"
+    });
+    const nft = (response.result.account_nfts || []).find(
+      n => n.NFTokenTaxon === NFT_TAXON_MOSAICO && n.Issuer === addr
+    );
+    if (!nft) {
+      throw new Error("No mosaic keychain NFT found on this account.");
+    }
+    return buildBurnTxJson(addr, nft.NFTokenID);
+  }, logger);
+}
+
+export async function registerMnemonicNftNonCustodial(address, walletType, logger = console.log, options = {}) {
   await getXrplClient(logger);
   const txJson = buildMintTxJson(address);
 
@@ -289,14 +352,75 @@ export async function registerMnemonicNftNonCustodial(address, walletType, logge
 
   if (walletType === 'xaman') {
     logger("[red] Creating signing request in Xaman (Xumm)...");
-    const config = getAppConfig();
-    if (config.xummBackendEnabled) {
-      return registerWithXamanBackend(txJson, logger);
-    }
-    return registerWithXamanSdk(txJson, logger);
+    const result = await signWithXaman(txJson, logger, options);
+    logger(`[red] Mosaic key registered with Xaman! Tx Hash: ${result.hash}`);
+    return result;
   }
 
   throw new Error("Unsupported wallet.");
+}
+
+export async function burnMnemonicNftNonCustodial(address, walletType, logger = console.log, options = {}) {
+  await getXrplClient(logger);
+  const nft = await findMosaicNft(address, logger);
+  if (!nft) {
+    throw new Error("No mosaic keychain NFT found on this account.");
+  }
+
+  const txJson = buildBurnTxJson(address, nft.NFTokenID);
+  logger(`[red] Preparing burn for mosaic NFT on ${address}...`);
+  logger("[red] Sending NFTokenBurn to your wallet to sign...");
+
+  if (walletType === 'gem') {
+    const response = await window.GemWallet.signAndSubmitTransaction({ transaction: txJson });
+    if (response?.result?.hash) {
+      logger(`[red] Mosaic key burned with Gem Wallet! Tx Hash: ${response.result.hash}`);
+      return { success: true, hash: response.result.hash };
+    }
+    throw new Error("Transaction cancelled or failed in Gem Wallet.");
+  }
+
+  if (walletType === 'crossmark') {
+    const response = await window.crossmark.signAndSubmitAndWait(txJson);
+    const hash = response.result?.hash || response.hash;
+    if (hash) {
+      logger(`[red] Mosaic key burned with Crossmark! Tx Hash: ${hash}`);
+      return { success: true, hash: hash };
+    }
+    throw new Error("Transaction cancelled or failed in Crossmark.");
+  }
+
+  if (walletType === 'xaman') {
+    logger("[red] Creating burn signing request in Xaman (Xumm)...");
+    const result = await signWithXaman(txJson, logger, options);
+    logger(`[red] Mosaic key burned with Xaman! Tx Hash: ${result.hash}`);
+    return result;
+  }
+
+  throw new Error("Unsupported wallet.");
+}
+
+export async function burnMnemonicNft(seed, logger = console.log) {
+  if (isProductionDeployment()) {
+    throw new Error("Seed-based signing is disabled in production. Connect Gem Wallet, Crossmark, or Xaman.");
+  }
+
+  const client = await getXrplClient(logger);
+  const wallet = window.xrpl.Wallet.fromSeed(seed);
+  const nft = await findMosaicNft(wallet.address, logger);
+  if (!nft) {
+    throw new Error("No mosaic keychain NFT found on this account.");
+  }
+
+  const txJson = buildBurnTxJson(wallet.address, nft.NFTokenID);
+  logger(`[red] Burning mosaic NFT for: ${wallet.address}`);
+  const response = await client.submitAndWait(txJson, { wallet });
+
+  if (response.result.meta.TransactionResult === "tesSUCCESS") {
+    logger(`[red] Mosaic key burned! Reserve reclaimed. Tx Hash: ${response.result.hash}`);
+    return { success: true, hash: response.result.hash };
+  }
+  throw new Error(`Ledger error: ${response.result.meta.TransactionResult}`);
 }
 
 export async function checkAddressRegistration(address, logger = console.log) {
