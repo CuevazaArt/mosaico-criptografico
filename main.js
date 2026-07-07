@@ -913,7 +913,7 @@ function initTestingSuite() {
     const stats = testSession.getStats();
     const total = stats.totalTrials;
     const streak = stats.currentStreak;
-    const text = `🎯 My success streak in the Cryptographic Mosaic Simulator is ${streak}! I completed ${total} security checks on XRPL addresses without falling for phishing. Test your visual speed! 💠 #XRPL #MakeWaves`;
+    const text = `🎯 My success streak in Keychain comparison training is ${streak}! I completed ${total} security checks on XRPL addresses without falling for phishing. Test your visual speed! 💠 #XRPL #MakeWaves`;
     const shareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`;
     window.open(shareUrl, '_blank');
   });
