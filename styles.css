@@ -136,7 +136,8 @@ body {
 }
 
 .header-help-btn {
-  margin-right: auto;
+  margin-left: auto;
+  flex-shrink: 0;
   font-size: 0.78rem;
   padding: 6px 14px;
   border-radius: 20px;
@@ -150,9 +151,10 @@ body {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   gap: 0.65rem;
   flex: 1;
+  min-width: 0;
 }
 
 .header-link-btn {
@@ -172,7 +174,7 @@ body {
   }
 
   .header-help-btn {
-    margin-right: 0;
+    margin-left: 0;
     justify-content: center;
   }
 
