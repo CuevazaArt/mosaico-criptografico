@@ -396,7 +396,7 @@ function initComparator() {
         xrplAddressOutput.placeholder = "Waiting for generation...";
 
         xrplSecretBadge.style.color = "#fbbf24";
-        xrplSecretBadge.textContent = "⚠️ Local Demo";
+        xrplSecretBadge.textContent = "⚠️ Testnet only";
         xrplSecretOutput.value = "";
         xrplSecretOutput.placeholder = "Waiting for generation...";
         xrplSecretOutput.readOnly = true;

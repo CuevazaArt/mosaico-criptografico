@@ -65,7 +65,7 @@ const ELEMENT_TIPS = {
   'play-audio-btn': 'Plays 4 unique notes derived from your address hash.',
   'compare-a-input': 'Trusted address — one you saved or know in advance.',
   'compare-b-input': 'Address to verify — the one you will use in the real transaction.',
-  'simulate-phishing-btn': 'Demo: alters one character to show how the mosaic changes.',
+  'simulate-phishing-btn': 'Simulates one altered character to show how the mosaic changes.',
   'force-match-btn': 'Copies Address A into B to show the green perfect-match badge.',
   'xrpl-register-mosaico-btn': 'Mint a Soulbound NFT on XRPL (~2 XRP recoverable reserve on Mainnet).',
   'xaman-connect-btn': 'Open Xaman on your phone, authorize, and sign the NFT via QR.',
@@ -312,7 +312,7 @@ function showHostNotice() {
     notice.innerHTML = `
       <span>📄</span>
       <span>You are on <strong>GitHub Pages</strong> (visual mode). For Mainnet NFT minting use the
-      <a href="https://mosaico-criptografico.vercel.app" target="_blank" rel="noopener">full demo on Vercel</a>.</span>
+      <a href="https://mosaico-criptografico.vercel.app" target="_blank" rel="noopener">full Mainnet app on Vercel</a>.</span>
     `;
   } else if (platform === 'vercel') {
     notice.style.display = 'flex';
