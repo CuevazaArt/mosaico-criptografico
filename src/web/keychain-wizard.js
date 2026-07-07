@@ -8,15 +8,17 @@ import { playMnemonicAudio, playRegistrationSuccessFanfare } from '../core/audio
 import {
   connectWallet,
   registerMnemonicNftNonCustodial,
-  burnMnemonicNftNonCustodial,
   setXrplNetwork,
   getXrplNetwork,
   getConnectedXamanAccount,
   waitForXamanPayloadSignature
 } from '../core/xrpl.js';
+import { burnKeychainWithSelection } from './burn-flow.js';
+import { buildNftPackageSummary } from '../core/nft-package.js';
+import { getAppConfig } from '../app-config.js';
 import { hasAcceptedTerms, showToast, openRegisterTab } from './onboarding.js';
 import { confirmMintCosts, confirmBurnCosts } from './cost-confirm.js';
-import { openFirstUseGuide, hasCompletedFirstUseGuide } from './first-use-guide.js';
+import { openFirstUseGuide, hasCompletedFirstUseGuide, authorizeMintTour, scheduleFirstUseTour } from './first-use-guide.js';
 
 const XRPL_ADDRESS_RE = /^r[1-9A-HJ-NP-Za-km-z]{24,34}$/;
 const TOTAL_STEPS = 5;
@@ -121,6 +123,9 @@ function setStep(step, { persist = true } = {}) {
   if (nextBtn) {
     const labels = { 1: 'Next →', 2: 'Next →', 3: 'Connect Xaman →', 4: 'Mint NFT →' };
     nextBtn.textContent = labels[currentStep] || 'Next →';
+    nextBtn.classList.toggle('btn-register', currentStep === 4);
+    nextBtn.classList.toggle('btn-primary', currentStep !== 4);
+    nextBtn.classList.toggle('wizard-mint-cta', currentStep === 4);
   }
 
   if (persist) {
@@ -213,7 +218,7 @@ function startMintBroadcastListener(payloadUuid) {
     }
 
     if (data.type === 'mint-complete' && data.hash) {
-      completeWizardSuccess(data, { broadcast: false });
+      completeWizardSuccess(data, { broadcast: false, showTour: false });
     }
   };
 
@@ -245,7 +250,7 @@ function launchCelebration() {
   playRegistrationSuccessFanfare();
 }
 
-function completeWizardSuccess({ hash, address }, { broadcast = true } = {}) {
+function completeWizardSuccess({ hash, address }, { broadcast = true, showTour = false } = {}) {
   const resolvedAddress = address || connectedAddress || wizardAddress;
   if ($('wizard-tx-hash')) $('wizard-tx-hash').textContent = hash || 'Confirmed on ledger';
   if ($('wizard-success-address')) $('wizard-success-address').textContent = resolvedAddress;
@@ -260,11 +265,9 @@ function completeWizardSuccess({ hash, address }, { broadcast = true } = {}) {
   if (broadcast) {
     postMintComplete({ hash, address: resolvedAddress });
   }
-  setTimeout(() => {
-    if (!hasCompletedFirstUseGuide()) {
-      openFirstUseGuide(resolvedAddress);
-    }
-  }, 4200);
+  if (showTour && resolvedAddress && !hasCompletedFirstUseGuide()) {
+    scheduleFirstUseTour(resolvedAddress);
+  }
 }
 
 async function resumeMintPolling(session) {
@@ -302,7 +305,7 @@ async function resumeMintPolling(session) {
 
   try {
     const txHash = await waitForXamanPayloadSignature(uuid, wizardLog);
-    completeWizardSuccess({ hash: txHash, address });
+    completeWizardSuccess({ hash: txHash, address }, { broadcast: true, showTour: false });
   } catch (err) {
     wizardLog(`Error: ${err.message}`);
     showToast(err.message || 'Mint confirmation failed.', 'warn', 6000);
@@ -428,13 +431,20 @@ async function handleMint() {
     return;
   }
 
+  setXrplNetwork('mainnet');
+  const netSelect = $('xrpl-network-select');
+  if (netSelect) netSelect.value = 'mainnet';
+
   const accepted = await confirmMintCosts(address, wizardLog);
   if (!accepted) {
     wizardLog('Mint cancelled — you did not accept the ledger costs.');
     return;
   }
 
-  const btn = $('wizard-mint-btn');
+  const pkg = buildNftPackageSummary(address, getAppConfig().appUrl);
+  wizardLog(`Minting keychain package: mosaic + acoustic WAV via ${pkg.mintUri}`);
+
+  const btn = $('wizard-next-btn');
   if (btn) btn.disabled = true;
 
   saveWizardSession({
@@ -459,7 +469,8 @@ async function handleMint() {
     });
 
     if (res?.success) {
-      completeWizardSuccess({ hash: res.hash, address });
+      authorizeMintTour();
+      completeWizardSuccess({ hash: res.hash, address }, { broadcast: true, showTour: true });
     }
   } catch (err) {
     wizardLog(`Error: ${err.message}`);
@@ -480,22 +491,19 @@ async function handleUnmint() {
     return;
   }
 
-  const accepted = await confirmBurnCosts(address, wizardLog);
-  if (!accepted) {
-    wizardLog('Burn cancelled — you did not accept the ledger costs.');
-    return;
-  }
-
   const btn = $('wizard-unmint-btn');
   if (btn) btn.disabled = true;
-  wizardLog('Burning mosaic NFT to reclaim owner reserve…');
 
   try {
-    const res = await burnMnemonicNftNonCustodial(address, 'xaman', wizardLog);
-    if (res?.success) {
-      wizardLog(`Burn confirmed. Tx: ${res.hash}`);
+    const result = await burnKeychainWithSelection(address, 'xaman', wizardLog);
+    if (result.cancelled) {
+      wizardLog('Burn cancelled.');
+      return;
+    }
+    if (result?.success) {
+      wizardLog(`Burn confirmed. Tx: ${result.hash}`);
       showToast('Keychain burned — XRP reserve reclaimed to your account.', 'success', 7000);
-      $('wizard-unmint-btn')?.classList.add('hidden');
+      btn?.classList.add('hidden');
     }
   } catch (err) {
     wizardLog(`Error: ${err.message}`);
@@ -541,11 +549,20 @@ function goBack() {
 }
 
 export async function initKeychainWizard() {
-  $('wizard-next-btn')?.addEventListener('click', goNext);
+  $('wizard-next-btn')?.addEventListener('click', (event) => {
+    if (currentStep === 4) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+    goNext();
+  });
   $('wizard-back-btn')?.addEventListener('click', goBack);
   $('wizard-connect-btn')?.addEventListener('click', handleConnect);
-  $('wizard-mint-btn')?.addEventListener('click', handleMint);
-  $('wizard-unmint-btn')?.addEventListener('click', handleUnmint);
+  $('wizard-unmint-btn')?.addEventListener('click', (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    void handleUnmint();
+  });
 
   $('wizard-audio-btn')?.addEventListener('click', async () => {
     if (!wizardHash) await renderWizardMosaic();
@@ -554,7 +571,7 @@ export async function initKeychainWizard() {
 
   $('wizard-finish-btn')?.addEventListener('click', () => {
     const addr = connectedAddress || wizardAddress;
-    openFirstUseGuide(addr);
+    openFirstUseGuide(addr, { manual: true });
   });
 
   $('wizard-address-input')?.addEventListener('keydown', (e) => {

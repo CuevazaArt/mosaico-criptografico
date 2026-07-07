@@ -9,6 +9,8 @@ import { initKeychainWizard } from './src/web/keychain-wizard.js';
 import { initCostConfirmModal, confirmMintCosts, confirmBurnCosts } from './src/web/cost-confirm.js';
 import { initFirstUseGuide } from './src/web/first-use-guide.js';
 import { initHeaderActions } from './src/web/header-actions.js';
+import { initNftPickerModal } from './src/web/nft-picker.js';
+import { burnKeychainWithSelection } from './src/web/burn-flow.js';
 
 const testSession = new CognitiveTestSession();
 
@@ -46,6 +48,7 @@ function applyDeploymentSettings() {
   const prodBanner = document.getElementById('production-mode-banner');
   if (prodBanner && config.deploymentMode === 'production') {
     prodBanner.style.display = 'flex';
+    document.body.classList.add('has-production-banner');
   }
 
   const xrplConsole = document.getElementById('xrpl-console-log');
@@ -58,8 +61,9 @@ function applyDeploymentSettings() {
 document.addEventListener('DOMContentLoaded', () => {
   applyDeploymentSettings();
   initOnboarding();
-  initCostConfirmModal();
   initFirstUseGuide();
+  initCostConfirmModal();
+  initNftPickerModal();
   initHeaderActions();
   initKeychainWizard();
   initTabs();
@@ -187,7 +191,18 @@ function initComparator() {
   const previewB = document.getElementById('compare-b-preview');
   const statusBadge = document.getElementById('comparison-badge');
   const statusMsg = document.getElementById('comparison-msg');
+  const compareVerdict = document.getElementById('compare-verdict');
   const comparisonGrid = document.querySelector('.comparison-grid');
+
+  const setCompareVerdict = (state, badgeText, message) => {
+    statusBadge.textContent = badgeText;
+    statusMsg.textContent = message;
+    if (compareVerdict) {
+      compareVerdict.className = `compare-verdict compare-verdict--${state}`;
+    }
+    statusBadge.className = `comparison-badge comparison-badge--${state}`;
+    statusMsg.className = `comparison-msg comparison-msg--${state}`;
+  };
 
   // XRPL UI elements
   const xrplNetworkSelect = document.getElementById('xrpl-network-select');
@@ -329,24 +344,20 @@ function initComparator() {
       if (valA && valB) {
         if (valA === valB) {
           playMatchSequence();
-          statusBadge.className = 'status-badge match';
-          statusBadge.innerText = '✓ MATCH';
-          statusMsg.innerText = 'Visual and acoustic signatures are identical. You may proceed with caution.';
+          setCompareVerdict('match', '✓', 'Visual and acoustic signatures match. You may proceed with caution.');
           comparisonGrid.classList.remove('mismatch-detected');
+          comparisonGrid.classList.add('match-detected');
           onComparisonResult(true);
         } else {
           playMismatchSequence();
-          statusBadge.className = 'status-badge mismatch';
-          statusBadge.innerText = '⚠️ MISMATCH';
-          statusMsg.innerText = 'Alert! Mosaics differ. Possible phishing or corrupted address — do not sign.';
+          setCompareVerdict('mismatch', '⚠', 'Mosaics differ — possible phishing or corrupted address. Do not sign.');
           comparisonGrid.classList.add('mismatch-detected');
+          comparisonGrid.classList.remove('match-detected');
           onComparisonResult(false);
         }
       } else {
-        statusBadge.className = 'status-badge neutral';
-        statusBadge.innerText = 'AWAITING INPUT';
-        statusMsg.innerText = 'Paste two addresses to compare their sensory signatures instantly.';
-        comparisonGrid.classList.remove('mismatch-detected');
+        setCompareVerdict('neutral', '⏳', 'Paste two addresses to compare their visual and acoustic signatures.');
+        comparisonGrid.classList.remove('mismatch-detected', 'match-detected');
       }
     }
 
@@ -359,7 +370,7 @@ function initComparator() {
     if (!seed) {
       xrplAddressOutput.value = "";
       xrplRegisterMosaicoBtn.disabled = true;
-      xrplConnStatus.className = 'disconnected';
+      xrplConnStatus.className = 'xrpl-connection-pill disconnected';
       xrplConnStatus.textContent = '🔴 XRPL Disconnected';
       return;
     }
@@ -373,7 +384,7 @@ function initComparator() {
       xrplAddressOutput.value = wallet.address;
       generatedSecret = seed;
       
-      xrplConnStatus.className = 'connected';
+      xrplConnStatus.className = 'xrpl-connection-pill connected';
       xrplConnStatus.textContent = '🟢 XRPL Connected';
       xrplRegisterMosaicoBtn.disabled = false;
       
@@ -382,7 +393,7 @@ function initComparator() {
       xrplAddressOutput.value = "";
       generatedSecret = null;
       xrplRegisterMosaicoBtn.disabled = true;
-      xrplConnStatus.className = 'disconnected';
+      xrplConnStatus.className = 'xrpl-connection-pill disconnected';
       xrplConnStatus.textContent = '🔴 Invalid Secret Key';
     }
   };
@@ -393,7 +404,7 @@ function initComparator() {
     const selectedWallet = xrplWalletSelect.value;
 
     // Reset state when options change
-    xrplConnStatus.className = 'disconnected';
+    xrplConnStatus.className = 'xrpl-connection-pill disconnected';
     xrplConnStatus.textContent = '🔴 XRPL Disconnected';
     xrplRegisterMosaicoBtn.disabled = true;
     generatedSecret = null;
@@ -509,7 +520,7 @@ function initComparator() {
   // XRPL panel event listeners
   xrplGenWalletBtn.addEventListener('click', async () => {
     xrplGenWalletBtn.disabled = true;
-    xrplConnStatus.className = 'connecting';
+    xrplConnStatus.className = 'xrpl-connection-pill connecting';
     xrplConnStatus.textContent = '🟡 Connecting...';
     
     try {
@@ -519,12 +530,12 @@ function initComparator() {
       xrplSecretOutput.value = walletData.seed;
       generatedSecret = walletData.seed;
       
-      xrplConnStatus.className = 'connected';
+      xrplConnStatus.className = 'xrpl-connection-pill connected';
       xrplConnStatus.textContent = '🟢 XRPL Connected';
       xrplRegisterMosaicoBtn.disabled = false;
     } catch (err) {
       logToXrplConsole(`[error] Connection or faucet failure: ${err.message}`);
-      xrplConnStatus.className = 'disconnected';
+      xrplConnStatus.className = 'xrpl-connection-pill disconnected';
       xrplConnStatus.textContent = '🔴 Connection Failed';
     } finally {
       xrplGenWalletBtn.disabled = false;
@@ -534,7 +545,7 @@ function initComparator() {
   xrplConnectWalletBtn.addEventListener('click', async () => {
     if (!requireTermsAccepted()) return;
     xrplConnectWalletBtn.disabled = true;
-    xrplConnStatus.className = 'connecting';
+    xrplConnStatus.className = 'xrpl-connection-pill connecting';
     xrplConnStatus.textContent = '🟡 Connecting...';
     
     const walletType = xrplWalletSelect.value;
@@ -544,7 +555,7 @@ function initComparator() {
       const address = await connectWallet(walletType, logToXrplConsole);
       
       xrplAddressOutput.value = address;
-      xrplConnStatus.className = 'connected';
+      xrplConnStatus.className = 'xrpl-connection-pill connected';
       xrplConnStatus.textContent = '🟢 XRPL Connected';
       xrplRegisterMosaicoBtn.disabled = false;
       
@@ -552,7 +563,7 @@ function initComparator() {
       updateRegistryMintBurnButtons(address);
     } catch (err) {
       logToXrplConsole(`[error] Wallet connection error: ${err.message}`);
-      xrplConnStatus.className = 'disconnected';
+      xrplConnStatus.className = 'xrpl-connection-pill disconnected';
       xrplConnStatus.textContent = '🔴 Connection Failed';
       xrplAddressOutput.value = "";
       xrplRegisterMosaicoBtn.disabled = true;
@@ -605,19 +616,18 @@ function initComparator() {
     const address = xrplAddressOutput.value.trim();
     if (!address || walletType === 'local') return;
 
-    const accepted = await confirmBurnCosts(address, logToXrplConsole);
-    if (!accepted) {
-      logToXrplConsole('[info] Burn cancelled by user.');
-      return;
-    }
-
     xrplUnmintMosaicoBtn.disabled = true;
     try {
       let res;
       if (walletType === 'local') {
         res = await burnMnemonicNft(generatedSecret, logToXrplConsole);
       } else {
-        res = await burnMnemonicNftNonCustodial(address, walletType, logToXrplConsole);
+        const result = await burnKeychainWithSelection(address, walletType, logToXrplConsole);
+        if (result.cancelled) {
+          logToXrplConsole('[info] Burn cancelled by user.');
+          return;
+        }
+        res = result;
       }
       if (res?.success) {
         logToXrplConsole('[info] NFT burned — owner reserve returned to your account.');
@@ -668,6 +678,7 @@ function initComparator() {
 
   // Initial wallet UI setup
   updateWalletUILayout();
+  updateComparison(true);
 }
 
 /* ----------------------------------------------------

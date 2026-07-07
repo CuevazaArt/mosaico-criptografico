@@ -30,7 +30,7 @@ export function stopMnemonicAudio() {
  * @returns {number} The ending time in seconds when the arpeggio finishes.
  */
 export function scheduleMnemonicAudio(hash, options = {}, startTime) {
-  if (!audioCtx) return startTime;
+  if (!audioCtx || !hash || hash.length < 32) return startTime;
 
   const gridSize = parseInt(options.gridSize) || 3;
   const numCells = gridSize * gridSize;

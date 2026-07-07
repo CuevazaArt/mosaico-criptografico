@@ -5,6 +5,7 @@
  */
 
 import { getAppConfig, isProductionDeployment } from '../app-config.js';
+import { buildNftMintUri } from './nft-package.js';
 
 const NETWORKS = {
   testnet: [
@@ -21,6 +22,18 @@ const NETWORKS = {
 };
 
 const NFT_TAXON_MOSAICO = 1001;
+
+export function isValidXrplAddress(address) {
+  if (!address || typeof address !== 'string') return false;
+  const trimmed = address.trim();
+  if (typeof window.xrpl?.isValidClassicAddress === 'function') {
+    return window.xrpl.isValidClassicAddress(trimmed);
+  }
+  if (typeof window.xrpl?.isValidAddress === 'function') {
+    return window.xrpl.isValidAddress(trimmed);
+  }
+  return /^r[1-9A-HJ-NP-Za-km-z]{24,34}$/.test(trimmed);
+}
 
 let clientInstance = null;
 let currentNetwork = 'testnet';
@@ -40,7 +53,12 @@ function getXummClient() {
 }
 
 function buildMintTxJson(address) {
-  const uriHex = window.xrpl.convertStringToHex(`mosaico://identity/${address}`);
+  if (typeof window.xrpl?.convertStringToHex !== 'function') {
+    throw new Error('XRPL SDK is not ready. Reload the page and try again.');
+  }
+  const config = getAppConfig();
+  const mintUri = buildNftMintUri(address, config.appUrl);
+  const uriHex = window.xrpl.convertStringToHex(mintUri);
   return {
     TransactionType: "NFTokenMint",
     Account: address,
@@ -48,6 +66,11 @@ function buildMintTxJson(address) {
     Flags: 0,
     URI: uriHex
   };
+}
+
+export function getNftMintPackageUri(address) {
+  const config = getAppConfig();
+  return buildNftMintUri(address, config.appUrl);
 }
 
 async function pollXamanPayload(uuid, logger, timeoutMs = 300000) {
@@ -290,7 +313,10 @@ function buildBurnTxJson(address, nftTokenId) {
   };
 }
 
-export async function findMosaicNft(address, logger = () => {}) {
+export async function findAllMosaicNfts(address, logger = () => {}) {
+  if (!isValidXrplAddress(address)) {
+    throw new Error('Invalid XRPL address.');
+  }
   const client = await getXrplClient(logger);
   const response = await client.request({
     command: "account_nfts",
@@ -298,7 +324,21 @@ export async function findMosaicNft(address, logger = () => {}) {
     ledger_index: "validated"
   });
   const nfts = response.result.account_nfts || [];
-  return nfts.find(nft => nft.NFTokenTaxon === NFT_TAXON_MOSAICO && nft.Issuer === address) || null;
+  return nfts.filter(nft => nft.NFTokenTaxon === NFT_TAXON_MOSAICO && nft.Issuer === address);
+}
+
+export async function findMosaicNft(address, logger = () => {}) {
+  const nfts = await findAllMosaicNfts(address, logger);
+  return nfts[0] || null;
+}
+
+async function resolveMosaicNftForBurn(address, logger, nftTokenId) {
+  const nfts = await findAllMosaicNfts(address, logger);
+  if (!nfts.length) return null;
+  if (nftTokenId) {
+    return nfts.find(nft => nft.NFTokenID === nftTokenId) || null;
+  }
+  return nfts[0];
 }
 
 export async function getMintCostEstimateForAddress(address, logger = () => {}) {
@@ -306,17 +346,10 @@ export async function getMintCostEstimateForAddress(address, logger = () => {}) 
   return getMintCostEstimate(address, buildMintTxJson, logger);
 }
 
-export async function getBurnCostEstimateForAddress(address, logger = () => {}) {
+export async function getBurnCostEstimateForAddress(address, logger = () => {}, nftTokenId = null) {
   const { getBurnRecoveryEstimate } = await import('./xrpl-reserves.js');
   return getBurnRecoveryEstimate(address, async (addr, client) => {
-    const response = await client.request({
-      command: "account_nfts",
-      account: addr,
-      ledger_index: "validated"
-    });
-    const nft = (response.result.account_nfts || []).find(
-      n => n.NFTokenTaxon === NFT_TAXON_MOSAICO && n.Issuer === addr
-    );
+    const nft = await resolveMosaicNftForBurn(addr, logger, nftTokenId);
     if (!nft) {
       throw new Error("No mosaic keychain NFT found on this account.");
     }
@@ -362,7 +395,7 @@ export async function registerMnemonicNftNonCustodial(address, walletType, logge
 
 export async function burnMnemonicNftNonCustodial(address, walletType, logger = console.log, options = {}) {
   await getXrplClient(logger);
-  const nft = await findMosaicNft(address, logger);
+  const nft = await resolveMosaicNftForBurn(address, logger, options.nftTokenId || null);
   if (!nft) {
     throw new Error("No mosaic keychain NFT found on this account.");
   }

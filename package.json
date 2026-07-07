@@ -32,7 +32,8 @@
     "vault:sync": "node scripts/sync-vault.mjs",
     "predeploy": "npm run audit && npm run build",
     "build": "npm run config && npm run icons",
-    "test": "node --test tests/app-config.test.js tests/mosaico.test.js",
+    "test": "node --test tests/app-config.test.js tests/mosaico.test.js tests/nft-package.test.js tests/first-use-guide.test.js",
+    "test:ui": "node scripts/ui-audit.mjs",
     "dev": "npm run config && npx -y serve .",
     "dev:mainnet": "npm run config && npx vercel dev --listen 3000 --yes",
     "deploy": "npm run predeploy && npx vercel --prod --yes"
@@ -47,6 +48,7 @@
   "author": "CuevazaArt (https://github.com/CuevazaArt)",
   "license": "MIT",
   "devDependencies": {
+    "playwright": "^1.58.2",
     "sharp": "^0.35.3"
   }
 }

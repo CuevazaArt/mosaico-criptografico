@@ -18,7 +18,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="styles.css?v=3.7.1">
   <!-- Fallback config if config.runtime.js is missing (run: npm run config) -->
   <script>
     window.__APP_CONFIG__ = window.__APP_CONFIG__ || {
@@ -54,14 +54,33 @@
       } catch (e) { /* ignore */ }
     })();
   </script>
+  <script>
+    window.__dismissFirstUseTour = function (markDone) {
+      if (markDone === undefined) markDone = true;
+      var overlay = document.getElementById('first-use-modal');
+      if (overlay) {
+        overlay.classList.remove('is-open');
+        overlay.setAttribute('aria-hidden', 'true');
+      }
+      document.body.classList.remove('first-use-open');
+      if (!markDone) return;
+      try {
+        localStorage.setItem('mosaico_first_use_done', '1');
+        sessionStorage.setItem('mosaico_first_use_done', '1');
+      } catch (e) { /* ignore */ }
+    };
+    document.addEventListener('DOMContentLoaded', function () {
+      window.__dismissFirstUseTour(false);
+    });
+  </script>
   <!-- Official XRP Ledger JavaScript SDK for on-chain transactions -->
-  <script src="https://unpkg.com/xrpl"></script>
+  <script src="https://unpkg.com/xrpl@4.4.3/build/xrpl-latest-min.js"></script>
   <!-- Xaman (Xumm) browser SDK — API key injected via config.runtime.js -->
   <script src="https://xumm.app/assets/cdn/xumm.min.js"></script>
 </head>
 <body class="terms-locked">
   <!-- Production deployment indicator (shown when DEPLOYMENT_MODE=production) -->
-  <div id="production-mode-banner" style="display: none; position: fixed; top: 0; left: 0; right: 0; z-index: 9999; background: linear-gradient(90deg, #1e3a5f, #312e81); color: #e0f2fe; font-size: 0.78rem; padding: 6px 16px; text-align: center; font-weight: 600; letter-spacing: 0.3px; border-bottom: 1px solid rgba(56, 189, 248, 0.3);">
+  <div id="production-mode-banner" class="production-mode-banner" role="status" aria-live="polite">
     🌊 Production · XRPL Mainnet · Non-custodial wallet signing only
   </div>
   <!-- Ambient light gradients background -->
@@ -69,66 +88,78 @@
   <div class="bg-glow bg-glow-2"></div>
 
   <div class="app-container">
-    <header class="app-header">
-      <div class="header-logo">
-        <img src="assets/logo.png" alt="" class="logo-img" width="48" height="48" decoding="async">
-        <h1>Cryptographic Mosaic</h1>
-      </div>
-      <p class="header-subtitle">
-        Turn every XRPL address into a unique <strong>visual and acoustic keychain</strong>. Detect phishing and clipboard hijacking before signing — without reading 34 characters one by one.
-      </p>
-      <div class="header-action-bar" role="toolbar" aria-label="Main actions">
-        <button type="button" id="header-register-btn" class="header-chip header-chip--primary">
-          <span class="header-chip-icon" aria-hidden="true">🔑</span>
-          <span class="header-chip-label">Register My Keychain</span>
-        </button>
-
-        <div class="header-chip-group" aria-label="Quick links">
-          <a href="https://github.com/CuevazaArt/mosaico-criptografico/issues/new" id="report-bug-header-link" target="_blank" rel="noopener" class="header-chip">
-            <span class="header-chip-icon" aria-hidden="true">🐛</span>
-            <span class="header-chip-label">Report a bug</span>
-          </a>
-          <a href="https://github.com/CuevazaArt/mosaico-criptografico/blob/main/USER_GUIDE.md" target="_blank" rel="noopener" class="header-chip">
-            <span class="header-chip-icon" aria-hidden="true">📘</span>
-            <span class="header-chip-label">Step-by-step guide</span>
-          </a>
-          <button type="button" id="header-burn-btn" class="header-chip header-chip--warn" title="Burn your Soulbound NFT and reclaim the XRP owner reserve">
-            <span class="header-chip-icon" aria-hidden="true">🔥</span>
-            <span class="header-chip-label">Burn &amp; reclaim XRP</span>
-          </button>
-          <span class="header-chip-sep" aria-hidden="true"></span>
-          <a href="https://github.com/CuevazaArt/mosaico-criptografico" target="_blank" rel="noopener" class="header-chip">
-            <span class="header-chip-icon" aria-hidden="true">💻</span>
-            <span class="header-chip-label">GitHub</span>
-          </a>
-          <a href="https://www.npmjs.com/package/cryptographic_mosaic_keychain" target="_blank" rel="noopener" class="header-chip">
-            <span class="header-chip-icon" aria-hidden="true">📦</span>
-            <span class="header-chip-label">NPM</span>
-          </a>
+    <div class="app-shell">
+      <aside class="app-sidebar" aria-label="Navigation and actions">
+        <div class="sidebar-brand">
+          <img src="assets/logo.png" alt="" class="logo-img" width="44" height="44" decoding="async">
+          <div class="sidebar-brand-text">
+            <h1>Cryptographic Mosaic</h1>
+            <p class="sidebar-tagline">Visual &amp; acoustic XRPL keychains</p>
+          </div>
         </div>
 
-        <button type="button" id="help-open-btn" class="header-chip">
-          <span class="header-chip-icon" aria-hidden="true">❓</span>
-          <span class="header-chip-label">Help / Tool map</span>
-        </button>
-      </div>
-      
-      <!-- Tab Navigation -->
-      <nav class="tab-navigation" aria-label="Main sections">
-        <button class="nav-btn active" data-tab="register-tab" aria-controls="register-tab" title="Guided setup: register your keychain NFT on XRPL">
-          <span class="btn-icon">🔑</span> Register
-        </button>
-        <button class="nav-btn" data-tab="generator-tab" aria-controls="generator-tab" title="Generate and memorize an address mosaic">
-          <span class="btn-icon">⚡</span> Generator
-        </button>
-        <button class="nav-btn" data-tab="comparator-tab" aria-controls="comparator-tab" title="Compare two addresses before sending XRP">
-          <span class="btn-icon">⚖️</span> Comparator
-        </button>
-        <button class="nav-btn" data-tab="testing-tab" aria-controls="testing-tab" title="Practice comparing keychains to detect phishing">
-          <span class="btn-icon">🎯</span> Keychain comparison training
-        </button>
-      </nav>
-    </header>
+        <nav class="sidebar-nav" aria-label="Navigation and actions">
+          <div class="sidebar-group sidebar-group--primary">
+            <button type="button" id="header-register-btn" class="sidebar-btn sidebar-btn--primary">
+              <span class="sidebar-btn-icon" aria-hidden="true">🔑</span>
+              <span class="sidebar-btn-label">Register My Keychain</span>
+            </button>
+            <button type="button" id="header-burn-btn" class="sidebar-btn sidebar-btn--warn" title="Burn your Soulbound NFT and reclaim the XRP owner reserve">
+              <span class="sidebar-btn-icon" aria-hidden="true">🔥</span>
+              <span class="sidebar-btn-label">Burn &amp; reclaim XRP</span>
+            </button>
+          </div>
+
+          <div class="sidebar-group sidebar-group--tools">
+            <p class="sidebar-group-label">Tools</p>
+            <button class="nav-btn sidebar-tab-btn" data-tab="generator-tab" aria-controls="generator-tab" title="Generate and memorize an address mosaic">
+              <span class="btn-icon">⚡</span> Generator
+            </button>
+            <button class="nav-btn sidebar-tab-btn" data-tab="comparator-tab" aria-controls="comparator-tab" title="Compare two addresses before sending XRP">
+              <span class="btn-icon">⚖️</span> Comparator
+            </button>
+          </div>
+
+          <div class="sidebar-group">
+            <button class="nav-btn sidebar-tab-btn" data-tab="testing-tab" aria-controls="testing-tab" title="Practice comparing keychains to detect phishing">
+              <span class="btn-icon">🎯</span> Keychain comparison training
+            </button>
+            <a href="https://github.com/CuevazaArt/mosaico-criptografico/blob/main/USER_GUIDE.md" target="_blank" rel="noopener" class="sidebar-btn">
+              <span class="sidebar-btn-icon" aria-hidden="true">📘</span>
+              <span class="sidebar-btn-label">Step-by-step guide</span>
+            </a>
+          </div>
+
+          <div class="sidebar-spacer" aria-hidden="true"></div>
+
+          <div class="sidebar-group sidebar-group--service">
+            <p class="sidebar-group-label">Support &amp; resources</p>
+            <a href="https://github.com/CuevazaArt/mosaico-criptografico/issues/new" id="report-bug-header-link" target="_blank" rel="noopener" class="sidebar-btn sidebar-btn--muted">
+              <span class="sidebar-btn-icon" aria-hidden="true">🐛</span>
+              <span class="sidebar-btn-label">Report a bug</span>
+            </a>
+            <a href="https://www.npmjs.com/package/cryptographic_mosaic_keychain" target="_blank" rel="noopener" class="sidebar-btn sidebar-btn--muted">
+              <span class="sidebar-btn-icon" aria-hidden="true">📦</span>
+              <span class="sidebar-btn-label">NPM package</span>
+            </a>
+            <button type="button" id="help-open-btn" class="sidebar-btn sidebar-btn--muted">
+              <span class="sidebar-btn-icon" aria-hidden="true">❓</span>
+              <span class="sidebar-btn-label">Help / Tool map</span>
+            </button>
+            <a href="https://github.com/CuevazaArt/mosaico-criptografico" target="_blank" rel="noopener" class="sidebar-btn sidebar-btn--muted">
+              <span class="sidebar-btn-icon" aria-hidden="true">💻</span>
+              <span class="sidebar-btn-label">GitHub</span>
+            </a>
+          </div>
+        </nav>
+      </aside>
+
+      <div class="app-main">
+        <header class="app-hero">
+          <p class="header-subtitle">
+            Turn every XRPL address into a unique <strong>visual and acoustic keychain</strong>. Detect phishing and clipboard hijacking before signing — without reading 34 characters one by one.
+          </p>
+        </header>
 
     <!-- Welcome banner (first visit) -->
     <aside id="welcome-banner" class="welcome-banner hidden" role="region" aria-label="Welcome">
@@ -158,7 +189,7 @@
         <div class="keychain-wizard card glass-panel">
           <header class="wizard-header">
             <h2 id="register-heading">Register your XRPL keychain</h2>
-            <p class="wizard-intro">Follow each step — paste your address, preview your mosaic, connect Xaman, and mint your Soulbound NFT. Costs are fetched live from the ledger before you confirm.</p>
+            <p class="wizard-intro">Paste address → preview mosaic → connect Xaman → mint Soulbound NFT.</p>
           </header>
 
           <ol class="wizard-progress" aria-label="Registration progress">
@@ -195,8 +226,7 @@
 
           <div class="wizard-step" data-step="4">
             <h3>Step 4 — Mint your Soulbound NFT</h3>
-            <p>Sign the transaction in Xaman. This anchors your mosaic identity on the XRP Ledger (taxon 1001, non-transferable).</p>
-            <button type="button" id="wizard-mint-btn" class="btn-register">🛡️ Mint Mosaic Key (Soulbound NFT)</button>
+            <p>Your NFT URI anchors a <strong>keychain package</strong>: visual mosaic (SVG) + acoustic signature (WAV) + metadata manifest. Sign in Xaman when prompted.</p>
             <pre id="wizard-console" class="wizard-console" aria-live="polite"></pre>
           </div>
 
@@ -338,83 +368,95 @@
 
       <!-- ================= TAB: COMPARATOR ================= -->
       <section id="comparator-tab" class="tab-panel" aria-labelledby="comparator-heading">
-        <div class="card glass-panel">
-          <h2 id="comparator-heading" class="card-title text-center">Address comparator</h2>
-          <p class="card-desc text-center">Paste the <strong>expected</strong> address (A) and the <strong>copied</strong> address (B). If the mosaics don't match, <strong>do not sign the transaction</strong>.</p>
-
-          <div style="display: flex; justify-content: center; margin-bottom: 1.5rem;">
-            <div class="form-group" style="max-width: 250px; margin-bottom: 0; text-align: center;">
-              <label for="compare-grid-size-select" style="margin-bottom: 0.25rem;">Grid Size for Comparison</label>
-              <select id="compare-grid-size-select" class="form-select">
-                <option value="3" selected>3 x 3</option>
-                <option value="4">4 x 4</option>
-                <option value="5">5 x 5</option>
-              </select>
-            </div>
-          </div>
-
-          <div class="match-instructions-bar" role="note">
-            ⚠️ <strong>Action required:</strong> Before sending XRP, confirm both mosaics are <strong style="color: #fbbf24;">visually and acoustically identical</strong>. Any difference in color, shape, or melody = warning sign.
-          </div>
-
-          <div class="badge-legend" aria-label="Badge meanings">
-            <span class="legend-item"><span class="legend-dot legend-dot--ok">✅</span> Match — safe</span>
-            <span class="legend-item"><span class="legend-dot legend-dot--bad">⚠️</span> Differ — possible phishing</span>
-            <span class="legend-item"><span class="legend-dot legend-dot--unk">❓</span> No on-chain NFT (normal)</span>
-          </div>
-
-          <div class="comparison-grid">
-            <!-- Address A -->
-            <div class="comparison-column">
-              <div class="form-group flex-row-align" style="display: flex; align-items: center; justify-content: space-between; min-height: 26px; margin-bottom: 0.5rem;">
-                <label for="compare-a-input" style="margin-bottom: 0;">A — Trusted address</label>
-                <span id="xrpl-badge-a" class="xrpl-badge-unregistered" title="On-chain NFT registration status">❓ Unregistered</span>
+        <div class="comparator-layout">
+          <div class="card glass-panel comparator-workspace">
+            <header class="comparator-header">
+              <div class="comparator-header-main">
+                <h2 id="comparator-heading" class="card-title">Address comparator</h2>
+                <p class="comparator-lead">Paste the <strong>expected</strong> address (A) and the <strong>copied</strong> address (B). If mosaics or melodies differ, <strong>do not sign</strong>.</p>
               </div>
-              <input type="text" id="compare-a-input" class="form-input" data-tip="compare-a-input"
-                     placeholder="Paste the address you expect..." 
-                     value="rG1QQv2dh2AGTf5gZUXyZEaXcRmGRHsGQE">
-              <div id="compare-a-preview" class="identicon-medium-container">
-                <!-- SVG A -->
-              </div>
-              <button id="play-audio-a-btn" class="btn-tiny btn-block" style="margin-top: 0.5rem; display: flex; align-items: center; justify-content: center; gap: 0.25rem;">
-                <span>🔊</span> Listen to Key A
-              </button>
-            </div>
-
-            <!-- Center: Status Indicator -->
-            <div class="comparison-status-container">
-              <div id="comparison-badge" class="badge">
-                <!-- Status Icon -->
-              </div>
-              <div id="comparison-msg" class="status-msg">
-                Loading...
-              </div>
-            </div>
-
-            <!-- Address B -->
-            <div class="comparison-column">
-              <div class="form-group flex-row-align" style="display: flex; align-items: center; justify-content: space-between; min-height: 26px; margin-bottom: 0.5rem;">
-                <label for="compare-b-input" style="margin-bottom: 0;">B — Copied / destination address</label>
-                <div style="display: flex; gap: 0.35rem; align-items: center;">
-                  <span id="xrpl-badge-b" class="xrpl-badge-unregistered" style="margin-right: 0.5rem;" title="On-chain NFT registration status">❓ Unregistered</span>
-                  <button type="button" id="simulate-phishing-btn" class="btn-tiny" data-tip="simulate-phishing-btn">Phishing ⚠️</button>
-                  <button type="button" id="force-match-btn" class="btn-tiny" data-tip="force-match-btn" style="background: rgba(16, 185, 129, 0.2); border: 1px solid rgba(16, 185, 129, 0.35); color: #10b981;">Perfect ✅</button>
+              <div class="comparator-toolbar">
+                <div class="comparator-control">
+                  <label for="compare-grid-size-select">Grid size</label>
+                  <select id="compare-grid-size-select" class="form-select comparator-select">
+                    <option value="3" selected>3 × 3</option>
+                    <option value="4">4 × 4</option>
+                    <option value="5">5 × 5</option>
+                  </select>
+                </div>
+                <div class="comparator-demo-tools" aria-label="Demo shortcuts">
+                  <span class="comparator-demo-label">Demo</span>
+                  <button type="button" id="simulate-phishing-btn" class="btn-demo btn-demo--danger" data-tip="simulate-phishing-btn">Phishing ⚠️</button>
+                  <button type="button" id="force-match-btn" class="btn-demo btn-demo--ok" data-tip="force-match-btn">Perfect ✅</button>
                 </div>
               </div>
-              <input type="text" id="compare-b-input" class="form-input" data-tip="compare-b-input"
-                     placeholder="Paste the address to verify..." 
-                     value="rG1QQv2dh2AGTf5gZUXyZEaXcRmGRHsGQf">
-              <div id="compare-b-preview" class="identicon-medium-container">
-                <!-- SVG B -->
+            </header>
+
+            <div class="comparator-meta-row">
+              <div class="match-instructions-bar" role="note">
+                <span class="match-instructions-icon" aria-hidden="true">⚠️</span>
+                <p>Before sending XRP, confirm both mosaics are <strong>visually and acoustically identical</strong>. Any difference = warning sign.</p>
               </div>
-              <button id="play-audio-b-btn" class="btn-tiny btn-block" style="margin-top: 0.5rem; display: flex; align-items: center; justify-content: center; gap: 0.25rem;">
-                <span>🔊</span> Listen to Key B
-              </button>
+              <div class="badge-legend comparator-legend" aria-label="Badge meanings">
+                <span class="legend-item"><span class="legend-dot legend-dot--ok">✅</span> Match</span>
+                <span class="legend-item"><span class="legend-dot legend-dot--bad">⚠️</span> Differ</span>
+                <span class="legend-item"><span class="legend-dot legend-dot--unk">❓</span> No NFT</span>
+              </div>
+            </div>
+
+            <div id="compare-verdict" class="compare-verdict compare-verdict--neutral" aria-live="polite">
+              <div id="comparison-badge" class="comparison-badge">⏳</div>
+              <div class="compare-verdict-text">
+                <span id="comparison-msg" class="comparison-msg">Paste two addresses to compare their visual and acoustic signatures.</span>
+              </div>
+            </div>
+
+            <div class="comparison-grid">
+              <article class="compare-slot compare-slot-a">
+                <header class="compare-slot-header">
+                  <div class="compare-slot-title">
+                    <span class="compare-slot-badge compare-slot-badge--a" aria-hidden="true">A</span>
+                    <div>
+                      <label for="compare-a-input">Trusted address</label>
+                      <p class="compare-slot-hint">Address you expect to send to</p>
+                    </div>
+                  </div>
+                  <span id="xrpl-badge-a" class="xrpl-badge-unregistered" title="On-chain NFT registration status">❓ Unregistered</span>
+                </header>
+                <input type="text" id="compare-a-input" class="form-input compare-address-input" data-tip="compare-a-input"
+                       placeholder="r… paste expected address"
+                       value="rG1QQv2dh2AGTf5gZUXyZEaXcRmGRHsGQE">
+                <div id="compare-a-preview" class="compare-preview identicon-medium-container"></div>
+                <button type="button" id="play-audio-a-btn" class="btn-audio btn-block" disabled>
+                  <span aria-hidden="true">🔊</span> Listen to Key A
+                </button>
+              </article>
+
+              <div class="compare-divider" aria-hidden="true"><span>vs</span></div>
+
+              <article class="compare-slot compare-slot-b">
+                <header class="compare-slot-header">
+                  <div class="compare-slot-title">
+                    <span class="compare-slot-badge compare-slot-badge--b" aria-hidden="true">B</span>
+                    <div>
+                      <label for="compare-b-input">Copied / destination</label>
+                      <p class="compare-slot-hint">Address from clipboard or wallet</p>
+                    </div>
+                  </div>
+                  <span id="xrpl-badge-b" class="xrpl-badge-unregistered" title="On-chain NFT registration status">❓ Unregistered</span>
+                </header>
+                <input type="text" id="compare-b-input" class="form-input compare-address-input" data-tip="compare-b-input"
+                       placeholder="r… paste address to verify"
+                       value="rG1QQv2dh2AGTf5gZUXyZEaXcRmGRHsGQf">
+                <div id="compare-b-preview" class="compare-preview identicon-medium-container"></div>
+                <button type="button" id="play-audio-b-btn" class="btn-audio btn-block" disabled>
+                  <span aria-hidden="true">🔊</span> Listen to Key B
+                </button>
+              </article>
             </div>
           </div>
 
-          <!-- First approach: Xaman (recommended) + Gem (alternative) -->
-          <div id="wallet-approach-panel" class="wallet-approach-panel">
+          <div id="wallet-approach-panel" class="wallet-approach-panel comparator-secondary-panel">
             <div class="wallet-approach-header">
               <div>
                 <h3 class="wallet-approach-title">🚀 First approach — Register your identity on XRPL</h3>
@@ -438,34 +480,31 @@
             <p class="wallet-approach-note">You need the <a href="https://xaman.app" target="_blank" rel="noopener">Xaman</a> app installed and at least ~2 XRP free on Mainnet for the NFT.</p>
           </div>
 
-          <!-- XRPL Registration Panel -->
-          <div class="card glass-panel xrpl-registry-panel" style="margin-top: 2rem;">
-            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 1rem;">
-              <div>
-                <h3 class="card-title" style="margin-bottom: 0.25rem; display: flex; align-items: center; gap: 0.5rem;">
-                  <span>🔒</span> XRPL identity registry <span class="section-badge">Optional · ~2 XRP</span>
+          <div class="card glass-panel xrpl-registry-panel comparator-secondary-panel">
+            <header class="comparator-registry-header">
+              <div class="comparator-registry-intro">
+                <h3 class="card-title comparator-registry-title">
+                  <span aria-hidden="true">🔒</span> XRPL identity registry
+                  <span class="section-badge">Optional · ~2 XRP</span>
                 </h3>
-                <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0; line-height: 1.4;">
-                  Mint a Soulbound NFT (non-transferable) that proves your mosaic on-chain. <strong>Xaman</strong> (mobile) or <strong>Gem Wallet</strong> (browser alternative).
-                </p>
+                <p class="comparator-registry-desc">Mint a Soulbound NFT (non-transferable) that proves your mosaic on-chain. <strong>Xaman</strong> (mobile) or <strong>Gem Wallet</strong> (browser).</p>
               </div>
-              <div style="display: flex; gap: 0.75rem; align-items: center;">
-                <select id="xrpl-network-select" class="form-select" style="font-size: 0.8rem; padding: 6px 12px; max-width: 170px; margin: 0; background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; color: #fff; outline: none; cursor: pointer;">
+              <div class="comparator-registry-status-row">
+                <select id="xrpl-network-select" class="form-select comparator-select comparator-select--compact">
                   <option value="testnet" selected>Testnet (Sandbox)</option>
                   <option value="mainnet">Mainnet (Production)</option>
                 </select>
-                <div id="xrpl-connection-status" style="font-size: 0.78rem; font-weight: 700; color: #f43f5e; background: rgba(244, 63, 94, 0.1); padding: 0.35rem 0.75rem; border-radius: 6px; border: 1px solid rgba(244, 63, 94, 0.2); text-transform: uppercase; letter-spacing: 0.5px;">
+                <div id="xrpl-connection-status" class="xrpl-connection-pill disconnected">
                   🔴 XRPL Disconnected
                 </div>
               </div>
-            </div>
+            </header>
 
-            <div class="grid-2col" style="gap: 1.5rem; margin-bottom: 0.5rem;">
-              <div style="display: flex; flex-direction: column; gap: 0.85rem;">
-                
-                <div class="form-group" style="margin-bottom: 0;">
-                  <label for="xrpl-wallet-select" style="font-size: 0.8rem; font-weight: 600;">Signing method / Wallet</label>
-                  <select id="xrpl-wallet-select" class="form-select" style="font-size: 0.8rem; padding: 8px 12px; background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; color: #fff; width: 100%; cursor: pointer; outline: none;">
+            <div class="comparator-registry-grid">
+              <div class="comparator-registry-form">
+                <div class="form-group comparator-field">
+                  <label for="xrpl-wallet-select">Signing method / Wallet</label>
+                  <select id="xrpl-wallet-select" class="form-select comparator-select">
                     <option value="xaman">Xaman / Xumm (Mobile QR) — Recommended</option>
                     <option value="gem">Gem Wallet (Browser extension) — Alternative</option>
                     <option value="crossmark">Crossmark (Browser extension)</option>
@@ -473,43 +512,42 @@
                   </select>
                 </div>
 
-                <!-- Security warning for Mainnet (hidden by default) -->
-                <div id="xrpl-mainnet-warning" style="display: none; font-size: 0.8rem; color: #f43f5e; padding: 0.75rem 1rem; background: rgba(244, 63, 94, 0.08); border: 1px solid rgba(244, 63, 94, 0.3); border-radius: 8px; line-height: 1.45;">
+                <div id="xrpl-mainnet-warning" class="comparator-warning" hidden>
                   ⚠️ <strong>SECURITY WARNING:</strong> Never expose the secret key of your main account. We recommend using a dedicated testing account with minimal funds (e.g. 12 XRP) solely for minting your identity NFT.
                 </div>
 
-                <button id="xrpl-generate-wallet-btn" class="btn-generate">
-                  ⚡ Generate & Fund Test Wallet
+                <button type="button" id="xrpl-generate-wallet-btn" class="btn-generate">
+                  ⚡ Generate &amp; Fund Test Wallet
                 </button>
 
-                <button id="xrpl-connect-wallet-btn" class="btn-connect" style="display: none;">
+                <button type="button" id="xrpl-connect-wallet-btn" class="btn-connect" hidden>
                   📱 Connect Xaman
                 </button>
-                
-                <div class="form-group" style="margin-bottom: 0;">
-                  <label id="xrpl-address-label" for="xrpl-address-output" style="font-size: 0.8rem; font-weight: 600;">XRPL Address</label>
-                  <input type="text" id="xrpl-address-output" class="form-input" readonly placeholder="Waiting for connection..." style="font-family: var(--font-mono); font-size: 0.78rem; background: rgba(15, 23, 42, 0.4); border-color: rgba(255,255,255,0.06); padding: 8px 12px; color: #38bdf8;">
+
+                <div class="form-group comparator-field">
+                  <label id="xrpl-address-label" for="xrpl-address-output">XRPL Address</label>
+                  <input type="text" id="xrpl-address-output" class="form-input comparator-mono-input" readonly placeholder="Waiting for connection…">
                 </div>
 
-                <div id="xrpl-secret-container" class="form-group" style="margin-bottom: 0;">
-                  <label for="xrpl-secret-output" style="font-size: 0.8rem; font-weight: 600; display: flex; justify-content: space-between;">
+                <div id="xrpl-secret-container" class="form-group comparator-field">
+                  <label for="xrpl-secret-output" class="comparator-secret-label">
                     <span>Secret (Seed / Private Key)</span>
-                    <span id="xrpl-secret-badge" style="color: #fbbf24; font-size: 0.75rem;">⚠️ Testnet only</span>
+                    <span id="xrpl-secret-badge" class="comparator-secret-badge">⚠️ Testnet only</span>
                   </label>
-                  <input type="password" id="xrpl-secret-output" class="form-input" readonly placeholder="Waiting for generation..." style="font-family: var(--font-mono); font-size: 0.78rem; background: rgba(15, 23, 42, 0.4); border-color: rgba(255,255,255,0.06); padding: 8px 12px; color: #fbbf24;">
+                  <input type="password" id="xrpl-secret-output" class="form-input comparator-mono-input comparator-mono-input--secret" readonly placeholder="Waiting for generation…">
                 </div>
 
                 <button type="button" id="xrpl-register-mosaico-btn" class="btn-register" data-tip="xrpl-register-mosaico-btn" disabled>
                   🛡️ Mint Mosaic Key (Soulbound NFT)
                 </button>
-                <button type="button" id="xrpl-unmint-mosaico-btn" class="btn-secondary btn-sm" style="display: none; margin-top: 0.5rem;" disabled>
+                <button type="button" id="xrpl-unmint-mosaico-btn" class="btn-secondary btn-sm comparator-burn-btn" hidden disabled>
                   🔥 Burn keychain &amp; reclaim XRP reserve
                 </button>
               </div>
 
-              <div style="display: flex; flex-direction: column; gap: 0.5rem; height: 100%;">
-                <label style="font-size: 0.8rem; font-weight: 600; color: var(--text-color);">Ledger Operations Console</label>
-                <div id="xrpl-console-log" style="flex-grow: 1; min-height: 220px; background: rgba(15, 23, 42, 0.75); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; font-family: var(--font-mono); font-size: 0.76rem; padding: 0.85rem; color: #38bdf8; overflow-y: auto; line-height: 1.45; box-sizing: border-box; max-height: 235px; white-space: pre-wrap; word-break: break-all; box-shadow: inset 0 2px 8px rgba(0,0,0,0.5);">[info] Initializing client... Ready to connect with Testnet.</div>
+              <div class="comparator-console-wrap">
+                <label for="xrpl-console-log" class="comparator-console-label">Ledger operations console</label>
+                <div id="xrpl-console-log" class="comparator-console" role="log" aria-live="polite">[info] Initializing client... Ready to connect with Testnet.</div>
               </div>
             </div>
           </div>
@@ -679,8 +717,25 @@
         <a href="https://github.com/CuevazaArt/mosaico-criptografico/issues/new" id="report-bug-footer-link" target="_blank" rel="noopener" style="color: #38bdf8; text-decoration: none;">🐛 Report a bug</a>
       </p>
     </footer>
-  </div>
 
+    <footer class="app-footer" role="contentinfo">
+      <p class="footer-disclaimer">
+        Cryptographic Mosaic is experimental, non-custodial software provided <strong>"AS IS"</strong> without warranty.
+        Visual mosaics assist verification; they do not guarantee safety of funds or transactions.
+        You are solely responsible for wallet confirmations before signing.
+        Not affiliated with Ripple, XRPL Foundation, Xaman, or Make Waves.
+      </p>
+      <nav class="footer-legal" aria-label="Legal">
+        <a href="https://github.com/CuevazaArt/mosaico-criptografico/blob/main/TERMS.md" target="_blank" rel="noopener">Terms of Use</a>
+        <a href="https://github.com/CuevazaArt/mosaico-criptografico/blob/main/LEGAL.md" target="_blank" rel="noopener">Legal &amp; Disclaimer</a>
+        <a href="https://github.com/CuevazaArt/mosaico-criptografico/blob/main/LICENSE" target="_blank" rel="noopener">MIT License</a>
+        <a href="https://github.com/CuevazaArt/mosaico-criptografico/blob/main/NOTICES.md" target="_blank" rel="noopener">Third-party notices</a>
+        <a href="https://github.com/CuevazaArt/mosaico-criptografico/issues/new" id="report-bug-legal-link" target="_blank" rel="noopener">Report a bug</a>
+      </nav>
+      <p class="footer-copy">© 2025–2026 CuevazaArt · Open source under MIT</p>
+    </footer>
+      </div>
+    </div>
   </div>
 
   <!-- Terms of Use — must accept before using the app -->
@@ -788,6 +843,17 @@
     </div>
   </div>
 
+  <!-- Pick which keychain NFT to burn when multiple exist -->
+  <div id="nft-picker-modal" class="nft-picker-modal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="nft-picker-title">
+    <div id="nft-picker-modal-backdrop" class="nft-picker-modal-backdrop"></div>
+    <div class="nft-picker-panel">
+      <h2 id="nft-picker-title">Choose keychain to burn</h2>
+      <p id="nft-picker-subtitle" class="nft-picker-subtitle"></p>
+      <div id="nft-picker-list" class="nft-picker-list"></div>
+      <button type="button" id="nft-picker-cancel-btn" class="btn-secondary">Cancel</button>
+    </div>
+  </div>
+
   <!-- Live ledger cost confirmation (mint / burn) -->
   <div id="cost-confirm-modal" class="cost-confirm-modal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="cost-confirm-title">
     <div id="cost-confirm-modal-backdrop" class="cost-confirm-modal-backdrop"></div>
@@ -798,64 +864,62 @@
         <button type="button" id="cost-confirm-accept-btn" class="btn-primary">Accept</button>
         <button type="button" id="cost-confirm-cancel-btn" class="btn-secondary">Cancel</button>
       </div>
+      <p class="cost-confirm-hint">Review the costs above, then choose Accept or Cancel.</p>
     </div>
   </div>
 
   <!-- First real-use guided tour (after registration) -->
-  <div id="first-use-modal" class="first-use-modal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="first-use-title">
-    <div id="first-use-modal-backdrop" class="first-use-modal-backdrop"></div>
-    <div class="first-use-panel">
-      <button type="button" id="first-use-modal-close" class="first-use-close" aria-label="Close">✕</button>
-      <h2 id="first-use-title">Your first real use</h2>
-      <p class="first-use-intro">You registered on-chain — now learn how to use your visual keychain every day.</p>
-      <ol class="first-use-progress" aria-label="First use progress">
-        <li class="first-use-progress-step active" data-step="1"><span>1</span> What happened</li>
-        <li class="first-use-progress-step" data-step="2"><span>2</span> Your keychain</li>
-        <li class="first-use-progress-step" data-step="3"><span>3</span> Try Comparator</li>
-        <li class="first-use-progress-step" data-step="4"><span>4</span> Daily habit</li>
-      </ol>
-      <div class="first-use-step active" data-step="1">
-        <h3>What you just did</h3>
-        <p>You minted a <strong>Soulbound NFT</strong> (taxon 1001) on XRPL Mainnet. It proves your mosaic identity on-chain — non-transferable, tied to your address forever until you burn it.</p>
+  <div id="first-use-modal" class="first-use-overlay" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="first-use-title">
+    <div class="first-use-backdrop" aria-hidden="true"></div>
+    <div class="first-use-panel" tabindex="-1">
+      <header class="first-use-header">
+        <div class="first-use-header-text">
+          <h2 id="first-use-title">Your first real use</h2>
+          <p class="first-use-intro">You registered on-chain — learn your keychain here, then close this window when finished.</p>
+        </div>
+        <button type="button" id="first-use-modal-close" class="first-use-close" aria-label="Close window">✕ Close</button>
+      </header>
+
+      <div class="first-use-scroll">
+        <ol class="first-use-progress" aria-label="First use progress">
+          <li class="first-use-progress-step active" data-step="1"><span>1</span> What happened</li>
+          <li class="first-use-progress-step" data-step="2"><span>2</span> Your keychain</li>
+          <li class="first-use-progress-step" data-step="3"><span>3</span> Try Comparator</li>
+          <li class="first-use-progress-step" data-step="4"><span>4</span> Daily habit</li>
+        </ol>
+        <div class="first-use-step active" data-step="1">
+          <h3>What you just did</h3>
+          <p>You minted a <strong>Soulbound NFT</strong> (taxon 1001) on XRPL Mainnet. It proves your mosaic identity on-chain — non-transferable, tied to your address until you burn it.</p>
+        </div>
+        <div class="first-use-step" data-step="2">
+          <h3>Your visual &amp; acoustic keychain</h3>
+          <p>Every XRPL address has a unique mosaic and melody. Memorize yours — you'll use it to spot phishing and clipboard swaps before signing.</p>
+          <div id="first-use-mosaic-preview" class="first-use-mosaic-wrap" role="button" tabindex="0" aria-label="Open your keychain in the Comparator">
+            <div class="first-use-mosaic-canvas identicon-medium-container wizard-mosaic"></div>
+            <span class="first-use-mosaic-hint">Tap your mosaic to open the Comparator (window stays open)</span>
+          </div>
+        </div>
+        <div class="first-use-step" data-step="3">
+          <h3>Try the Comparator</h3>
+          <p>On the last step you'll open the Comparator with <strong>your address</strong> on both sides — a perfect match. Next time, paste the destination from your wallet into slot B before sending XRP.</p>
+        </div>
+        <div class="first-use-step" data-step="4">
+          <h3>Make it a daily habit</h3>
+          <p>Before every send: Comparator → your address in A → destination in B → green match + same melody = safe. Red mismatch = stop and investigate. When ready, click <strong>Close window</strong>.</p>
+        </div>
       </div>
-      <div class="first-use-step" data-step="2">
-        <h3>Your visual &amp; acoustic keychain</h3>
-        <p>Every XRPL address has a unique mosaic and melody. Memorize yours — you'll use it to spot phishing and clipboard swaps before signing.</p>
-        <div id="first-use-mosaic-preview" class="identicon-medium-container wizard-mosaic"></div>
-      </div>
-      <div class="first-use-step" data-step="3">
-        <h3>Try the Comparator now</h3>
-        <p>We will open the Comparator with <strong>your address</strong> on both sides — a perfect match. Next time, paste the destination from your wallet into slot B and compare before sending XRP.</p>
-      </div>
-      <div class="first-use-step" data-step="4">
-        <h3>Make it a daily habit</h3>
-        <p>Before every send: open Comparator → your address in A → destination in B → green match + same melody = safe. Red mismatch = stop and investigate.</p>
-      </div>
+
       <footer class="first-use-footer">
-        <button type="button" id="first-use-back-btn" class="btn-secondary" disabled>← Back</button>
-        <button type="button" id="first-use-next-btn" class="btn-primary">Next →</button>
-        <button type="button" id="first-use-finish-btn" class="btn-primary hidden">Open Comparator</button>
+        <button type="button" id="first-use-done-btn" class="btn-secondary first-use-footer-close">Close window</button>
+        <div class="first-use-footer-nav">
+          <button type="button" id="first-use-back-btn" class="btn-secondary" disabled>← Back</button>
+          <button type="button" id="first-use-next-btn" class="btn-primary">Next →</button>
+          <button type="button" id="first-use-open-comparator-btn" class="btn-primary hidden">Open Comparator</button>
+        </div>
       </footer>
     </div>
   </div>
 
-  <footer class="app-footer" role="contentinfo">
-    <p class="footer-disclaimer">
-      Cryptographic Mosaic is experimental, non-custodial software provided <strong>"AS IS"</strong> without warranty.
-      Visual mosaics assist verification; they do not guarantee safety of funds or transactions.
-      You are solely responsible for wallet confirmations before signing.
-      Not affiliated with Ripple, XRPL Foundation, Xaman, or Make Waves.
-    </p>
-    <nav class="footer-legal" aria-label="Legal">
-      <a href="https://github.com/CuevazaArt/mosaico-criptografico/blob/main/TERMS.md" target="_blank" rel="noopener">Terms of Use</a>
-      <a href="https://github.com/CuevazaArt/mosaico-criptografico/blob/main/LEGAL.md" target="_blank" rel="noopener">Legal &amp; Disclaimer</a>
-      <a href="https://github.com/CuevazaArt/mosaico-criptografico/blob/main/LICENSE" target="_blank" rel="noopener">MIT License</a>
-      <a href="https://github.com/CuevazaArt/mosaico-criptografico/blob/main/NOTICES.md" target="_blank" rel="noopener">Third-party notices</a>
-      <a href="https://github.com/CuevazaArt/mosaico-criptografico/issues/new" id="report-bug-legal-link" target="_blank" rel="noopener">Report a bug</a>
-    </nav>
-    <p class="footer-copy">© 2025–2026 CuevazaArt · Open source under MIT</p>
-  </footer>
-
-  <script type="module" src="main.js?v=3.2.9"></script>
+  <script type="module" src="main.js?v=3.7.1"></script>
 </body>
 </html>

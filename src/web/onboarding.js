@@ -81,8 +81,18 @@ export function registerWalletApproachHandlers({ switchToComparator, setWalletTy
   connectWalletCallback = connectWallet;
 }
 
+export function activateTabPanel(tabId) {
+  document.querySelectorAll('.nav-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.getAttribute('data-tab') === tabId);
+  });
+  document.querySelectorAll('.tab-panel').forEach(panel => {
+    panel.classList.toggle('active', panel.id === tabId);
+  });
+  onTabChanged(tabId);
+}
+
 export function openRegisterTab() {
-  document.querySelector('.nav-btn[data-tab="register-tab"]')?.click();
+  activateTabPanel('register-tab');
 }
 
 function scrollToWalletApproach() {
@@ -248,6 +258,11 @@ function updateTabGuide(tabId) {
   const guide = TAB_GUIDES[tabId];
   const panel = document.getElementById('tab-guide-panel');
   if (!panel || !guide) return;
+
+  if (tabId === 'register-tab') {
+    panel.innerHTML = '';
+    return;
+  }
 
   placeTabGuidePanel(tabId);
 
@@ -441,7 +456,7 @@ export function initOnboarding() {
   if (termsOk && !localStorage.getItem(STORAGE_TOUR)) {
     localStorage.setItem(STORAGE_TOUR, '1');
     setTimeout(() => {
-      showToast('New here? Open the 🔑 Register tab for a step-by-step keychain setup.', 'info', 6000);
+      showToast('New here? Click Register My Keychain for a step-by-step setup.', 'info', 6000);
     }, 1500);
   }
 
