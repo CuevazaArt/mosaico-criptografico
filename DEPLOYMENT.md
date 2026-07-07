@@ -116,6 +116,7 @@ Chrome → `chrome://extensions` → Developer mode → Load unpacked → `/exte
 - [x] `XUMM_API_SECRET` in Vercel vault only
 - [x] `ENABLE_LOCAL_DEMO=false` in production
 - [x] Live demo: https://mosaico-criptografico.vercel.app
+- [x] GitHub Pages enabled (Source: GitHub Actions) — https://cuevazaart.github.io/mosaico-criptografico/
 - [ ] Demo video with Mainnet tx hash recorded
 - [ ] Screenshots for Devpost submission
 
