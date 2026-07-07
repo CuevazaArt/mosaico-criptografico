@@ -8,6 +8,7 @@ import { initOnboarding, onTabChanged, onComparisonResult, showToast, registerWa
 import { initKeychainWizard } from './src/web/keychain-wizard.js';
 import { initCostConfirmModal, confirmMintCosts, confirmBurnCosts } from './src/web/cost-confirm.js';
 import { initFirstUseGuide } from './src/web/first-use-guide.js';
+import { initHeaderActions } from './src/web/header-actions.js';
 
 const testSession = new CognitiveTestSession();
 
@@ -59,6 +60,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initOnboarding();
   initCostConfirmModal();
   initFirstUseGuide();
+  initHeaderActions();
   initKeychainWizard();
   initTabs();
   initGenerator();
