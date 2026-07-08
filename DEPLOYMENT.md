@@ -137,6 +137,11 @@ Chrome → `chrome://extensions` → Developer mode → Load unpacked → `/exte
 | `tecINSUFFICIENT_RESERVE` | Fund wallet with ≥ 12 XRP |
 | `vercel dev` fails with "yarn not recognized" (Windows) | Install yarn: `npm install -g yarn`, then `npm run dev:mainnet` |
 | Local Xaman signing unavailable | Use production URL or `npm run dev:mainnet` (not plain `npm run dev`) |
+| Xaman “scam” label after user self-mint | Known false positive — [XAMAN_TRUST_ISSUE.md](XAMAN_TRUST_ISSUE.md) (Bithomp → XRPL Labs order) |
+| `xrp-ledger.toml` missing `[[ACCOUNTS]]` | Set `XRPL_WALLET_ADDRESS` in `.env` → `npm run deploy` — see [OPERATOR_ACTIONS.md](OPERATOR_ACTIONS.md) |
+| Verify page | https://mosaico-criptografico.vercel.app/verify |
+| `npm audit` vulnerabilities | Run `npm audit` — see [SECURITY.md §5](SECURITY.md#5-supply-chain-hygiene-npm--ide-tooling) |
+| Accidental `.codebase-memory/` in repo | Purge per [SECURITY.md §5](SECURITY.md#5-supply-chain-hygiene-npm--ide-tooling) — not a project dependency |
 
 ---
 

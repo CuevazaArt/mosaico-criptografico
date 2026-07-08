@@ -272,6 +272,33 @@ export function playMatchSequence(hashA, hashB, options = {}) {
 }
 
 /**
+ * Training feedback when user picks an option: target melody, then selection melody, then outcome cue.
+ */
+export function playTrainingSelectionFeedback(targetHash, selectedHash, isCorrect, options = {}) {
+  stopMnemonicAudio();
+  if (!targetHash || !selectedHash || targetHash.length < 32 || selectedHash.length < 32) return;
+
+  if (!audioCtx) {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  }
+  if (audioCtx.state === 'suspended') {
+    audioCtx.resume();
+  }
+
+  let time = audioCtx.currentTime + 0.02;
+  time = scheduleMnemonicAudio(targetHash, options, time);
+  time += 0.1;
+  time = scheduleMnemonicAudio(selectedHash, options, time);
+  time += 0.08;
+
+  if (isCorrect) {
+    scheduleComparisonSuccessSound(time);
+  } else {
+    scheduleComparisonFailureSound(time);
+  }
+}
+
+/**
  * Triumphant registration fanfare — major ascending chord + sparkle notes.
  */
 export function playRegistrationSuccessFanfare() {

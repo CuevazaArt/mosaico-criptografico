@@ -14,6 +14,20 @@ function getCredentials() {
   return { apiKey, apiSecret };
 }
 
+function resolveAppUrl() {
+  return String(process.env.APP_URL || 'https://mosaico-criptografico.vercel.app').replace(/\/$/, '');
+}
+
+/**
+ * Xaman substitutes {id} / {txid} after signing so the return tab can restore state.
+ * @param {string} appUrl
+ * @param {'mint'|'burn'|'connect'} action
+ */
+function buildReturnUrl(appUrl, action = 'mint') {
+  const safeAction = ['mint', 'burn', 'connect'].includes(action) ? action : 'mint';
+  return `${appUrl}/?xumm_payload={id}&txid={txid}&wizard=${safeAction}`;
+}
+
 async function xummFetch(path, options = {}) {
   const { apiKey, apiSecret } = getCredentials();
   const response = await fetch(`${XUMM_API}${path}`, {
@@ -44,12 +58,13 @@ export default async function handler(req, res) {
 
   try {
     if (req.method === 'POST') {
-      const { txjson } = req.body || {};
+      const { txjson, returnAction } = req.body || {};
       if (!txjson || typeof txjson !== 'object') {
         return res.status(400).json({ error: 'Missing txjson in request body.' });
       }
 
-      const appUrl = process.env.APP_URL || 'https://localhost';
+      const appUrl = resolveAppUrl();
+      const returnTarget = buildReturnUrl(appUrl, returnAction || 'mint');
       const payload = await xummFetch('', {
         method: 'POST',
         body: JSON.stringify({
@@ -57,7 +72,7 @@ export default async function handler(req, res) {
           options: {
             submit: true,
             expire: 5,
-            return_url: { app: appUrl, web: appUrl }
+            return_url: { app: returnTarget, web: returnTarget }
           }
         })
       });
@@ -78,7 +93,13 @@ export default async function handler(req, res) {
 
       const status = await xummFetch(`/${uuid}`);
       const meta = status.meta || {};
-      const txHash = meta.txid || meta.hash || null;
+      const responseBody = status.response || {};
+      // Xumm puts the ledger hash in response.txid (not meta.txid).
+      const txHash = responseBody.txid
+        || responseBody.hash
+        || meta.txid
+        || meta.hash
+        || null;
       const signed = Boolean(meta.signed);
       const cancelled = Boolean(meta.cancelled);
       const expired = Boolean(meta.expired);
@@ -90,7 +111,9 @@ export default async function handler(req, res) {
         expired,
         resolved: signed || cancelled || expired,
         txHash,
-        meta
+        account: responseBody.account || responseBody.Account || null,
+        meta,
+        response: responseBody
       });
     }
 

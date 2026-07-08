@@ -118,6 +118,8 @@ npm run dev           # static UI only (no Xaman signing)
 | [DEPLOYMENT.md](DEPLOYMENT.md) | Developers / DevOps | Mainnet deploy, vault sync, 5-min pitch script |
 | [XAMAN_DEVELOPER_SETUP.md](XAMAN_DEVELOPER_SETUP.md) | **Xaman app config** | OAuth redirect URIs, legal URLs, webhook policy |
 | [XAMAN_WEBHOOK.md](XAMAN_WEBHOOK.md) | Xaman reviewers | Why webhooks are intentionally not used |
+| [XAMAN_TRUST_ISSUE.md](XAMAN_TRUST_ISSUE.md) | **Users + operators** | **Known issue:** Xaman scam warning after self-mint — workarounds until fixed |
+| [OPERATOR_ACTIONS.md](OPERATOR_ACTIONS.md) | **Project operator** | **Your action checklist** — .env, Domain, Bithomp, XRPL Labs emails |
 | [NARRATIVE.md](NARRATIVE.md) | End-users + devs | Simple keychain analogy + technical pipeline |
 | [MANUAL.md](MANUAL.md) | End-users | 3-step verification protocol |
 | [SECURITY.md](SECURITY.md) | Security reviewers | Entropy model, attack resistance, credential policy |

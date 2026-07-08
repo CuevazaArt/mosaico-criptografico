@@ -20,7 +20,10 @@ const VAULT_VARS = [
   { key: 'APP_URL', environments: ['production', 'preview'] },
   { key: 'XUMM_API_KEY', environments: ['production', 'preview'] },
   { key: 'XUMM_API_SECRET', environments: ['production'], sensitive: true },
-  { key: 'ENABLE_LOCAL_DEMO', environments: ['production', 'preview'] }
+  { key: 'ENABLE_LOCAL_DEMO', environments: ['production', 'preview'] },
+  { key: 'XRPL_WALLET_ADDRESS', environments: ['production', 'preview'] },
+  { key: 'PROJECT_CONTACT_EMAIL', environments: ['production', 'preview'] },
+  { key: 'PROJECT_TWITTER', environments: ['production', 'preview'] }
 ];
 
 function parseEnv(filePath) {

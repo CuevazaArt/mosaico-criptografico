@@ -4,6 +4,8 @@ Configuration guide for [apps.xumm.dev](https://apps.xumm.dev/) — Cryptographi
 
 **Production app:** https://mosaico-criptografico.vercel.app
 
+> **Known UX issue:** Users may see a false “scam” label on self-minted keychain NFTs in Xaman until domain safelisting. See [XAMAN_TRUST_ISSUE.md](XAMAN_TRUST_ISSUE.md).
+
 ---
 
 ## Quick copy-paste (Xaman Developer Console)

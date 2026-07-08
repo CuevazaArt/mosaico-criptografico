@@ -18,7 +18,13 @@ import { buildNftPackageSummary } from '../core/nft-package.js';
 import { getAppConfig } from '../app-config.js';
 import { hasAcceptedTerms, showToast, openRegisterTab } from './onboarding.js';
 import { confirmMintCosts, confirmBurnCosts } from './cost-confirm.js';
-import { openFirstUseGuide, hasCompletedFirstUseGuide, authorizeMintTour, scheduleFirstUseTour } from './first-use-guide.js';
+import { openFirstUseGuide, hasCompletedFirstUseGuide, authorizeMintTour, scheduleFirstUseTour, clearFirstUseBurnBlock } from './first-use-guide.js';
+import {
+  saveMintSuccess,
+  resolveMintAddress,
+  fetchAccountFromXummPayload,
+  readMintSuccess
+} from './mint-success.js';
 
 const XRPL_ADDRESS_RE = /^r[1-9A-HJ-NP-Za-km-z]{24,34}$/;
 const TOTAL_STEPS = 5;
@@ -42,13 +48,13 @@ function $(id) {
   return document.getElementById(id);
 }
 
-function loadWizardSession() {
+function readStoredSession(storage) {
   try {
-    const raw = sessionStorage.getItem(WIZARD_SESSION_KEY);
+    const raw = storage.getItem(WIZARD_SESSION_KEY);
     if (!raw) return null;
     const data = JSON.parse(raw);
     if (!data?.updatedAt || Date.now() - data.updatedAt > SESSION_TTL_MS) {
-      sessionStorage.removeItem(WIZARD_SESSION_KEY);
+      storage.removeItem(WIZARD_SESSION_KEY);
       return null;
     }
     return data;
@@ -57,9 +63,13 @@ function loadWizardSession() {
   }
 }
 
+function loadWizardSession() {
+  return readStoredSession(sessionStorage) || readStoredSession(localStorage);
+}
+
 function saveWizardSession(partial = {}) {
   const prev = loadWizardSession() || {};
-  sessionStorage.setItem(WIZARD_SESSION_KEY, JSON.stringify({
+  const next = {
     ...prev,
     ...partial,
     wizardAddress: partial.wizardAddress ?? wizardAddress ?? prev.wizardAddress ?? '',
@@ -69,20 +79,60 @@ function saveWizardSession(partial = {}) {
     payloadUuid: partial.payloadUuid !== undefined ? partial.payloadUuid : (activePayloadUuid ?? prev.payloadUuid ?? null),
     ownerTabId: partial.ownerTabId ?? prev.ownerTabId ?? TAB_ID,
     updatedAt: Date.now()
-  }));
+  };
+  const encoded = JSON.stringify(next);
+  try {
+    sessionStorage.setItem(WIZARD_SESSION_KEY, encoded);
+  } catch {
+    /* ignore */
+  }
+  // localStorage survives Xaman deep-link / return_url opening a new tab.
+  try {
+    localStorage.setItem(WIZARD_SESSION_KEY, encoded);
+  } catch {
+    /* ignore */
+  }
 }
 
 function clearWizardSession() {
-  sessionStorage.removeItem(WIZARD_SESSION_KEY);
+  try {
+    sessionStorage.removeItem(WIZARD_SESSION_KEY);
+  } catch {
+    /* ignore */
+  }
+  try {
+    localStorage.removeItem(WIZARD_SESSION_KEY);
+  } catch {
+    /* ignore */
+  }
   pendingAction = null;
   activePayloadUuid = null;
+}
+
+function readXamanReturnParams() {
+  try {
+    const url = new URL(window.location.href);
+    const payloadUuid = url.searchParams.get('xumm_payload')
+      || url.searchParams.get('payload')
+      || url.searchParams.get('id');
+    const txid = url.searchParams.get('txid') || url.searchParams.get('txhash');
+    const wizard = url.searchParams.get('wizard');
+    return {
+      payloadUuid: payloadUuid || null,
+      txid: txid || null,
+      wizard: wizard || null,
+      hasReturn: Boolean(payloadUuid || txid || wizard)
+    };
+  } catch {
+    return { payloadUuid: null, txid: null, wizard: null, hasReturn: false };
+  }
 }
 
 function stripXamanReturnParams() {
   if (!window.history.replaceState) return;
   const url = new URL(window.location.href);
   if (!url.search) return;
-  const isReturn = [...url.searchParams.keys()].some(k => /xumm|payload|txid|account/i.test(k));
+  const isReturn = [...url.searchParams.keys()].some(k => /xumm|payload|txid|account|wizard/i.test(k));
   if (isReturn) {
     window.history.replaceState({}, document.title, url.pathname);
   }
@@ -218,7 +268,7 @@ function startMintBroadcastListener(payloadUuid) {
     }
 
     if (data.type === 'mint-complete' && data.hash) {
-      completeWizardSuccess(data, { broadcast: false, showTour: false });
+      void completeWizardSuccess(data, { broadcast: false, showTour: true });
     }
   };
 
@@ -250,10 +300,37 @@ function launchCelebration() {
   playRegistrationSuccessFanfare();
 }
 
-function completeWizardSuccess({ hash, address }, { broadcast = true, showTour = false } = {}) {
-  const resolvedAddress = address || connectedAddress || wizardAddress;
+async function completeWizardSuccess({ hash, address }, { broadcast = true, showTour = false } = {}) {
+  let resolvedAddress = address
+    || connectedAddress
+    || wizardAddress
+    || resolveMintAddress({ connected: connectedAddress, wizard: wizardAddress });
+
+  if (!resolvedAddress) {
+    const session = loadWizardSession();
+    resolvedAddress = session?.connectedAddress || session?.wizardAddress || '';
+  }
+
+  if (!resolvedAddress && activePayloadUuid) {
+    resolvedAddress = await fetchAccountFromXummPayload(activePayloadUuid) || '';
+  }
+
+  if (resolvedAddress) {
+    connectedAddress = connectedAddress || resolvedAddress;
+    wizardAddress = wizardAddress || resolvedAddress;
+  }
+
   if ($('wizard-tx-hash')) $('wizard-tx-hash').textContent = hash || 'Confirmed on ledger';
-  if ($('wizard-success-address')) $('wizard-success-address').textContent = resolvedAddress;
+  if ($('wizard-success-address')) {
+    $('wizard-success-address').textContent = resolvedAddress || '—';
+  }
+
+  const verifyLink = $('wizard-verify-link');
+  if (verifyLink && resolvedAddress) {
+    verifyLink.href = `/verify?address=${encodeURIComponent(resolvedAddress)}`;
+  }
+
+  saveMintSuccess({ address: resolvedAddress, hash });
   pendingAction = null;
   activePayloadUuid = null;
   clearWizardSession();
@@ -265,21 +342,41 @@ function completeWizardSuccess({ hash, address }, { broadcast = true, showTour =
   if (broadcast) {
     postMintComplete({ hash, address: resolvedAddress });
   }
+  // First-use real tour is mint-only, after Done.
   if (showTour && resolvedAddress && !hasCompletedFirstUseGuide()) {
+    clearFirstUseBurnBlock();
+    authorizeMintTour(resolvedAddress);
     scheduleFirstUseTour(resolvedAddress);
   }
 }
 
-async function resumeMintPolling(session) {
-  const uuid = session.payloadUuid;
-  const address = session.connectedAddress || session.wizardAddress;
-  if (!uuid) return;
+async function resumeMintPolling(session, returnParams = {}) {
+  const uuid = returnParams.payloadUuid || session.payloadUuid;
+  let address = session.connectedAddress || session.wizardAddress || '';
+  const returnedTxid = returnParams.txid || null;
+  if (!uuid && !returnedTxid) return;
 
-  activePayloadUuid = uuid;
+  activePayloadUuid = uuid || null;
   pendingAction = 'mint';
   openRegisterTab();
   setStep(4);
   wizardLog('Waiting for Xaman signature confirmation…');
+
+  if (!address && uuid) {
+    address = await fetchAccountFromXummPayload(uuid) || '';
+  }
+
+  // Deep-link return may already include a ledger hash — finish immediately.
+  if (returnedTxid && returnedTxid !== '{txid}') {
+    clearFirstUseBurnBlock();
+    await completeWizardSuccess({ hash: returnedTxid, address }, { broadcast: true, showTour: true });
+    return;
+  }
+
+  if (!uuid) {
+    wizardLog('Missing Xaman payload id — open the original tab or mint again.');
+    return;
+  }
 
   const ownerExists = await probeForOwnerTab(uuid);
   if (ownerExists && session.ownerTabId && session.ownerTabId !== TAB_ID) {
@@ -289,8 +386,8 @@ async function resumeMintPolling(session) {
       const response = await fetch(`/api/xumm/payload?uuid=${encodeURIComponent(uuid)}`);
       if (response.ok) {
         const status = await response.json();
-        if (status.signed && status.txHash) {
-          postMintComplete({ hash: status.txHash, address });
+        if (status.signed) {
+          postMintComplete({ hash: status.txHash || `signed:${uuid}`, address });
         }
       }
     } catch {
@@ -305,7 +402,8 @@ async function resumeMintPolling(session) {
 
   try {
     const txHash = await waitForXamanPayloadSignature(uuid, wizardLog);
-    completeWizardSuccess({ hash: txHash, address }, { broadcast: true, showTour: false });
+    clearFirstUseBurnBlock();
+    await completeWizardSuccess({ hash: txHash, address }, { broadcast: true, showTour: true });
   } catch (err) {
     wizardLog(`Error: ${err.message}`);
     showToast(err.message || 'Mint confirmation failed.', 'warn', 6000);
@@ -335,9 +433,32 @@ async function tryCompletePendingConnect() {
 }
 
 async function restoreWizardSession() {
+  const returnParams = readXamanReturnParams();
+  // Burn returns are handled by burn-result.js (fresh confirmation session).
+  if (returnParams.wizard === 'burn') {
+    stripXamanReturnParams();
+    return false;
+  }
   stripXamanReturnParams();
-  const session = loadWizardSession();
-  if (!session) return false;
+
+  let session = loadWizardSession();
+
+  // Xaman opened a fresh tab: hydrate from URL + localStorage (or minimal mint resume).
+  if (returnParams.hasReturn) {
+    session = session || {};
+    if (returnParams.payloadUuid) {
+      session.payloadUuid = returnParams.payloadUuid;
+      session.pendingAction = session.pendingAction || 'mint';
+    }
+    if (returnParams.wizard === 'mint') {
+      session.pendingAction = 'mint';
+      session.step = session.step || 4;
+    }
+  }
+
+  if (!session || (!session.wizardAddress && !session.payloadUuid && !returnParams.txid)) {
+    return false;
+  }
 
   wizardAddress = session.wizardAddress || '';
   connectedAddress = session.connectedAddress || '';
@@ -353,8 +474,9 @@ async function restoreWizardSession() {
   updateWalletStatusUI();
   openRegisterTab();
 
-  if (session.pendingAction === 'mint' && session.payloadUuid) {
-    await resumeMintPolling(session);
+  if ((session.pendingAction === 'mint' || returnParams.wizard === 'mint' || (returnParams.hasReturn && !returnParams.wizard))
+    && (session.payloadUuid || returnParams.txid)) {
+    await resumeMintPolling(session, returnParams);
     return true;
   }
 
@@ -456,6 +578,8 @@ async function handleMint() {
     ownerTabId: TAB_ID
   });
   pendingAction = 'mint';
+  // A new mint clears any prior burn block so Done can offer first-use again.
+  clearFirstUseBurnBlock();
 
   wizardLog(`Minting Soulbound NFT on ${getXrplNetwork()}…`);
 
@@ -469,8 +593,7 @@ async function handleMint() {
     });
 
     if (res?.success) {
-      authorizeMintTour();
-      completeWizardSuccess({ hash: res.hash, address }, { broadcast: true, showTour: true });
+      await completeWizardSuccess({ hash: res.hash, address }, { broadcast: true, showTour: true });
     }
   } catch (err) {
     wizardLog(`Error: ${err.message}`);
@@ -502,7 +625,7 @@ async function handleUnmint() {
     }
     if (result?.success) {
       wizardLog(`Burn confirmed. Tx: ${result.hash}`);
-      showToast('Keychain burned — XRP reserve reclaimed to your account.', 'success', 7000);
+      // Burn success UI is shown by burn-result (fresh session / confirmation panel).
       btn?.classList.add('hidden');
     }
   } catch (err) {
@@ -569,8 +692,20 @@ export async function initKeychainWizard() {
     if (wizardHash) playMnemonicAudio(wizardHash, { gridSize: 3, chaoticMode: false });
   });
 
-  $('wizard-finish-btn')?.addEventListener('click', () => {
-    const addr = connectedAddress || wizardAddress;
+  $('wizard-finish-btn')?.addEventListener('click', async () => {
+    let addr = resolveMintAddress({ connected: connectedAddress, wizard: wizardAddress });
+    if (!addr) {
+      addr = await getConnectedXamanAccount().catch(() => null);
+    }
+    if (!addr) {
+      showToast('Could not find your XRPL address. Reconnect Xaman or start a new registration.', 'warn', 6000);
+      return;
+    }
+    if (hasCompletedFirstUseGuide()) {
+      showToast('You already completed the first-use tour.', 'info', 5000);
+      return;
+    }
+    clearFirstUseBurnBlock();
     openFirstUseGuide(addr, { manual: true });
   });
 
@@ -582,4 +717,17 @@ export async function initKeychainWizard() {
   if (!restored) {
     setStep(1);
   }
+  hydrateDoneScreenFromMintRecord();
+}
+
+function hydrateDoneScreenFromMintRecord() {
+  if (currentStep !== 5) return;
+  const record = readMintSuccess();
+  if (!record?.address) return;
+  const el = $('wizard-success-address');
+  if (el && (!el.textContent?.trim() || el.textContent.trim() === '—')) {
+    el.textContent = record.address;
+  }
+  if (!connectedAddress) connectedAddress = record.address;
+  if (!wizardAddress) wizardAddress = record.address;
 }

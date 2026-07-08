@@ -4,8 +4,11 @@
 import { sha256 } from '../core/crypto.js';
 import { generateSvg } from '../core/generator.js';
 import { activateTabPanel, showToast } from './onboarding.js';
+import { resolveMintAddress } from './mint-success.js';
 
 const STORAGE_FIRST_USE = 'mosaico_first_use_done';
+const STORAGE_TOUR_AUTH = 'mosaico_mint_tour_auth';
+const STORAGE_BURN_BLOCK = 'mosaico_first_use_burn_block';
 const TOTAL_STEPS = 4;
 const OPEN_CLASS = 'is-open';
 
@@ -14,7 +17,7 @@ let guideAddress = '';
 let mosaicPreviewBound = false;
 let tourTimeoutId = null;
 let controlsBound = false;
-/** In-memory only — never survives page load. */
+/** Survives reload via localStorage while a mint is completing. */
 let mintTourAuthorized = false;
 
 function $(id) {
@@ -67,8 +70,78 @@ export function hasCompletedFirstUseGuide() {
   return false;
 }
 
-export function authorizeMintTour() {
+export function blockFirstUseAfterBurn() {
+  mintTourAuthorized = false;
+  clearScheduledFirstUseTour();
+  clearMintTourAuthorization();
+  closeFirstUseGuide();
+  try {
+    localStorage.setItem(STORAGE_BURN_BLOCK, JSON.stringify({ at: Date.now() }));
+  } catch {
+    /* ignore */
+  }
+}
+
+export function clearFirstUseBurnBlock() {
+  try {
+    localStorage.removeItem(STORAGE_BURN_BLOCK);
+  } catch {
+    /* ignore */
+  }
+}
+
+function isFirstUseBlockedByBurn() {
+  try {
+    const raw = localStorage.getItem(STORAGE_BURN_BLOCK);
+    if (!raw) return false;
+    const data = JSON.parse(raw);
+    // Keep the mint-tour blocked for this browser session window after burn.
+    if (!data?.at || Date.now() - data.at > 24 * 60 * 60 * 1000) {
+      localStorage.removeItem(STORAGE_BURN_BLOCK);
+      return false;
+    }
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+export function authorizeMintTour(address = '') {
+  // Mint path only — ignore if a burn just completed.
+  if (isFirstUseBlockedByBurn()) return;
   mintTourAuthorized = true;
+  try {
+    localStorage.setItem(STORAGE_TOUR_AUTH, JSON.stringify({
+      at: Date.now(),
+      address: String(address || '')
+    }));
+  } catch {
+    /* storage may be blocked */
+  }
+}
+
+export function consumeMintTourAuthorization() {
+  if (mintTourAuthorized) return true;
+  try {
+    const raw = localStorage.getItem(STORAGE_TOUR_AUTH);
+    if (!raw) return false;
+    localStorage.removeItem(STORAGE_TOUR_AUTH);
+    const data = JSON.parse(raw);
+    if (!data?.at || Date.now() - data.at > 60 * 60 * 1000) return false;
+    mintTourAuthorized = true;
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+export function clearMintTourAuthorization() {
+  mintTourAuthorized = false;
+  try {
+    localStorage.removeItem(STORAGE_TOUR_AUTH);
+  } catch {
+    /* ignore */
+  }
 }
 
 export function clearScheduledFirstUseTour() {
@@ -80,12 +153,16 @@ export function clearScheduledFirstUseTour() {
 
 export function scheduleFirstUseTour(address, delayMs = 4200) {
   clearScheduledFirstUseTour();
-  if (!mintTourAuthorized || !address || hasCompletedFirstUseGuide()) return;
+  if (isFirstUseBlockedByBurn()) return;
+  const authorized = mintTourAuthorized || consumeMintTourAuthorization();
+  if (!authorized || !address || hasCompletedFirstUseGuide()) return;
 
+  mintTourAuthorized = true;
   tourTimeoutId = window.setTimeout(() => {
     tourTimeoutId = null;
-    if (!mintTourAuthorized || hasCompletedFirstUseGuide()) return;
+    if (isFirstUseBlockedByBurn() || hasCompletedFirstUseGuide()) return;
     mintTourAuthorized = false;
+    clearMintTourAuthorization();
     openFirstUseGuide(address);
   }, delayMs);
 }
@@ -184,10 +261,30 @@ function bindMosaicPreviewInteraction() {
 }
 
 export function openFirstUseGuide(address, { manual = false } = {}) {
-  if (!address || hasCompletedFirstUseGuide()) return;
+  const resolved = address || resolveMintAddress();
+
+  // After burn, never prepare or offer the first-use mechanic (auto or manual).
+  if (isFirstUseBlockedByBurn()) {
+    if (manual) {
+      showToast('First-use tour is only available after minting a new keychain.', 'info', 5000);
+    }
+    return;
+  }
+  if (!resolved) {
+    if (manual) {
+      showToast('Could not find your XRPL address for the tour.', 'warn', 5000);
+    }
+    return;
+  }
+  if (hasCompletedFirstUseGuide()) {
+    if (manual) {
+      showToast('You already completed the first-use tour.', 'info', 5000);
+    }
+    return;
+  }
   if (!manual && !mintTourAuthorized) return;
 
-  guideAddress = address;
+  guideAddress = resolved;
   mintTourAuthorized = false;
   forceCloseBlockingModals();
   setStep(1);

@@ -55,7 +55,7 @@ const TAB_GUIDES = {
     steps: [
       'Choose grid size and color mode.',
       'Click "Start Simulation" and memorize the target mosaic.',
-      'Pick the option that matches visually among the six cards.',
+      'Pick the option that matches visually among the six cards — click the identical mosaic to answer.',
       'Check your stats on the right: reaction time and streak.'
     ]
   }

@@ -70,9 +70,7 @@ export async function handleHeaderBurnKeychain() {
 
     const result = await burnKeychainWithSelection(address, 'xaman', () => {});
     if (result.cancelled) return;
-    if (result?.success) {
-      showToast('Keychain burned — XRP reserve reclaimed to your account.', 'success', 7000);
-    }
+    // Success panel is owned by burn-result.js (original tab or Xaman return session).
   } catch (err) {
     showToast(formatBurnError(err), 'warn', 6000);
   } finally {

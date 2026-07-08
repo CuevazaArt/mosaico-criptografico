@@ -4,6 +4,23 @@ All notable changes to the **Cryptographic Mosaic** project are documented in th
 
 ---
 
+## [Unreleased]
+
+### Added
+* **XAMAN_TRUST_ISSUE.md:** Known issue — Xaman false “scam” warning after self-mint; user workarounds, operator roadmap (Bithomp → XRPL Labs), email templates, definition of done.
+* **OPERATOR_ACTIONS.md:** Step-by-step checklist for the project operator (`.env`, Domain `AccountSet`, Bithomp, XRPL Labs).
+* **`/.well-known/xrp-ledger.toml`:** Generated at build via `scripts/generate-toml.js` from `XRPL_WALLET_ADDRESS`.
+* **`/verify`:** Public on-chain Mosaic Keychain verification page (`verify.html` + `src/web/verify-page.js`).
+
+### Changed
+* **SECURITY.md §5:** Supply-chain hygiene — no `codebase-memory-mcp` in repo; purge procedure; `npm audit` cadence.
+* **.gitignore:** Block `.codebase-memory/` and graph DB artifacts.
+* **index.html:** Help modal + post-mint Xaman trust panel on wizard Step Done.
+* **vercel.json:** `/verify` rewrite + TOML `Content-Type` header.
+* **package.json:** `npm run toml` in build pipeline.
+
+---
+
 ## [3.1.6] - 2026-07-07
 
 ### Fixed

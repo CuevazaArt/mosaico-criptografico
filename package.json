@@ -31,7 +31,8 @@
     "xumm:validate": "node scripts/validate-xumm-credentials.mjs",
     "vault:sync": "node scripts/sync-vault.mjs",
     "predeploy": "npm run audit && npm run build",
-    "build": "npm run config && npm run icons",
+    "build": "npm run config && npm run icons && npm run toml",
+    "toml": "node scripts/generate-toml.js",
     "test": "node --test tests/app-config.test.js tests/mosaico.test.js tests/nft-package.test.js tests/first-use-guide.test.js",
     "test:ui": "node scripts/ui-audit.mjs",
     "dev": "npm run config && npx -y serve .",
@@ -47,8 +48,10 @@
   ],
   "author": "CuevazaArt (https://github.com/CuevazaArt)",
   "license": "MIT",
-  "devDependencies": {
-    "playwright": "^1.58.2",
+  "dependencies": {
     "sharp": "^0.35.3"
+  },
+  "devDependencies": {
+    "playwright": "^1.58.2"
   }
 }

@@ -15,6 +15,7 @@ let currentAction = 'mint';
 let currentAddress = '';
 let currentLogger = () => {};
 let currentNftTokenId = null;
+let lastEstimate = null;
 
 function $(id) {
   return document.getElementById(id);
@@ -75,7 +76,12 @@ function finishModal(accepted) {
   const resolver = activeResolve;
   activeResolve = null;
   closeModal();
-  resolver?.(accepted);
+  if (!resolver) return;
+  if (!accepted) {
+    resolver(false);
+    return;
+  }
+  resolver(lastEstimate ? { accepted: true, estimate: lastEstimate } : { accepted: true });
 }
 
 function shouldSwallowPointerEvent(event) {
@@ -222,6 +228,7 @@ async function presentCosts(session) {
   try {
     const estimate = await fetchEstimate(currentAction, currentAddress, currentLogger);
     if (session !== modalSession || !activeResolve) return;
+    lastEstimate = estimate;
 
     await settlePendingPointerEvents();
 
@@ -316,13 +323,14 @@ async function confirmLedgerAction(action, address, logger, nftTokenId = null) {
   currentAddress = address;
   currentLogger = logger;
   currentNftTokenId = nftTokenId;
+  lastEstimate = null;
 
   return new Promise((resolve) => {
-    activeResolve = (accepted) => {
+    activeResolve = (result) => {
       if (session !== modalSession) return;
       activeResolve = null;
       closeModal();
-      resolve(accepted);
+      resolve(result);
     };
 
     void presentCosts(session);

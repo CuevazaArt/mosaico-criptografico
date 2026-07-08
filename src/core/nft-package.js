@@ -63,7 +63,7 @@ export function buildNftPackageSummary(address, appUrl) {
     imageUrl: urls.image,
     audioUrl: urls.audio,
     includes: [
-      'Visual mosaic (deterministic SVG)',
+      'Visual mosaic (deterministic PNG)',
       'Acoustic signature (4-note WAV)',
       'Metadata manifest (JSON)'
     ]
@@ -77,20 +77,34 @@ export async function buildNftPackageMetadata(address, appUrl) {
   const notes = getAcousticNoteSequence(hash, DEFAULT_PACKAGE_OPTIONS);
 
   return {
-    name: `Mosaic Keychain — ${normalized}`,
-    description: `Soulbound visual and acoustic identity for XRPL public address ${normalized}. Safe to share: this is your public receiving address, not a secret key.`,
+    nftType: 'art.v0',
+    name: `Mosaic Keychain — ${normalized.slice(0, 8)}…${normalized.slice(-4)}`,
+    description: [
+      'Self-minted Cryptographic Mosaic keychain — utility identity anchor, NOT an airdrop or claim pass.',
+      `Deterministic visual + acoustic fingerprint of public XRPL address ${normalized}.`,
+      'Safe to share: public receiving address only, never a secret key.',
+      'Minted by the account holder at mosaico-criptografico.vercel.app — verify mosaic in Comparator.'
+    ].join(' '),
     external_url: resolveAppUrl(appUrl),
     address: normalized,
     image: urls.image,
+    image_url: urls.image,
     animation_url: urls.audio,
+    content: {
+      url: urls.image,
+      type: 'image/png',
+      media_type: 'image/png'
+    },
     properties: {
       package: PACKAGE_VERSION,
       standard: 'XLS-20',
       taxon: 1001,
       soulbound: true,
+      issuer: 'self',
+      category: 'identity-utility',
       address: normalized,
       visual: {
-        type: 'image/svg+xml',
+        type: 'image/png',
         algorithm: 'sha256-mosaic-grid',
         grid_size: DEFAULT_PACKAGE_OPTIONS.gridSize,
         url: urls.image
@@ -107,15 +121,16 @@ export async function buildNftPackageMetadata(address, appUrl) {
       { trait_type: 'Package', value: PACKAGE_VERSION },
       { trait_type: 'Grid', value: `${DEFAULT_PACKAGE_OPTIONS.gridSize}x${DEFAULT_PACKAGE_OPTIONS.gridSize}` },
       { trait_type: 'Acoustic Notes', value: String(notes.length) },
-      { trait_type: 'Soulbound', value: 'Yes' }
+      { trait_type: 'Soulbound', value: 'Yes' },
+      { trait_type: 'Category', value: 'Identity Utility' }
     ]
   };
 }
 
-export async function renderNftPackageSvg(address) {
+export async function renderNftPackageSvg(address, options = {}) {
   const normalized = normalizePackageAddress(address);
   const hash = await sha256(normalized);
-  return generateSvg(hash, normalized, DEFAULT_PACKAGE_OPTIONS);
+  return generateSvg(hash, normalized, { ...DEFAULT_PACKAGE_OPTIONS, ...options });
 }
 
 export function decodeMosaicNftUri(uriHex) {

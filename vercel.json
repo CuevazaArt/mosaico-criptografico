@@ -3,7 +3,23 @@
   "installCommand": "npm install",
   "buildCommand": "npm run build",
   "outputDirectory": ".",
+  "rewrites": [
+    { "source": "/verify", "destination": "/verify.html" }
+  ],
   "headers": [
+    {
+      "source": "/.well-known/xrp-ledger.toml",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "application/toml; charset=utf-8"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=3600"
+        }
+      ]
+    },
     {
       "source": "/(index.html)?",
       "headers": [

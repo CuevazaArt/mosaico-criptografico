@@ -33,6 +33,7 @@ jobs:
         run: |
           npm ci
           npm run icons
+          npm run toml
           cp config.runtime.github.js config.runtime.js
           touch .nojekyll
           rm -rf node_modules

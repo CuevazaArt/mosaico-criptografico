@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Verify a Mosaic Keychain Soulbound NFT on XRPL Mainnet — taxon 1001, self-issued utility identity.">
+  <title>Verify Mosaic Keychain — Cryptographic Mosaic</title>
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css?v=3.8.2">
+  <script>
+    window.__APP_CONFIG__ = window.__APP_CONFIG__ || {
+      deploymentMode: 'production',
+      defaultNetwork: 'mainnet',
+      appUrl: window.location.origin,
+      version: '3.1.6'
+    };
+  </script>
+  <script src="config.runtime.js" onerror="console.info('[config] Using inline fallback.')"></script>
+  <script src="https://unpkg.com/xrpl@4.4.3/build/xrpl-latest-min.js"></script>
+</head>
+<body class="verify-page-body">
+  <main class="verify-page">
+    <header class="verify-header">
+      <a href="/" class="verify-back">← Back to app</a>
+      <h1>Verify Mosaic Keychain</h1>
+      <p class="verify-lead">Check whether an XRPL address has a <strong>valid self-issued</strong> Mosaic Keychain NFT on Mainnet.</p>
+    </header>
+
+    <section class="verify-card glass-panel">
+      <h2>On-chain check</h2>
+      <p>Paste a public address (<code>r…</code>). We query <code>account_nfts</code> for taxon <code>1001</code> where <strong>Issuer = Owner</strong>.</p>
+      <div class="form-group">
+        <label for="verify-address-input">XRPL address</label>
+        <input type="text" id="verify-address-input" class="form-input" placeholder="r..." autocomplete="off" spellcheck="false">
+      </div>
+      <button type="button" id="verify-submit-btn" class="btn-primary">Verify on Mainnet</button>
+      <p id="verify-log" class="verify-log" aria-live="polite"></p>
+      <div id="verify-status" class="verify-status verify-status--idle" role="status" aria-live="polite">
+        <p>Enter an address and click verify.</p>
+      </div>
+    </section>
+
+    <section class="verify-card glass-panel verify-explainer">
+      <h2>What counts as valid?</h2>
+      <ul>
+        <li><strong>Self-minted:</strong> you signed <code>NFTokenMint</code> in your wallet — not an unsolicited inbound NFT.</li>
+        <li><strong>Taxon 1001:</strong> Mosaic Keychain convention.</li>
+        <li><strong>Issuer == Owner:</strong> only your account can issue your identity NFT.</li>
+        <li><strong>Non-transferable:</strong> utility anchor, not a tradable pass or airdrop.</li>
+      </ul>
+      <p>Metadata is served from this domain: <code>/api/nft/{address}</code></p>
+    </section>
+
+    <section class="verify-card verify-warning glass-panel">
+      <h2>⚠️ Xaman “scam” warning after you minted?</h2>
+      <p>That is often a <strong>false positive</strong> until our metadata domain is safelisted. If this page shows <strong>✅ Valid</strong>, your anchor is legitimate on-chain.</p>
+      <a href="https://github.com/CuevazaArt/mosaico-criptografico/blob/main/XAMAN_TRUST_ISSUE.md" target="_blank" rel="noopener" class="btn-secondary">Known issue &amp; mitigation guide</a>
+      <a href="https://github.com/CuevazaArt/mosaico-criptografico/blob/main/OPERATOR_ACTIONS.md" target="_blank" rel="noopener" class="btn-secondary">Operator registration steps</a>
+    </section>
+
+    <footer class="verify-footer">
+      <a href="/">Cryptographic Mosaic</a>
+      ·
+      <a href="https://github.com/CuevazaArt/mosaico-criptografico" target="_blank" rel="noopener">GitHub</a>
+      ·
+      <a href="/.well-known/xrp-ledger.toml" target="_blank" rel="noopener">xrp-ledger.toml</a>
+    </footer>
+  </main>
+  <script type="module" src="src/web/verify-page.js"></script>
+</body>
+</html>

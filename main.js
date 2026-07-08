@@ -1,16 +1,17 @@
 import { sha256, bytesToHex } from './src/core/crypto.js';
 import { generateSvg } from './src/core/generator.js';
-import { playMnemonicAudio, stopMnemonicAudio, playMismatchSequence, playMatchSequence } from './src/core/audio.js';
+import { playMnemonicAudio, stopMnemonicAudio, playMismatchSequence, playMatchSequence, playTrainingSelectionFeedback } from './src/core/audio.js';
 import { CognitiveTestSession, generateRandomAddress, generateSimilarAddress } from './src/web/testing.js';
-import { checkAddressRegistration, registerMnemonicNft, generateFaucetWallet, setXrplNetwork, getXrplNetwork, connectWallet, registerMnemonicNftNonCustodial, burnMnemonicNftNonCustodial, burnMnemonicNft, findMosaicNft } from './src/core/xrpl.js';
+import { checkAddressRegistration, registerMnemonicNft, generateFaucetWallet, setXrplNetwork, getXrplNetwork, connectWallet, registerMnemonicNftNonCustodial, burnMnemonicNft, findMosaicNft } from './src/core/xrpl.js';
 import { getAppConfig, isLocalDemoEnabled } from './src/app-config.js';
 import { initOnboarding, onTabChanged, onComparisonResult, showToast, registerWalletApproachHandlers, hasAcceptedTerms } from './src/web/onboarding.js';
 import { initKeychainWizard } from './src/web/keychain-wizard.js';
-import { initCostConfirmModal, confirmMintCosts, confirmBurnCosts } from './src/web/cost-confirm.js';
+import { initCostConfirmModal, confirmMintCosts } from './src/web/cost-confirm.js';
 import { initFirstUseGuide } from './src/web/first-use-guide.js';
 import { initHeaderActions } from './src/web/header-actions.js';
 import { initNftPickerModal } from './src/web/nft-picker.js';
 import { burnKeychainWithSelection } from './src/web/burn-flow.js';
+import { initBurnResultUi, resumeBurnFromReturn } from './src/web/burn-result.js';
 
 const testSession = new CognitiveTestSession();
 
@@ -58,13 +59,33 @@ function applyDeploymentSettings() {
   }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
   applyDeploymentSettings();
   initOnboarding();
   initFirstUseGuide();
   initCostConfirmModal();
   initNftPickerModal();
+  initBurnResultUi();
   initHeaderActions();
+
+  // Prefer burn return over mint restore when Xaman opens a fresh session after burn.
+  const params = new URLSearchParams(window.location.search);
+  const wizardAction = params.get('wizard');
+  const isBurnReturn = wizardAction === 'burn'
+    || (/xumm|payload|txid/i.test(window.location.search) && localStorage.getItem('mosaico_burn_session'));
+
+  if (isBurnReturn) {
+    await resumeBurnFromReturn({
+      payloadUuid: params.get('xumm_payload') || params.get('payload') || params.get('id'),
+      txid: params.get('txid') || params.get('txhash'),
+      wizard: 'burn'
+    });
+    // Clean return params from the URL after handling burn.
+    if (window.history.replaceState && window.location.search) {
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+  }
+
   initKeychainWizard();
   initTabs();
   initGenerator();
@@ -343,13 +364,15 @@ function initComparator() {
     if (userTriggered) {
       if (valA && valB) {
         if (valA === valB) {
-          playMatchSequence();
+          const audioOpts = { gridSize: parseInt(compareGridSizeSelect.value) || 3, chaoticMode: false };
+          playMatchSequence(currentHashA, currentHashB, audioOpts);
           setCompareVerdict('match', '✓', 'Visual and acoustic signatures match. You may proceed with caution.');
           comparisonGrid.classList.remove('mismatch-detected');
           comparisonGrid.classList.add('match-detected');
           onComparisonResult(true);
         } else {
-          playMismatchSequence();
+          const audioOpts = { gridSize: parseInt(compareGridSizeSelect.value) || 3, chaoticMode: false };
+          playMismatchSequence(currentHashA, audioOpts);
           setCompareVerdict('mismatch', '⚠', 'Mosaics differ — possible phishing or corrupted address. Do not sign.');
           comparisonGrid.classList.add('mismatch-detected');
           comparisonGrid.classList.remove('match-detected');
@@ -865,10 +888,14 @@ function initTestingSuite() {
         
         // Stop timer immediately
         stopLiveTimer();
-        stopMnemonicAudio();
+
+        const audioOpts = { gridSize, chaoticMode: isChaotic };
 
         // Submit answer
         const result = testSession.submitAnswer(address);
+
+        // Play target + selected mosaic sounds, then success/failure cue
+        playTrainingSelectionFeedback(currentTargetHash, optHash, result.isCorrect, audioOpts);
         
         // Freeze exact final time on screen
         if (result) {
@@ -880,7 +907,7 @@ function initTestingSuite() {
           setTimeout(() => {
             updateStatsDisplay();
             startNextRound();
-          }, 800);
+          }, 1400);
         } else {
           card.classList.add('wrong-flash');
           
@@ -895,7 +922,7 @@ function initTestingSuite() {
           setTimeout(() => {
             updateStatsDisplay();
             startNextRound();
-          }, 1600);
+          }, 2400);
         }
       });
 

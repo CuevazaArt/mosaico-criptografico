@@ -18,7 +18,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=3.7.1">
+  <link rel="stylesheet" href="styles.css?v=3.8.2">
   <!-- Fallback config if config.runtime.js is missing (run: npm run config) -->
   <script>
     window.__APP_CONFIG__ = window.__APP_CONFIG__ || {
@@ -241,6 +241,19 @@
               <li><strong>Address:</strong> <code id="wizard-success-address">—</code></li>
               <li><strong>Transaction:</strong> <code id="wizard-tx-hash">—</code></li>
             </ul>
+            <section class="wizard-xaman-trust-panel" id="wizard-xaman-trust-panel" aria-labelledby="wizard-xaman-trust-title">
+              <h4 id="wizard-xaman-trust-title">⚠️ Xaman may label your NFT as suspicious</h4>
+              <p>This is a <strong>known false positive</strong> for self-minted utility NFTs. Your mint is valid if <strong>you</strong> just signed it here and taxon is <code>1001</code>.</p>
+              <ul class="wizard-trust-checklist">
+                <li>Issuer = Owner = your address</li>
+                <li>Comparator shows <strong>✅ Registered</strong></li>
+                <li>Explorer shows the NFT on your account</li>
+              </ul>
+              <div class="wizard-trust-actions">
+                <a href="/verify" id="wizard-verify-link" class="btn-secondary btn-sm">🔍 Verify on-chain</a>
+                <a href="https://github.com/CuevazaArt/mosaico-criptografico/blob/main/XAMAN_TRUST_ISSUE.md" target="_blank" rel="noopener" class="btn-secondary btn-sm">Full guide</a>
+              </div>
+            </section>
             <div class="wizard-unmint-section">
               <p class="wizard-unmint-note">Need to reclaim your XRP owner reserve? Burn the NFT — costs are fetched live from the ledger before you confirm.</p>
               <button type="button" id="wizard-unmint-btn" class="btn-secondary btn-sm">🔥 Burn keychain &amp; reclaim XRP</button>
@@ -371,47 +384,11 @@
         <div class="comparator-layout">
           <div class="card glass-panel comparator-workspace">
             <header class="comparator-header">
-              <div class="comparator-header-main">
-                <h2 id="comparator-heading" class="card-title">Address comparator</h2>
-                <p class="comparator-lead">Paste the <strong>expected</strong> address (A) and the <strong>copied</strong> address (B). If mosaics or melodies differ, <strong>do not sign</strong>.</p>
-              </div>
-              <div class="comparator-toolbar">
-                <div class="comparator-control">
-                  <label for="compare-grid-size-select">Grid size</label>
-                  <select id="compare-grid-size-select" class="form-select comparator-select">
-                    <option value="3" selected>3 × 3</option>
-                    <option value="4">4 × 4</option>
-                    <option value="5">5 × 5</option>
-                  </select>
-                </div>
-                <div class="comparator-demo-tools" aria-label="Demo shortcuts">
-                  <span class="comparator-demo-label">Demo</span>
-                  <button type="button" id="simulate-phishing-btn" class="btn-demo btn-demo--danger" data-tip="simulate-phishing-btn">Phishing ⚠️</button>
-                  <button type="button" id="force-match-btn" class="btn-demo btn-demo--ok" data-tip="force-match-btn">Perfect ✅</button>
-                </div>
-              </div>
+              <h2 id="comparator-heading" class="card-title">Address comparator</h2>
+              <p class="comparator-lead">Paste the <strong>expected</strong> address (A) and the <strong>copied</strong> address (B). If mosaics or melodies differ, <strong>do not sign</strong>.</p>
             </header>
 
-            <div class="comparator-meta-row">
-              <div class="match-instructions-bar" role="note">
-                <span class="match-instructions-icon" aria-hidden="true">⚠️</span>
-                <p>Before sending XRP, confirm both mosaics are <strong>visually and acoustically identical</strong>. Any difference = warning sign.</p>
-              </div>
-              <div class="badge-legend comparator-legend" aria-label="Badge meanings">
-                <span class="legend-item"><span class="legend-dot legend-dot--ok">✅</span> Match</span>
-                <span class="legend-item"><span class="legend-dot legend-dot--bad">⚠️</span> Differ</span>
-                <span class="legend-item"><span class="legend-dot legend-dot--unk">❓</span> No NFT</span>
-              </div>
-            </div>
-
-            <div id="compare-verdict" class="compare-verdict compare-verdict--neutral" aria-live="polite">
-              <div id="comparison-badge" class="comparison-badge">⏳</div>
-              <div class="compare-verdict-text">
-                <span id="comparison-msg" class="comparison-msg">Paste two addresses to compare their visual and acoustic signatures.</span>
-              </div>
-            </div>
-
-            <div class="comparison-grid">
+            <div class="comparison-grid comparison-grid--primary">
               <article class="compare-slot compare-slot-a">
                 <header class="compare-slot-header">
                   <div class="compare-slot-title">
@@ -453,6 +430,48 @@
                   <span aria-hidden="true">🔊</span> Listen to Key B
                 </button>
               </article>
+            </div>
+
+            <div class="comparator-options" aria-label="Comparison options and status">
+              <div id="compare-verdict" class="compare-verdict compare-verdict--neutral" aria-live="polite">
+                <div id="comparison-badge" class="comparison-badge">⏳</div>
+                <div class="compare-verdict-text">
+                  <span id="comparison-msg" class="comparison-msg">Paste two addresses to compare their visual and acoustic signatures.</span>
+                </div>
+              </div>
+
+              <div class="comparator-options-toolbar">
+                <div class="comparator-control">
+                  <label for="compare-grid-size-select">Grid size</label>
+                  <select id="compare-grid-size-select" class="form-select comparator-select">
+                    <option value="3" selected>3 × 3</option>
+                    <option value="4">4 × 4</option>
+                    <option value="5">5 × 5</option>
+                  </select>
+                </div>
+                <div class="comparator-example-tools" aria-label="Example shortcuts">
+                  <div class="comparator-example-action">
+                    <span class="comparator-example-hint">Click for example of:</span>
+                    <button type="button" id="simulate-phishing-btn" class="btn-demo btn-demo--danger" data-tip="simulate-phishing-btn">Phishing ⚠️</button>
+                  </div>
+                  <div class="comparator-example-action">
+                    <span class="comparator-example-hint">Click for example of:</span>
+                    <button type="button" id="force-match-btn" class="btn-demo btn-demo--ok" data-tip="force-match-btn">Perfect ✅</button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="comparator-meta-row">
+                <div class="match-instructions-bar" role="note">
+                  <span class="match-instructions-icon" aria-hidden="true">⚠️</span>
+                  <p>Before sending XRP, confirm both mosaics are <strong>visually and acoustically identical</strong>. Any difference = warning sign.</p>
+                </div>
+                <div class="badge-legend comparator-legend" aria-label="Badge meanings">
+                  <span class="legend-item"><span class="legend-dot legend-dot--ok">✅</span> Match</span>
+                  <span class="legend-item"><span class="legend-dot legend-dot--bad">⚠️</span> Differ</span>
+                  <span class="legend-item"><span class="legend-dot legend-dot--unk">❓</span> No NFT</span>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -559,71 +578,71 @@
       <section id="testing-tab" class="tab-panel" aria-labelledby="testing-heading">
         <div class="grid-2col-73">
           <div class="card glass-panel" id="game-card">
-            <div class="game-header">
+            <header class="training-header">
               <h2 id="testing-heading" class="card-title">Keychain comparison training</h2>
-              <div class="game-settings" style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
-                <div style="display: flex; align-items: center; gap: 0.5rem;">
-                  <label for="game-grid-size-select">Grid:</label>
-                  <select id="game-grid-size-select" class="form-select">
-                    <option value="3" selected>3 x 3</option>
-                    <option value="4">4 x 4</option>
-                    <option value="5">5 x 5</option>
-                  </select>
-                </div>
-                <div style="display: flex; align-items: center; gap: 0.5rem;">
-                  <label for="game-mode-select">Mode:</label>
-                  <select id="game-mode-select" class="form-select">
-                    <option value="harmonious">Harmonious Mode (Recommended)</option>
-                    <option value="chaotic">Chaotic Mode</option>
-                  </select>
+            </header>
+
+            <div class="training-playfield">
+              <!-- Game Start Screen -->
+              <div id="game-start-screen" class="game-screen active">
+                <div class="start-content">
+                  <span class="start-icon">🎯</span>
+                  <h3>Visual Accuracy & Speed Test</h3>
+                  <p>Measure how long it takes you to detect a mutated address (phishing attack) using the visual aid of 3x3 mosaics compared across both chromatic modes.</p>
+                  <button type="button" id="start-game-btn" class="btn-primary" data-tip="start-game-btn">Start simulation</button>
                 </div>
               </div>
-            </div>
-            
-            <p class="card-desc">
-              Train your eye against phishing: you'll see a <strong>target mosaic</strong> and 6 options below. 5 addresses are forged in the middle — only 1 is correct.
-              <strong>Can you spot it instantly?</strong>
-            </p>
 
-            <!-- Game Start Screen -->
-            <div id="game-start-screen" class="game-screen active">
-              <div class="start-content">
-                <span class="start-icon">🎯</span>
-                <h3>Visual Accuracy & Speed Test</h3>
-                <p>Measure how long it takes you to detect a mutated address (phishing attack) using the visual aid of 3x3 mosaics compared across both chromatic modes.</p>
-                <button type="button" id="start-game-btn" class="btn-primary" data-tip="start-game-btn">Start simulation</button>
-              </div>
-            </div>
-
-            <!-- Game Active Screen -->
-            <div id="game-active-screen" class="game-screen">
-              <div class="target-container">
-                <div class="target-card">
-                  <span class="badge-target">TARGET</span>
-                  <div id="game-target-preview" class="identicon-target-container">
-                    <!-- Target SVG -->
+              <!-- Game Active Screen -->
+              <div id="game-active-screen" class="game-screen">
+                <div class="target-container">
+                  <div class="target-card">
+                    <span class="badge-target">TARGET</span>
+                    <div id="game-target-preview" class="identicon-target-container"></div>
                   </div>
-                </div>
-                 <div class="target-instructions">
-                  <div class="flex-row-align" style="margin-bottom: 0.5rem; gap: 1rem; width: 100%;">
-                    <h4 style="margin: 0;">Find this exact mosaic below</h4>
-                    <div class="game-timer" style="font-family: var(--font-mono); font-size: 0.9rem; font-weight: 700; color: var(--primary); background: rgba(99, 102, 241, 0.1); padding: 0.25rem 0.6rem; border-radius: 6px; border: 1px solid rgba(99, 102, 241, 0.2); white-space: nowrap;">
-                      ⏱️ <span id="game-timer-ms">0.000</span>s
+                  <div class="target-instructions">
+                    <div class="target-instructions-head">
+                      <h4>Find this exact mosaic below</h4>
+                      <div class="game-timer">
+                        ⏱️ <span id="game-timer-ms">0.000</span>s
+                      </div>
                     </div>
+                    <p>Compare the geometric pattern, the anchors, and listen to the audios of the options. Then <strong>click the identical mosaic</strong> to submit your answer.</p>
+                    <p class="target-matching-rule">
+                      ⚠️ <strong>MATCHING RULE:</strong> The correct option must be <span class="target-matching-highlight">visually and audibly identical</span> to the target — click it to confirm.
+                    </p>
+                    <button type="button" id="play-game-target-audio-btn" class="btn-tiny btn-listen-target">
+                      <span aria-hidden="true">🔊</span> Listen to Target
+                    </button>
                   </div>
-                  <p>Compare the geometric pattern, the anchors, and listen to the audios of the options.</p>
-                  <p style="color: #fbbf24; background: rgba(245, 158, 11, 0.08); border: 1px solid rgba(245, 158, 11, 0.25); padding: 0.4rem 0.8rem; border-radius: 8px; font-size: 0.82rem; font-weight: 600; line-height: 1.4; margin-top: 0.4rem;">
-                    ⚠️ <strong>MATCHING RULE:</strong> The correct option must be <span style="text-shadow: 0 0 6px rgba(251, 191, 36, 0.5); text-decoration: underline;">visually and audibly identical</span> to the target.
-                  </p>
-                  <button id="play-game-target-audio-btn" class="btn-tiny" style="margin-top: 0.5rem; display: flex; align-items: center; gap: 0.25rem; width: auto; max-width: 180px;">
-                    <span>🔊</span> Listen to Target
-                  </button>
+                </div>
+
+                <div class="options-grid" id="game-options-container"></div>
+              </div>
+            </div>
+
+            <div class="training-options" aria-label="Training settings and instructions">
+              <div class="training-options-toolbar">
+                <div class="training-control">
+                  <label for="game-grid-size-select">Grid</label>
+                  <select id="game-grid-size-select" class="form-select training-select">
+                    <option value="3" selected>3 × 3</option>
+                    <option value="4">4 × 4</option>
+                    <option value="5">5 × 5</option>
+                  </select>
+                </div>
+                <div class="training-control">
+                  <label for="game-mode-select">Mode</label>
+                  <select id="game-mode-select" class="form-select training-select">
+                    <option value="harmonious">Harmonious (Recommended)</option>
+                    <option value="chaotic">Chaotic</option>
+                  </select>
                 </div>
               </div>
-
-              <div class="options-grid" id="game-options-container">
-                <!-- 6 Option cards injected by JS -->
-              </div>
+              <p class="training-lead">
+                Train your eye against phishing: you'll see a <strong>target mosaic</strong> and 6 options below. 5 addresses are forged in the middle — only 1 is correct.
+                <strong>Click the matching mosaic</strong> when you find it.
+              </p>
             </div>
           </div>
 
@@ -828,6 +847,11 @@
           <span class="help-map-cost">Free · Daily use</span>
         </article>
       </div>
+      <section class="help-known-issue" aria-labelledby="help-xaman-trust-title">
+        <h3 id="help-xaman-trust-title">⚠️ Xaman “scam” warning after mint?</h3>
+        <p>If <strong>you</strong> just minted your keychain and Xaman flags the NFT as suspicious, it is often a <strong>false positive</strong> — not a failed mint. Confirm taxon <code>1001</code>, Issuer = Owner = your address, and <strong>✅ Registered</strong> in Comparator.</p>
+        <a href="https://github.com/CuevazaArt/mosaico-criptografico/blob/main/XAMAN_TRUST_ISSUE.md" target="_blank" rel="noopener" class="btn-secondary">Known issue &amp; what to do</a>
+      </section>
       <section class="help-bug-report" aria-labelledby="help-bug-title">
         <h3 id="help-bug-title">🐛 Report a bug</h3>
         <p>Found something broken? Open a GitHub issue with your browser, steps, and what you expected. Include screenshots if you can.</p>
@@ -865,6 +889,29 @@
         <button type="button" id="cost-confirm-cancel-btn" class="btn-secondary">Cancel</button>
       </div>
       <p class="cost-confirm-hint">Review the costs above, then choose Accept or Cancel.</p>
+    </div>
+  </div>
+
+  <!-- Burn confirmation (fresh session after Xaman return) -->
+  <div id="burn-success-overlay" class="burn-success-overlay" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="burn-success-title">
+    <div class="burn-success-backdrop" aria-hidden="true"></div>
+    <div class="burn-success-panel" role="document">
+      <button type="button" id="burn-success-close-btn" class="burn-success-close" aria-label="Close">✕</button>
+      <div class="burn-success-banner">
+        <span class="burn-success-icon" aria-hidden="true">🔥</span>
+        <h2 id="burn-success-title">Keychain burned</h2>
+        <p class="burn-success-lead">Your mosaic NFT was destroyed on XRPL. The owner reserve is released and the XRP is available again in your account.</p>
+      </div>
+      <ul class="burn-success-list">
+        <li><strong>Account:</strong> <code id="burn-success-address">—</code></li>
+        <li><strong>Reserve released:</strong> <span id="burn-success-reserve">—</span></li>
+        <li><strong>NFT:</strong> <code id="burn-success-nft">—</code></li>
+        <li><strong>Transaction:</strong> <code id="burn-success-hash">—</code></li>
+      </ul>
+      <p class="burn-success-note">You can mint a new keychain later if you want a fresh on-chain identity package.</p>
+      <div class="burn-success-actions">
+        <button type="button" id="burn-success-done-btn" class="btn-primary">Done</button>
+      </div>
     </div>
   </div>
 
@@ -920,6 +967,6 @@
     </div>
   </div>
 
-  <script type="module" src="main.js?v=3.7.1"></script>
+  <script type="module" src="main.js?v=3.8.2"></script>
 </body>
 </html>

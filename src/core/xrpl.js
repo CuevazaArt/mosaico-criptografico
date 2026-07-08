@@ -82,8 +82,9 @@ async function pollXamanPayload(uuid, logger, timeoutMs = 300000) {
       throw new Error(err.error || `Payload status check failed (${response.status})`);
     }
     const status = await response.json();
-    if (status.signed && status.txHash) {
-      return status.txHash;
+    if (status.signed) {
+      // Prefer ledger txid; fall back so wizard can still complete if hash lag occurs.
+      return status.txHash || `signed:${uuid}`;
     }
     if (status.cancelled) {
       throw new Error("Transaction cancelled in Xaman.");
@@ -260,7 +261,10 @@ async function signWithXamanBackend(txJson, logger, options = {}) {
   const response = await fetch('/api/xumm/payload', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ txjson: txJson })
+    body: JSON.stringify({
+      txjson: txJson,
+      returnAction: options.returnAction || 'mint'
+    })
   });
   if (!response.ok) {
     const err = await response.json().catch(() => ({}));
@@ -282,7 +286,16 @@ async function signWithXamanSdk(txJson, logger, options = {}) {
   if (!xumm.authorized) {
     await xumm.authorize();
   }
-  const payload = await xumm.payload.create({ txjson: txJson });
+  const appUrl = String(getAppConfig().appUrl || window.location.origin).replace(/\/$/, '');
+  const action = options.returnAction || 'mint';
+  const returnTarget = `${appUrl}/?xumm_payload={id}&txid={txid}&wizard=${action}`;
+  const payload = await xumm.payload.create({
+    txjson: txJson,
+    options: {
+      submit: true,
+      return_url: { app: returnTarget, web: returnTarget }
+    }
+  });
   if (!payload?.next?.always) {
     throw new Error("Xaman payload created but no signing URL was returned.");
   }

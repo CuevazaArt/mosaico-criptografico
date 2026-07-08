@@ -103,7 +103,65 @@ This project separates **public configuration** from **secret credentials** to k
 4. `npm run vault:sync` pushes credentials to Vercel's encrypted environment variables.
 5. Production mode (`DEPLOYMENT_MODE=production`) disables all seed/secret input fields in the UI.
 
+**Known wallet UX issue:** Xaman may label self-minted Mosaic Keychain NFTs as suspicious before metadata domain safelisting. This is documented in [XAMAN_TRUST_ISSUE.md](XAMAN_TRUST_ISSUE.md) — not a flaw in the mosaic cryptography model.
+
 **What judges should verify:** Open `config.runtime.js` on the live demo — it contains the public Xumm API key and deployment settings only. The API secret is accessible exclusively to the serverless route `api/xumm/payload.js` at runtime on Vercel's infrastructure.
+
+---
+
+## 5. Supply-chain hygiene (npm + IDE tooling)
+
+This repository has **no dependency** on graph indexers or MCP “codebase memory” tools. Dependencies are limited to `sharp` (production) and `playwright` (dev UI tests).
+
+### Do not install in this project
+
+| Tool / artifact | Why |
+|-----------------|-----|
+| `codebase-memory-mcp` ([DeusData](https://github.com/DeusData/codebase-memory-mcp)) | External Cursor/IDE indexer — not part of Cryptographic Mosaic; past installer CVE class (tar-slip) reported — keep out of repo |
+| `.codebase-memory/` directory | Local graph DB / index artifacts — must never be committed |
+| `graph.db` / `graph.db.zst` | Compressed knowledge-graph exports from such tools |
+
+If you use third-party indexers **on your machine**, configure them **outside** this repo (user-level Cursor MCP settings only).
+
+### Periodic checks (operators)
+
+Run before every release:
+
+```bash
+npm audit
+npm run audit          # project secret-leak scan (not npm registry)
+```
+
+`npm audit` in this project should report **0 vulnerabilities** with current lockfile.
+
+### If you find traces — purge immediately
+
+**Local repo:**
+
+```bash
+# From repository root
+rm -rf .codebase-memory
+git rm -r --cached .codebase-memory 2>/dev/null || true
+git status
+```
+
+**Remote (only if accidentally committed):**
+
+```bash
+git rm -r --cached .codebase-memory
+git commit -m "Remove accidental codebase-memory indexer artifacts"
+git push
+```
+
+Also remove any MCP server entry pointing at `codebase-memory-mcp` from your **user** Cursor config (`~/.cursor/mcp.json` or Cursor Settings → MCP) — that file is **not** in this repository.
+
+**Rotate credentials** if a compromised or unvetted indexer ever ran against a machine that holds `.env`, `XUMM_API_SECRET`, or wallet seeds.
+
+### What this repo already blocks
+
+- `.gitignore` — `.codebase-memory/`, `graph.db`, `graph.db.zst`
+- `npm run audit` — fails deploy if secrets appear in client bundles
+- Minimal `package.json` dependencies (audit surface is small)
 
 ---
 

@@ -241,6 +241,14 @@ The generator accepts any text or address. On-chain registration (NFT) is **XRPL
 
 XRPL confirms in ~4 seconds. You'll see the hash in the dApp console.
 
+### Xaman says my NFT is a scam or suspicious — did something go wrong?
+
+**Often no.** This is a [known false positive](XAMAN_TRUST_ISSUE.md) when wallets flag self-minted utility NFTs from domains that are not yet safelisted.
+
+Your mint is probably legitimate if **you** signed it in our app, taxon is `1001`, **Issuer == Owner** (your address), and the Comparator shows **✅ Registered**. Verify the transaction on [Bithomp](https://bithomp.com) or [xrpl.org](https://xrpl.org).
+
+See **[XAMAN_TRUST_ISSUE.md](XAMAN_TRUST_ISSUE.md)** for the full checklist and what the project team is doing until Xaman fixes it.
+
 ---
 
 ## Quick summary
@@ -266,6 +274,7 @@ XRPL confirms in ~4 seconds. You'll see the hash in the dApp console.
 | Technical manual | [MANUAL.md](MANUAL.md) |
 | Simple + technical narrative | [NARRATIVE.md](NARRATIVE.md) |
 | Security and credentials | [SECURITY.md](SECURITY.md) |
+| Xaman scam warning after mint | [XAMAN_TRUST_ISSUE.md](XAMAN_TRUST_ISSUE.md) |
 | Developer deployment | [DEPLOYMENT.md](DEPLOYMENT.md) |
 | **Legal & disclaimer** | [LEGAL.md](LEGAL.md) |
 | **Terms of Use (required)** | [TERMS.md](TERMS.md) |

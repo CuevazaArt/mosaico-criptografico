@@ -39,3 +39,9 @@ config.runtime.js
 .env.local
 .env.*.local
 !.env.example
+
+# Third-party code indexers / MCP graph artifacts (never commit)
+.codebase-memory/
+**/.codebase-memory/
+**/graph.db
+**/graph.db.zst
