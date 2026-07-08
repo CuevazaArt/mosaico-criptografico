@@ -1,0 +1,36 @@
+1
+00:00:08,587 --> 00:00:11,900
+Cryptographic Mosaic — visual & acoustic 2FA for XRPL addresses
+
+2
+00:00:12,100 --> 00:00:15,717
+Register your keychain — each address gets a unique mosaic and melody
+
+3
+00:00:15,917 --> 00:00:20,324
+Acoustic signature — 4 notes unique to your address
+
+4
+00:00:20,524 --> 00:00:23,882
+Comparator — compare trusted vs copied address before every send
+
+5
+00:00:24,082 --> 00:00:27,045
+One wrong character — mosaic and melody change completely (phishing alert)
+
+6
+00:00:27,245 --> 00:00:31,152
+Matching addresses — green verdict, safe to sign in your wallet
+
+7
+00:00:31,352 --> 00:00:38,473
+Generator — paste any XRPL address, get its mosaic instantly
+
+8
+00:00:38,673 --> 00:00:43,030
+Mainnet Soulbound NFT mint — taxon 1001, self-issued (Issuer = Owner)
+
+9
+00:00:43,230 --> 00:00:53,592
+Public verify page — account_nfts confirms valid Mosaic Keychain
+

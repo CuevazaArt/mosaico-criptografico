@@ -45,3 +45,6 @@ config.runtime.js
 **/.codebase-memory/
 **/graph.db
 **/graph.db.zst
+assets/demo-recording/
+assets/demo-music-bed.wav
+assets/demo-acoustic-cues.wav

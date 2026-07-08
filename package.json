@@ -35,6 +35,8 @@
     "toml": "node scripts/generate-toml.js",
     "test": "node --test tests/app-config.test.js tests/mosaico.test.js tests/nft-package.test.js tests/first-use-guide.test.js",
     "test:ui": "node scripts/ui-audit.mjs",
+    "record:demo": "node scripts/record-demo-video.mjs",
+    "remux:demo": "node scripts/record-demo-video.mjs --remux-only",
     "dev": "npm run config && npx -y serve .",
     "dev:mainnet": "npm run config && npx vercel dev --listen 3000 --yes",
     "deploy": "npm run predeploy && npx vercel --prod --yes"
