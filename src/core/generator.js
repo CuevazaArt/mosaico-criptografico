@@ -3,6 +3,8 @@
  * Generates a deterministic vector SVG from a 32-byte hash (SHA-256).
  */
 
+import { buildSemiAnchoredLayout } from './layout.js';
+
 /**
  * Generates the SVG string of a 3x3 mosaic identicon.
  * @param {Uint8Array} hash - 32-byte array representing the hash.
@@ -31,18 +33,8 @@ export function generateSvg(hash, textSource, options = {}) {
   const globalSat = 65 + (hash[29] % 25); // 65% to 90%
   const globalLight = 40 + (hash[28] % 20); // 40% to 60%
 
-  // Create a deterministic cell layout based on hash bytes.
-  // Start with a standard sequential layout.
-  const layout = Array.from({ length: numCells }, (_, idx) => idx);
-  
-  // Perform a deterministic Fisher-Yates shuffle using hash bytes.
-  // This uniquely reorganizes the physical position of all patterns.
-  for (let k = numCells - 1; k > 0; k--) {
-    const j = hash[k % 32] % (k + 1);
-    const temp = layout[k];
-    layout[k] = layout[j];
-    layout[j] = temp;
-  }
+  // Semi-anchored layout: anchor (type 4) fixed at geometric center; shuffle periphery only.
+  const layout = buildSemiAnchoredLayout(hash, numCells);
 
   // Start SVG construction
   let svgContent = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 300" width="100%" height="100%" style="border-radius: 16px; box-shadow: 0 8px 30px rgba(0,0,0,0.3); overflow: hidden; background: #0c0f1d;">`;

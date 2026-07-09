@@ -18,7 +18,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=3.8.2">
+  <link rel="stylesheet" href="styles.css?v=3.9.0">
   <!-- Fallback config if config.runtime.js is missing (run: npm run config) -->
   <script>
     window.__APP_CONFIG__ = window.__APP_CONFIG__ || {
@@ -30,7 +30,7 @@
       enableLocalDemo: true,
       defaultWallet: 'xaman',
       sampleXrplAddress: 'rG1QQv2dh2AGTf5gZUXyZEaXcRmGRHsGQE',
-      version: '3.1.6'
+      version: '3.9.0'
     };
   </script>
   <script src="config.runtime.js" onerror="console.info('[config] Using inline fallback — run npm run config for full setup.')"></script>
@@ -241,17 +241,17 @@
               <li><strong>Address:</strong> <code id="wizard-success-address">—</code></li>
               <li><strong>Transaction:</strong> <code id="wizard-tx-hash">—</code></li>
             </ul>
-            <section class="wizard-xaman-trust-panel" id="wizard-xaman-trust-panel" aria-labelledby="wizard-xaman-trust-title">
-              <h4 id="wizard-xaman-trust-title">⚠️ Xaman may label your NFT as suspicious</h4>
-              <p>This is a <strong>known false positive</strong> for self-minted utility NFTs. Your mint is valid if <strong>you</strong> just signed it here and taxon is <code>1001</code>.</p>
+            <section class="wizard-xaman-trust-panel wizard-xaman-trust-ok" id="wizard-xaman-trust-panel" aria-labelledby="wizard-xaman-trust-title">
+              <h4 id="wizard-xaman-trust-title">✅ On-chain identity registered</h4>
+              <p>Your Mosaic Keychain is a self-issued Soulbound NFT (taxon <code>1001</code>, Issuer = Owner). Verify anytime on the public checker.</p>
               <ul class="wizard-trust-checklist">
                 <li>Issuer = Owner = your address</li>
                 <li>Comparator shows <strong>✅ Registered</strong></li>
-                <li>Explorer shows the NFT on your account</li>
+                <li>Xaman shows your NFT without scam false positives (resolved 2026-07)</li>
               </ul>
               <div class="wizard-trust-actions">
                 <a href="/verify" id="wizard-verify-link" class="btn-secondary btn-sm">🔍 Verify on-chain</a>
-                <a href="https://github.com/CuevazaArt/mosaico-criptografico/blob/main/XAMAN_TRUST_ISSUE.md" target="_blank" rel="noopener" class="btn-secondary btn-sm">Full guide</a>
+                <a href="https://github.com/CuevazaArt/mosaico-criptografico/blob/main/USER_GUIDE.md" target="_blank" rel="noopener" class="btn-secondary btn-sm">User guide</a>
               </div>
             </section>
             <div class="wizard-unmint-section">
@@ -848,9 +848,9 @@
         </article>
       </div>
       <section class="help-known-issue" aria-labelledby="help-xaman-trust-title">
-        <h3 id="help-xaman-trust-title">⚠️ Xaman “scam” warning after mint?</h3>
-        <p>If <strong>you</strong> just minted your keychain and Xaman flags the NFT as suspicious, it is often a <strong>false positive</strong> — not a failed mint. Confirm taxon <code>1001</code>, Issuer = Owner = your address, and <strong>✅ Registered</strong> in Comparator.</p>
-        <a href="https://github.com/CuevazaArt/mosaico-criptografico/blob/main/XAMAN_TRUST_ISSUE.md" target="_blank" rel="noopener" class="btn-secondary">Known issue &amp; what to do</a>
+        <h3 id="help-xaman-trust-title">✅ Xaman trust — resolved</h3>
+        <p>Self-minted Mosaic Keychains (taxon <code>1001</code>) are no longer expected to show a scam false positive in Xaman. If something looks wrong, confirm <strong>✅ Registered</strong> in Comparator or use the public verify page.</p>
+        <a href="/verify" class="btn-secondary">Verify on-chain</a>
       </section>
       <section class="help-bug-report" aria-labelledby="help-bug-title">
         <h3 id="help-bug-title">🐛 Report a bug</h3>
@@ -967,6 +967,6 @@
     </div>
   </div>
 
-  <script type="module" src="main.js?v=3.8.2"></script>
+  <script type="module" src="main.js?v=3.9.0"></script>
 </body>
 </html>

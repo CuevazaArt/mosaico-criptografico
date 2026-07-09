@@ -1,6 +1,8 @@
 # Submission Draft: Make Waves on XRPL
 
-Copy the sections below directly into the Devpost or Make Waves submission form.
+Copy the sections below directly into the Devpost / Make Waves submission form.
+
+**Version:** 3.9.0 · **Demo video:** `assets/demo-make-waves.mp4`
 
 ---
 
@@ -9,193 +11,113 @@ Copy the sections below directly into the Devpost or Make Waves submission form.
 | Field | Value |
 |-------|-------|
 | **Project name** | Cryptographic Mosaic (Sensory 2FA) |
-| **Tagline** (≤140 chars) | Visual & acoustic identicons on XRPL that stop phishing and clipboard hijacking — with on-chain Soulbound identity. |
-| **Track** | Make Waves — Web3 Security & Usability |
+| **Tagline** (≤140 chars) | Visual & acoustic identicons on XRPL that stop phishing — with on-chain Soulbound identity. |
+| **Track** | Make Waves — Security & Usability / ecosystem growth |
 | **Live demo** | https://mosaico-criptografico.vercel.app |
+| **Verify** | https://mosaico-criptografico.vercel.app/verify |
 | **Repository** | https://github.com/CuevazaArt/mosaico-criptografico |
 | **NPM package** | https://www.npmjs.com/package/cryptographic_mosaic_keychain |
+| **Demo video** | `assets/demo-make-waves.mp4` (English subtitles + audio) |
 
 ---
 
-## Project story (Devpost)
+## Project story
 
-### 1. What real-world problem does your project solve? Why does it matter?
+### 1. What real-world problem does your project solve?
 
-Every day, XRPL users lose funds because they cannot verify 34-character addresses like `rG1QQv2dh2AGTf5gZUXyZEaXcRmGRHsGQE`. Under pressure, people check only the first and last few characters — and attackers know it.
+XRPL users lose funds because humans cannot reliably compare 34-character addresses. Attackers exploit vanity phishing and clipboard hijacking — matching the start/end of a legitimate `r…` while changing the middle.
 
-Two attacks dominate:
-
-- **Vanity address phishing** — Scammers generate addresses that match the start and end of a legitimate one. The text *looks* right; the destination is wrong.
-- **Clipboard hijacking** — Malware silently replaces a copied address between Ctrl+C and Ctrl+V. The user never notices.
-
-Both exploit the same weakness: **humans are not built to compare long random strings.**
-
-Cryptographic Mosaic turns each address into a **visual and acoustic fingerprint** you can recognize in under two seconds. Change one character in the middle of the address and the entire mosaic reshuffles — colors, shapes, and melody all change. Phishing becomes visible and audible before you sign.
-
-This matters because XRPL settles value in 4 seconds. There is no undo button. Prevention at the UI layer is the last line of defense.
-
----
+Cryptographic Mosaic turns each address into a **visual mosaic** and **4-note acoustic signature**. Change one character → the entire pattern and melody change. Phishing becomes visible and audible before you sign.
 
 ### 2. What is your solution?
 
-**Cryptographic Mosaic** is a sensory second-factor layer for XRPL addresses:
-
 | Layer | What it does |
 |-------|--------------|
-| **Visual mosaic** | SHA-256 hash → deterministic SVG grid (3×3 / 4×4 / 5×5) with Fisher-Yates cell shuffling and 12 discrete color families |
-| **Acoustic key** | 4-note pentatonic arpeggio unique to each address; dissonant alarm on mismatch |
-| **On-chain anchor** | Soulbound XLS-20 NFT (taxon `1001`) minted via `NFTokenMint` — self-issued proof where `Issuer == Owner` |
-| **Browser extension** | Live mosaic badges injected next to XRPL addresses on block explorers |
-| **Cognitive simulator** | Gamified phishing test measuring detection speed and accuracy |
-
-**How a user protects a transfer in practice:**
-
-1. Save the mosaic pattern of your trusted counterparty address.
-2. Before signing, paste the destination and compare mosaics side by side.
-3. If they match visually and acoustically → proceed.
-4. If they differ → stop. Do not sign.
-
----
+| **Visual mosaic** | SHA-256 → deterministic SVG (3×3 / 4×4 / 5×5) with **semi-anchored layout** (center glyph fixed) |
+| **Acoustic key** | 4-note pentatonic arpeggio unique to each address |
+| **On-chain anchor** | Soulbound XLS-20 NFT (taxon `1001`, `Issuer == Owner`) |
+| **Browser extension** | Live mosaic badges on explorers |
+| **Public verify** | `/verify` queries Mainnet `account_nfts` |
 
 ### 3. How did you build it?
 
-- **Vanilla JavaScript** — No framework lock-in. Core crypto, SVG, and audio run entirely in the browser via Web Crypto API and Web Audio API.
-- **XRPL.js** — Direct `NFTokenMint` transactions and `account_nfts` verification on Mainnet and Testnet.
-- **Non-custodial wallets** — Gem Wallet, Crossmark, and Xaman (Xumm) handle all signing. Private keys never enter the dApp.
-- **Vercel serverless** — A single API route (`/api/xumm/payload`) handles Xaman signing requests; the API secret lives only in Vercel's encrypted vault.
-- **Security-first deploy pipeline** — `npm run audit` blocks deploys if secrets leak into client bundles; `.vercelignore` prevents local `.env` from being uploaded.
+Vanilla JS (Web Crypto + Web Audio), `xrpl.js`, non-custodial wallets (Xaman / Gem / Crossmark), Vercel serverless for Xaman payloads + NFT metadata/image/audio. Pre-deploy `npm run audit` blocks secret leaks.
 
----
-
-### 4. What challenges did you face?
+### 4. Challenges
 
 | Challenge | Solution |
 |-----------|----------|
-| Screen color calibration varies across devices | Quantized HSL hues in 12 families (30° apart) so mosaics stay recognizable on any display |
-| Attackers could mint fake identity NFTs for other users | Self-issued verification: valid only when NFT `Issuer == Owner` for taxon `1001` |
-| Xaman API secret cannot live in browser code | Serverless payload route on Vercel; secret encrypted at rest in environment variables |
-| Cognitive fatigue with complex visuals | Harmonious color mode + topological anchors (countable star vertices) for fast pattern memory |
+| Cognitive load of full Fisher-Yates shuffle | **v3.9.0 semi-anchored layout** — anchor fixed at center |
+| Xaman scam false-positive on self-mint | Domain TOML + Bithomp + XRPL Labs — **RESOLVED 2026-07** |
+| Xaman API secret in browser | Serverless `/api/xumm/payload` only |
 
----
+### 5. Proud of
 
-### 5. What are you proud of?
+- Working **Mainnet** mint/burn + public `/verify`
+- Xaman trust false-positive **closed**
+- Demo video with English subtitles + audible acoustic cues
+- XLS draft for wallet-native identicons
+- $0 always-on infrastructure (no DB)
 
-- A **working Mainnet deployment** where judges can mint a real Soulbound NFT in under 60 seconds.
-- A **browser extension** that makes mosaics appear automatically on XRPL explorers — zero user action required.
-- A **cognitive testing suite** with measurable metrics (reaction time, success rate, streaks) proving the approach works under fatigue.
-- An **XLS standard draft** proposing wallet-native identicons for the entire XRPL ecosystem.
-- **$0 infrastructure cost** — no database, no always-on server, no admin overhead.
-
----
-
-### 6. What did you learn?
-
-Security on a ledger is not only about consensus and validators. The moment a human reads an address on a screen, the attack surface shifts to **cognitive psychology**. Tools that respect how memory and perception actually work — visual patterns, not hex strings — are as important as cryptographic primitives.
-
----
-
-### 7. How can this scale beyond the hackathon?
+### 6. Scale beyond the hackathon
 
 | Phase | Milestone |
 |-------|-----------|
-| **Now** | Live dApp + NPM package + browser extension + XLS draft |
-| **30 days** | PR to Xaman/Gem/Crossmark for native identicon rendering |
-| **60 days** | XLS proposal submitted to XRPL standards committee |
-| **90 days** | Wallet integrations generating verification queries before every outbound payment |
+| **Now** | Live dApp + NPM + extension + verify + demo video |
+| **30 days** | Adoption campaign — target 50+ self-mints; wallet outreach |
+| **60 days** | XLS proposal + PR sketches for Xaman/Gem/Crossmark |
+| **90 days** | Native wallet rendering → `account_nfts` before every outbound payment |
 
-**Adoption multiplier:** If 3 major XRPL wallets embed the standard, every outbound transaction triggers an `account_nfts` check — turning security into recurring on-chain activity at ecosystem scale.
+**On-chain value:** 1 identity mint per user + recurring verification reads if wallets integrate — security that drives XRPL activity.
 
 ---
 
-## Make Waves judging criteria — direct answers
+## Judging criteria
 
-### Idea (originality)
+### Idea
+First sensory 2FA layer for XRPL addresses combining visual, acoustic, and Soulbound identity — proposed as an **ecosystem standard**, not a one-off dApp.
 
-First sensory 2FA layer designed specifically for XRPL address verification, combining visual identicons, acoustic signatures, and Soulbound on-chain identity in a single zero-server dApp. Not a clone of existing wallet features — a proposed **ecosystem standard**.
+### Implementation
+- Automated unit tests (crypto, layout, SVG, NFT package, config) + Playwright UI audit
+- Semi-anchored layout + CSP + secret audit + Mainnet node failover
+- Modular NPM exports (`crypto`, `generator`, `layout`, `audio`, `xrpl`)
 
-### Implementation (code quality)
+### Demo
+Live URL + `assets/demo-make-waves.mp4`. Judges can: Comparator phishing → Generator + audio → mint path → `/verify`.
 
-- 6 automated tests passing (crypto, generator, config)
-- Pre-deploy security audit (`npm run audit`) prevents credential leaks
-- Fault-tolerant XRPL node failover across 4 Mainnet WebSocket endpoints
-- Strict Content Security Policy in `vercel.json`
-- Modular NPM exports for third-party integration
-
-### Demo (clarity)
-
-**Live URL:** https://mosaico-criptografico.vercel.app
-
-Judges can immediately:
-1. See two similar addresses produce different mosaics (Comparator tab).
-2. Connect Xaman on Mainnet (or Gem Wallet) and mint a Soulbound NFT.
-3. Verify on-chain registration via the green badge.
-4. Play acoustic signatures and run the phishing simulator.
-
-**Suggested demo video structure (2–3 min):**
-Problem → Comparator phishing detection → Generator + audio → Mainnet mint with tx hash → Extension on explorer.
-
-### Potential (on-chain value)
-
-| Metric | Conservative estimate |
-|--------|----------------------|
-| Identity NFTs minted | 1 per adopting user (one-time `NFTokenMint`) |
-| Verification queries | 1–5 `account_nfts` calls per outbound payment if wallets integrate |
-| At 10,000 active users × 2 tx/week | ~80,000–400,000 on-chain reads/month |
-| Ecosystem impact | Prevents phishing losses; drives NFT adoption; proposes XLS standard for all XRPL wallets |
-
-Even one prevented phishing attack (often worth thousands of XRP) justifies the entire project.
+### Potential
+Identity NFTs + verification queries before payments. Conservative path: wallet integrations turn every outbound transfer into an on-chain identity check.
 
 ---
 
 ## XRPL features used
 
-| Feature | Transaction / query | Purpose |
-|---------|---------------------|---------|
-| XLS-20 `NFTokenMint` | Write | Register Soulbound visual identity (taxon `1001`) |
-| `account_nfts` | Read | Verify self-issued identity on-chain |
-| Mainnet WebSockets | Connection | Live ledger interaction |
-| Testnet Faucet | Write (dev only) | Developer sandbox |
-| Gem / Crossmark / Xaman | Signing | Non-custodial transaction authorization |
+| Feature | Purpose |
+|---------|---------|
+| `NFTokenMint` / `NFTokenBurn` | Soulbound identity register / reclaim |
+| `account_nfts` | Verify taxon `1001` self-issued |
+| Mainnet WebSockets | Live ledger |
+| Xaman / Gem / Crossmark | Non-custodial signing |
 
 ---
 
-## Security statement for reviewers
-
-- Private keys are **never** collected, stored, or transmitted by this dApp.
-- Production mode hides all seed/secret input fields.
-- `XUMM_API_SECRET` exists only in Vercel's encrypted environment variables.
-- `.env` and `config.runtime.js` are gitignored and blocked from Vercel uploads via `.vercelignore`.
-- `npm run audit` runs automatically before every production deploy.
-
-**Legal:** Open-source under [MIT](LICENSE). End users **must accept** [TERMS.md](TERMS.md) in the web app. Disclaimers and liability limits in [LEGAL.md](LEGAL.md). Not affiliated with Ripple, XRPL Foundation, or wallet vendors.
-
----
-
-## Links checklist for submission form
+## Links checklist
 
 - [x] Public GitHub repository
-- [x] Live demo URL (Mainnet-ready)
-- [ ] Demo video (2–3 min) — *record using pitch script in [DEPLOYMENT.md](DEPLOYMENT.md)*
-- [ ] Screenshots of Comparator, Mainnet mint, and extension overlay
+- [x] Live demo (Mainnet)
+- [x] Demo video (`assets/demo-make-waves.mp4`)
+- [ ] Screenshots (Comparator, mint success, `/verify`) — capture for form
+- [ ] Register on https://hackathons.xrpl-commons.org/
 
 ---
 
-## 5-minute pitch outline
+## 5-minute pitch
 
 | Time | Content |
 |------|---------|
-| 0:00–0:30 | "Addresses are unhuman. Scammers exploit that." Show similar `r...` addresses. |
-| 0:30–1:30 | Comparator demo — mosaics diverge on one-character change. Play mismatch audio. |
-| 1:30–2:30 | Connect Xaman (mobile QR) or Gem Wallet → Mint Soulbound NFT on Mainnet → show tx hash. |
-| 2:30–3:30 | Explain self-issued proof (`Issuer == Owner`). Show extension on xrpl.org. |
-| 3:30–4:30 | Cognitive simulator results. XLS standard vision. Ecosystem scale. |
-| 4:30–5:00 | "Every XRPL wallet should show a mosaic before you sign. We built the standard." |
-
----
-
-## What's next
-
-- Submit XLS proposal to the XRPL standards committee.
-- Native integration PRs for Xaman, Gem Wallet, and Crossmark.
-- Continuous cognitive testing metrics to publish detection-speed benchmarks.
-- Aquarium incubation program at XRPL Commons (Paris).
+| 0:00–0:30 | Addresses are unhuman. Show lookalike `r…` |
+| 0:30–1:30 | Comparator — one wrong char → mosaics diverge + audio |
+| 1:30–2:30 | Mint Soulbound NFT on Mainnet (Xaman) → tx hash |
+| 2:30–3:30 | `/verify` + self-issued proof; Xaman trust resolved |
+| 3:30–4:30 | Semi-anchored layout + XLS / wallet adoption path |
+| 4:30–5:00 | “Every XRPL wallet should show a mosaic before you sign.” |

@@ -177,21 +177,19 @@ After ~4 seconds (XRPL confirmation):
 2. Copy and save this hash — it is your on-chain receipt.
 3. Optional: open the hash on [Bithomp](https://bithomp.com) or [xrpl.org](https://xrpl.org) to view the NFT on the explorer.
 
-### Step 2.7 — If Xaman shows a “scam” or suspicious warning (known issue)
+### Step 2.7 — Confirm in Xaman (trust resolved)
 
-**Your mint may still be valid.** Xaman sometimes flags **self-minted** utility NFTs from unknown metadata domains — even when **you** just signed the mint.
+After mint, open the NFT in Xaman. Self-minted Mosaic Keychains should appear as normal utility NFTs — the previous scam false-positive was **resolved in 2026-07**.
 
-| Check | Expected for a legitimate Mosaic Keychain |
-|-------|-------------------------------------------|
-| You initiated mint in this app | Yes — you clicked **Mint Mosaic Key** |
-| Issuer == Owner | Both are **your** `r…` address |
+| Check | Expected |
+|-------|----------|
+| You initiated mint in this app | Yes |
+| Issuer == Owner | Your `r…` address |
 | Taxon | `1001` |
 | Comparator badge | **✅ Registered** |
-| Explorer | NFT visible on Bithomp / xrpl.org |
+| Public verify | https://mosaico-criptografico.vercel.app/verify |
 
-If all match, the warning is a **false positive**. Do not burn the NFT unless you want to remove the anchor.
-
-Full mitigation guide (users + operators): **[XAMAN_TRUST_ISSUE.md](XAMAN_TRUST_ISSUE.md)**
+Historical notes: **[XAMAN_TRUST_ISSUE.md](XAMAN_TRUST_ISSUE.md)**
 
 ---
 
@@ -269,7 +267,7 @@ Once your keychain exists, use this **10-second protocol** before every outbound
 | Mint button disabled | Connect wallet first; confirm Mainnet and sufficient XRP (~2 free) |
 | `tecINSUFFICIENT_RESERVE` | Add more XRP to your account |
 | Badge stays **❓ Unregistered** | Wait a few seconds; confirm Mainnet; paste exact same address in B |
-| Xaman labels NFT **scam / suspicious** after you minted | Likely false positive — see [XAMAN_TRUST_ISSUE.md](XAMAN_TRUST_ISSUE.md) |
+| Xaman labels NFT **scam / suspicious** after you minted | Rare after 2026-07 fix — verify at `/verify`; see [XAMAN_TRUST_ISSUE.md](XAMAN_TRUST_ISSUE.md) |
 | Mosaics look different for "same" address | One character is different — **stop**, this may be phishing |
 | GitHub Pages version | Visual demo only — use **Vercel** URL for Mainnet minting |
 
@@ -304,7 +302,7 @@ Once your keychain exists, use this **10-second protocol** before every outbound
 | [TERMS.md](TERMS.md) | Terms of Use (required acceptance) |
 | [LEGAL.md](LEGAL.md) | Disclaimers and liability limits |
 | [NARRATIVE.md](NARRATIVE.md) | Simple keychain analogy |
-| [XAMAN_TRUST_ISSUE.md](XAMAN_TRUST_ISSUE.md) | Xaman false “scam” warning after self-mint |
+| [XAMAN_TRUST_ISSUE.md](XAMAN_TRUST_ISSUE.md) | Historical Xaman false-positive — **RESOLVED** |
 
 ---
 

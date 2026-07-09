@@ -103,7 +103,7 @@ This project separates **public configuration** from **secret credentials** to k
 4. `npm run vault:sync` pushes credentials to Vercel's encrypted environment variables.
 5. Production mode (`DEPLOYMENT_MODE=production`) disables all seed/secret input fields in the UI.
 
-**Known wallet UX issue:** Xaman may label self-minted Mosaic Keychain NFTs as suspicious before metadata domain safelisting. This is documented in [XAMAN_TRUST_ISSUE.md](XAMAN_TRUST_ISSUE.md) — not a flaw in the mosaic cryptography model.
+**Xaman trust:** Self-minted Mosaic Keychain NFTs are no longer expected to show a scam false positive after domain safelisting (2026-07). Historical notes: [XAMAN_TRUST_ISSUE.md](XAMAN_TRUST_ISSUE.md).
 
 **What judges should verify:** Open `config.runtime.js` on the live demo — it contains the public Xumm API key and deployment settings only. The API secret is accessible exclusively to the serverless route `api/xumm/payload.js` at runtime on Vercel's infrastructure.
 

@@ -64,3 +64,25 @@ test('SVG Rendering Engine - Generates mosaic deterministically', async () => {
   const svgChaotic = generateSvg(hash, address, { chaoticMode: true });
   assert.ok(svgChaotic.includes('<svg'));
 });
+
+test('Semi-anchored layout - center cell is always topological anchor (type 4)', async () => {
+  const { buildSemiAnchoredLayout, centerCellIndex, ANCHOR_CELL_TYPE } = await import('../src/core/layout.js');
+  for (const gridSize of [3, 4, 5]) {
+    const numCells = gridSize * gridSize;
+    const hash = await sha256(`layout-test-${gridSize}`);
+    const layout = buildSemiAnchoredLayout(hash, numCells);
+    const center = centerCellIndex(gridSize);
+    assert.strictEqual(layout[center], ANCHOR_CELL_TYPE);
+    assert.strictEqual(layout.length, numCells);
+    const unique = new Set(layout);
+    assert.strictEqual(unique.size, numCells);
+  }
+});
+
+test('Semi-anchored layout - same hash yields identical layout', async () => {
+  const { buildSemiAnchoredLayout } = await import('../src/core/layout.js');
+  const hash = await sha256('rG1QQv2dh2AGTf5gZUXyZEaXcRmGRHsGQE');
+  const a = buildSemiAnchoredLayout(hash, 9);
+  const b = buildSemiAnchoredLayout(hash, 9);
+  assert.deepStrictEqual(a, b);
+});

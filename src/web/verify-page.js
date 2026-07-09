@@ -40,7 +40,7 @@ function renderValid(address, nft) {
       <a href="${bithomp}" target="_blank" rel="noopener">Bithomp NFT</a>
       <a href="${explorer}" target="_blank" rel="noopener">XRPL explorer</a>
     </p>
-    <p class="verify-note">If Xaman still shows a scam warning, see the <a href="https://github.com/CuevazaArt/mosaico-criptografico/blob/main/XAMAN_TRUST_ISSUE.md" target="_blank" rel="noopener">known issue guide</a> — your on-chain anchor can still be valid.</p>
+    <p class="verify-note">Need a second opinion? Re-run this page anytime — valid means taxon <code>1001</code> with Issuer = Owner on Mainnet.</p>
   `);
 }
 

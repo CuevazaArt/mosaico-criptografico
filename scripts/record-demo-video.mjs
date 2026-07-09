@@ -56,10 +56,22 @@ function getMnemonicFrequencies(address) {
   const baseFreq = 160 + (hash[31] % 120);
   const pentatonicIntervals = [0, 2, 4, 7, 9, 12, 14, 16, 19, 21];
   const scale = pentatonicIntervals.map((semitones) => baseFreq * 2 ** (semitones / 12));
-  const layout = Array.from({ length: numCells }, (_, idx) => idx);
-  for (let k = numCells - 1; k > 0; k--) {
+  // Semi-anchored (matches src/core/layout.js)
+  const centerIdx = 4;
+  const peripheral = [];
+  for (let i = 0; i < numCells; i++) {
+    if (i !== 4) peripheral.push(i);
+  }
+  for (let k = peripheral.length - 1; k > 0; k--) {
     const j = hash[k % 32] % (k + 1);
-    [layout[k], layout[j]] = [layout[j], layout[k]];
+    [peripheral[k], peripheral[j]] = [peripheral[j], peripheral[k]];
+  }
+  const layout = new Array(numCells);
+  layout[centerIdx] = 4;
+  let p = 0;
+  for (let i = 0; i < numCells; i++) {
+    if (i === centerIdx) continue;
+    layout[i] = peripheral[p++];
   }
   const freqs = [];
   for (let step = 0; step < 4; step++) {
@@ -276,9 +288,9 @@ async function showTitleCard(page) {
     el.id = 'demo-title-overlay';
     el.innerHTML = `
       <div class="demo-title-inner">
-        <p class="demo-title-kicker">Make Waves on XRPL</p>
+        <p class="demo-title-kicker">Make Waves · XRPL</p>
         <h1>Cryptographic Mosaic</h1>
-        <p class="demo-title-sub">Sensory 2FA — see and hear your XRPL address</p>
+        <p class="demo-title-sub">Stop lookalike-address phishing — see &amp; hear every XRPL address</p>
       </div>`;
     document.body.appendChild(el);
     if (!document.getElementById('demo-title-styles')) {
@@ -288,15 +300,29 @@ async function showTitleCard(page) {
         #demo-title-overlay {
           position: fixed; inset: 0; z-index: 99999;
           display: flex; align-items: center; justify-content: center;
-          background: linear-gradient(135deg, #0b1120 0%, #1e3a5f 50%, #0b1120 100%);
-          color: #e2e8f0; text-align: center; font-family: 'Plus Jakarta Sans', sans-serif;
+          background: linear-gradient(145deg, #070b14 0%, #0f2744 45%, #071018 100%);
+          color: #e2e8f0; text-align: center; font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
         }
-        #demo-title-overlay .demo-title-kicker { color: #38bdf8; font-size: 1rem; margin: 0 0 0.5rem; letter-spacing: 0.08em; text-transform: uppercase; }
-        #demo-title-overlay h1 { font-size: 2.4rem; margin: 0 0 0.5rem; color: #fff; }
-        #demo-title-overlay .demo-title-sub { font-size: 1.1rem; color: #94a3b8; margin: 0; }
+        #demo-title-overlay .demo-title-kicker { color: #38bdf8; font-size: 0.95rem; margin: 0 0 0.6rem; letter-spacing: 0.12em; text-transform: uppercase; }
+        #demo-title-overlay h1 { font-size: 2.6rem; margin: 0 0 0.65rem; color: #fff; font-weight: 700; }
+        #demo-title-overlay .demo-title-sub { font-size: 1.15rem; color: #94a3b8; margin: 0; max-width: 34rem; line-height: 1.45; }
       `;
       document.head.appendChild(style);
     }
+  });
+}
+
+async function showEndCard(page) {
+  await page.evaluate(() => {
+    const el = document.createElement('div');
+    el.id = 'demo-title-overlay';
+    el.innerHTML = `
+      <div class="demo-title-inner">
+        <p class="demo-title-kicker">Try it on Mainnet</p>
+        <h1 style="font-size:2rem">mosaico-criptografico.vercel.app</h1>
+        <p class="demo-title-sub">Mint your Soulbound keychain · Verify on-chain · Make Waves</p>
+      </div>`;
+    document.body.appendChild(el);
   });
 }
 
@@ -362,64 +388,62 @@ async function main() {
 
   console.log('[demo] Loading app…');
   await page.goto(BASE, { waitUntil: 'domcontentloaded', timeout: 60000 });
-  await pause(page, 1500);
+  await pause(page, 1200);
   await acceptTerms(page);
 
   await showTitleCard(page);
-  timer.mark('Cryptographic Mosaic — visual & acoustic 2FA for XRPL addresses');
-  await pause(page, 3500);
+  timer.mark('Cryptographic Mosaic — stop lookalike-address phishing on XRPL');
+  await pause(page, 3200);
   await hideTitleCard(page);
 
-  console.log('[demo] Scene 1 — Register wizard');
-  timer.mark('Register your keychain — each address gets a unique mosaic and melody');
-  await page.locator('#wizard-address-input').fill(DEMO_ADDRESS);
-  await pause(page, 1200);
-  await page.locator('#wizard-next-btn').click();
-  await pause(page, 2500);
-  timer.mark('Acoustic signature — 4 notes unique to your address');
-  timer.markAudio(DEMO_ADDRESS);
-  await page.locator('#wizard-audio-btn').click();
-  await pause(page, 3500);
-
-  console.log('[demo] Scene 2 — Comparator phishing');
+  console.log('[demo] Scene 1 — Comparator phishing (problem first)');
   await switchTab(page, 'comparator-tab');
-  timer.mark('Comparator — compare trusted vs copied address before every send');
+  timer.mark('Problem: two addresses look almost identical — humans miss the middle');
   await page.locator('#compare-a-input').fill(SAMPLE_A);
+  await pause(page, 900);
   await page.locator('#compare-b-input').fill(PHISHING_B);
-  await pause(page, 3500);
-  timer.mark('One wrong character — mosaic and melody change completely (phishing alert)');
+  await pause(page, 2800);
+  timer.mark('One wrong character — mosaics diverge. Phishing becomes visible.');
   timer.markAudio(SAMPLE_A);
   await page.locator('#play-audio-a-btn').click({ timeout: 5000 }).catch(() => {});
-  await pause(page, 3000);
+  await pause(page, 2200);
+  timer.markAudio(PHISHING_B);
+  await page.locator('#play-audio-b-btn').click({ timeout: 5000 }).catch(() => {});
+  await pause(page, 2800);
 
-  console.log('[demo] Scene 3 — Perfect match');
-  timer.mark('Matching addresses — green verdict, safe to sign in your wallet');
+  console.log('[demo] Scene 2 — Perfect match');
+  timer.mark('Same address both sides — green verdict. Safe to sign.');
   await page.locator('#compare-b-input').fill(SAMPLE_A);
-  await pause(page, 3000);
+  await pause(page, 2800);
 
-  console.log('[demo] Scene 4 — Generator');
+  console.log('[demo] Scene 3 — Generator + acoustic');
   await switchTab(page, 'generator-tab');
-  timer.mark('Generator — paste any XRPL address, get its mosaic instantly');
+  timer.mark('Every address gets a unique mosaic — center anchor stays fixed for fast recognition');
   await page.locator('#address-input').fill(DEMO_ADDRESS);
-  await pause(page, 2500);
+  await pause(page, 2200);
+  timer.mark('Acoustic signature — four notes unique to this address');
   timer.markAudio(DEMO_ADDRESS);
   await page.locator('#play-audio-btn').click({ timeout: 5000 }).catch(() => {});
-  await pause(page, 3500);
+  await pause(page, 3200);
 
-  console.log('[demo] Scene 5 — Mint success');
+  console.log('[demo] Scene 4 — Register / mint success');
   await switchTab(page, 'register-tab');
-  timer.mark('Mainnet Soulbound NFT mint — taxon 1001, self-issued (Issuer = Owner)');
+  timer.mark('Mainnet Soulbound NFT — taxon 1001, self-issued (Issuer = Owner)');
   await showWizardDone(page);
-  await pause(page, 4500);
+  await pause(page, 3800);
 
-  console.log('[demo] Scene 6 — Verify on-chain');
-  timer.mark('Public verify page — account_nfts confirms valid Mosaic Keychain');
+  console.log('[demo] Scene 5 — Verify on-chain');
+  timer.mark('Public verify — account_nfts confirms a valid Mosaic Keychain');
   const verifyUrl = `${BASE}/verify?address=${encodeURIComponent(DEMO_ADDRESS)}`;
   await page.goto(verifyUrl, { waitUntil: 'domcontentloaded', timeout: 60000 });
-  await pause(page, 2000);
+  await pause(page, 1500);
   await page.locator('#verify-submit-btn').click();
-  await pause(page, 8000);
+  await pause(page, 6500);
+
+  await showEndCard(page);
   timer.mark('mosaico-criptografico.vercel.app — Make Waves on XRPL');
+  await pause(page, 4500);
+  await hideTitleCard(page);
 
   const video = page.video();
   await context.close();

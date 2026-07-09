@@ -1,6 +1,6 @@
 {
   "name": "cryptographic_mosaic_keychain",
-  "version": "3.1.6",
+  "version": "3.9.0",
   "description": "Deterministic Sensory 2FA (Visual & Acoustic) for cryptographic identities on XRPL.",
   "repository": {
     "type": "git",
@@ -15,12 +15,14 @@
   "files": [
     "src/core/crypto.js",
     "src/core/generator.js",
+    "src/core/layout.js",
     "src/core/audio.js",
     "src/core/xrpl.js"
   ],
   "exports": {
     "./crypto": "./src/core/crypto.js",
     "./generator": "./src/core/generator.js",
+    "./layout": "./src/core/layout.js",
     "./audio": "./src/core/audio.js",
     "./xrpl": "./src/core/xrpl.js"
   },

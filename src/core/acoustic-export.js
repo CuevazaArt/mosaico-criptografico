@@ -3,19 +3,10 @@
  * Mirrors the browser arpeggio in audio.js without Web Audio API.
  */
 
+import { buildSemiAnchoredLayout } from './layout.js';
+
 const PENTATONIC_INTERVALS = [0, 2, 4, 7, 9, 12, 14, 16, 19, 21];
 const CHAOTIC_INTERVALS = [0, 1, 6, 7, 10, 11, 13, 16, 18, 22];
-
-function buildLayout(hash, numCells) {
-  const layout = Array.from({ length: numCells }, (_, idx) => idx);
-  for (let k = numCells - 1; k > 0; k--) {
-    const j = hash[k % 32] % (k + 1);
-    const temp = layout[k];
-    layout[k] = layout[j];
-    layout[j] = temp;
-  }
-  return layout;
-}
 
 export function getAcousticNoteSequence(hash, options = {}) {
   const gridSize = parseInt(options.gridSize, 10) || 3;
@@ -24,7 +15,7 @@ export function getAcousticNoteSequence(hash, options = {}) {
   const baseFreq = 160 + (hash[31] % 120);
   const intervals = chaoticMode ? CHAOTIC_INTERVALS : PENTATONIC_INTERVALS;
   const scale = intervals.map(semitones => baseFreq * (2 ** (semitones / 12)));
-  const layout = buildLayout(hash, numCells);
+  const layout = buildSemiAnchoredLayout(hash, numCells);
   const stepDuration = 0.16;
   const maxNotes = Math.min(numCells, 4);
   const notes = [];

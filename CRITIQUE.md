@@ -64,9 +64,9 @@ The Cryptographic Mosaic is a revolutionary usability and security layer compare
   - Only shuffle the borders.    - Avoid sensitive gradients.      long arpeggios.
 ```
 
-1. **Semi-Anchored Structure (Hybrid Layout):**
-   * **Recommendation:** Keep the topological anchor cell **fixed in the center** (or in a predictable location) and apply the Fisher-Yates shuffle only to the peripheral cells. This provides the user with an immediate, constant visual anchor, reducing visual scan time.
+1. **Semi-Anchored Structure (Hybrid Layout):** ✅ **Shipped in v3.9.0**
+   * Topological anchor cell type **4** is fixed at the **geometric center**; Fisher-Yates shuffles only peripheral cells (`src/core/layout.js`).
 2. **Color Palette Restriction (Discrete Chromatics):**
-   * Instead of allowing 360 continuous HSL hues, map the hues to **12 highly contrasted and distinguishable color families** (similar to a 12-note color wheel). This mitigates the impact of screen variations, brightness, and night-shift blue-light filters.
+   * Instead of allowing 360 continuous HSL hues, map the hues to **12 highly contrasted and distinguishable color families** (similar to a 12-note color wheel). This mitigates the impact of screen variations, brightness, and night-shift blue-light filters. *(Still recommended.)*
 3. **Simplified Audio Signatures:**
-   * Replace long sequential arpeggios with a **simultaneous 3-note chord** of 1 second maximum duration, complemented by haptic vibration on mobile devices. It is much easier to memorize a "characteristic chord" than a complex temporal melodic sequence.
+   * Replace long sequential arpeggios with a **simultaneous 3-note chord** of 1 second maximum duration, complemented by haptic vibration on mobile devices. *(Still recommended.)*

@@ -20,15 +20,24 @@ window.generateMosaicoSvg = function(hash, textSource, options = {}) {
   const globalSat = 65 + (hash[29] % 25); // 65% to 90%
   const globalLight = 40 + (hash[28] % 20); // 40% to 60%
 
-  // Create a deterministic cell layout based on hash bytes.
-  const layout = Array.from({ length: numCells }, (_, idx) => idx);
-  
-  // Perform a deterministic Fisher-Yates shuffle using hash bytes.
-  for (let k = numCells - 1; k > 0; k--) {
+  // Semi-anchored layout: anchor (type 4) fixed at geometric center; shuffle periphery only.
+  const centerIdx = Math.floor(gridSize / 2) * gridSize + Math.floor(gridSize / 2);
+  const peripheral = [];
+  for (let i = 0; i < numCells; i++) {
+    if (i !== 4) peripheral.push(i);
+  }
+  for (let k = peripheral.length - 1; k > 0; k--) {
     const j = hash[k % 32] % (k + 1);
-    const temp = layout[k];
-    layout[k] = layout[j];
-    layout[j] = temp;
+    const temp = peripheral[k];
+    peripheral[k] = peripheral[j];
+    peripheral[j] = temp;
+  }
+  const layout = new Array(numCells);
+  layout[centerIdx] = 4;
+  let p = 0;
+  for (let i = 0; i < numCells; i++) {
+    if (i === centerIdx) continue;
+    layout[i] = peripheral[p++];
   }
 
   // Start SVG construction (using border-radius: 6px for tighter extension overlay aesthetics)

@@ -149,17 +149,17 @@ Do **not** burn test NFTs used as evidence until the case is closed.
 
 ---
 
-## Definition of done — you close the issue when
+## Definition of done — CLOSED 2026-07-09
 
-- [ ] TOML live with operator `[[ACCOUNTS]]`
-- [ ] Domain field set on operator account
-- [ ] Bithomp project registered + domain verified
-- [ ] Email sent to support@xrpl-labs.com
-- [ ] Xaman Support case opened
-- [ ] New self-mints no longer show scam label (or official guidance received)
+- [x] TOML live with operator `[[ACCOUNTS]]`
+- [x] Domain field set on operator account
+- [x] Bithomp project registered + domain verified
+- [x] Email sent to support@xrpl-labs.com
+- [x] Xaman Support case opened
+- [x] New self-mints no longer show scam label
 
-Update status in [XAMAN_TRUST_ISSUE.md](XAMAN_TRUST_ISSUE.md) when resolved.
+Status in [XAMAN_TRUST_ISSUE.md](XAMAN_TRUST_ISSUE.md): **RESOLVED**.
 
 ---
 
-*Last updated: 2026-07-08*
+*Last updated: 2026-07-09*

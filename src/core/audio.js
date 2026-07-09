@@ -3,6 +3,8 @@
  * Generates procedural and deterministic melodies based on SHA-256 hashes using the Web Audio API.
  */
 
+import { buildSemiAnchoredLayout } from './layout.js';
+
 let activeOscillators = [];
 let audioCtx = null;
 
@@ -48,14 +50,8 @@ export function scheduleMnemonicAudio(hash, options = {}, startTime) {
     return baseFreq * Math.pow(2, semitones / 12);
   });
 
-  // 3. Get the deterministic Fisher-Yates layout
-  const layout = Array.from({ length: numCells }, (_, idx) => idx);
-  for (let k = numCells - 1; k > 0; k--) {
-    const j = hash[k % 32] % (k + 1);
-    const temp = layout[k];
-    layout[k] = layout[j];
-    layout[j] = temp;
-  }
+  // 3. Semi-anchored layout (matches generator.js)
+  const layout = buildSemiAnchoredLayout(hash, numCells);
 
   // 4. Sequence the notes (4-note snappy signature)
   const stepDuration = 0.16; // 160ms per note

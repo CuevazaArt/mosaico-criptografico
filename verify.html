@@ -9,13 +9,13 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=3.8.2">
+  <link rel="stylesheet" href="styles.css?v=3.9.0">
   <script>
     window.__APP_CONFIG__ = window.__APP_CONFIG__ || {
       deploymentMode: 'production',
       defaultNetwork: 'mainnet',
       appUrl: window.location.origin,
-      version: '3.1.6'
+      version: '3.9.0'
     };
   </script>
   <script src="config.runtime.js" onerror="console.info('[config] Using inline fallback.')"></script>
@@ -54,11 +54,10 @@
       <p>Metadata is served from this domain: <code>/api/nft/{address}</code></p>
     </section>
 
-    <section class="verify-card verify-warning glass-panel">
-      <h2>⚠️ Xaman “scam” warning after you minted?</h2>
-      <p>That is often a <strong>false positive</strong> until our metadata domain is safelisted. If this page shows <strong>✅ Valid</strong>, your anchor is legitimate on-chain.</p>
-      <a href="https://github.com/CuevazaArt/mosaico-criptografico/blob/main/XAMAN_TRUST_ISSUE.md" target="_blank" rel="noopener" class="btn-secondary">Known issue &amp; mitigation guide</a>
-      <a href="https://github.com/CuevazaArt/mosaico-criptografico/blob/main/OPERATOR_ACTIONS.md" target="_blank" rel="noopener" class="btn-secondary">Operator registration steps</a>
+    <section class="verify-card glass-panel">
+      <h2>✅ Xaman trust</h2>
+      <p>The previous scam false-positive for self-minted Mosaic Keychains is <strong>resolved</strong> (2026-07). If this page shows <strong>✅ Valid</strong>, your on-chain anchor is legitimate.</p>
+      <a href="https://github.com/CuevazaArt/mosaico-criptografico/blob/main/XAMAN_TRUST_ISSUE.md" target="_blank" rel="noopener" class="btn-secondary">Historical issue notes</a>
     </section>
 
     <footer class="verify-footer">

@@ -243,11 +243,13 @@ XRPL confirms in ~4 seconds. You'll see the hash in the dApp console.
 
 ### Xaman says my NFT is a scam or suspicious — did something go wrong?
 
-**Often no.** This is a [known false positive](XAMAN_TRUST_ISSUE.md) when wallets flag self-minted utility NFTs from domains that are not yet safelisted.
+**Usually no longer expected.** The Xaman false-positive for self-minted Mosaic Keychains was **resolved in 2026-07** (see [XAMAN_TRUST_ISSUE.md](XAMAN_TRUST_ISSUE.md)).
 
-Your mint is probably legitimate if **you** signed it in our app, taxon is `1001`, **Issuer == Owner** (your address), and the Comparator shows **✅ Registered**. Verify the transaction on [Bithomp](https://bithomp.com) or [xrpl.org](https://xrpl.org).
+If you still see a warning on an older NFT:
 
-See **[XAMAN_TRUST_ISSUE.md](XAMAN_TRUST_ISSUE.md)** for the full checklist and what the project team is doing until Xaman fixes it.
+1. Confirm **you** signed the mint in our app.
+2. Taxon `1001`, **Issuer == Owner**, Comparator **✅ Registered**.
+3. Double-check at https://mosaico-criptografico.vercel.app/verify
 
 ---
 
@@ -274,7 +276,7 @@ See **[XAMAN_TRUST_ISSUE.md](XAMAN_TRUST_ISSUE.md)** for the full checklist and 
 | Technical manual | [MANUAL.md](MANUAL.md) |
 | Simple + technical narrative | [NARRATIVE.md](NARRATIVE.md) |
 | Security and credentials | [SECURITY.md](SECURITY.md) |
-| Xaman scam warning after mint | [XAMAN_TRUST_ISSUE.md](XAMAN_TRUST_ISSUE.md) |
+| Xaman trust (historical) | [XAMAN_TRUST_ISSUE.md](XAMAN_TRUST_ISSUE.md) — **RESOLVED** |
 | Developer deployment | [DEPLOYMENT.md](DEPLOYMENT.md) |
 | **Legal & disclaimer** | [LEGAL.md](LEGAL.md) |
 | **Terms of Use (required)** | [TERMS.md](TERMS.md) |
