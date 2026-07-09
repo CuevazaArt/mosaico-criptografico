@@ -30,13 +30,57 @@ Track mints via Bithomp / explorer filters on taxon `1001` + self-issued pattern
 
 ---
 
+## Where to diffuse — priority channels
+
+Copy-paste posts and banners: **[SOCIAL_KIT.md](SOCIAL_KIT.md)** · **[assets/banners/](assets/banners/)**
+
+### Tier A — do this week (highest ROI for Make Waves)
+
+| Channel | Why | Action |
+|---------|-----|--------|
+| **Make Waves form** | Official judging entry | Paste [SUBMISSION_DRAFT.md](SUBMISSION_DRAFT.md) + upload MP4 |
+| **XRPL Commons Discord / hackathon channels** | Judges + mentors hang out here | Post Discord blurb from SOCIAL_KIT |
+| **X (Twitter)** `@` XRPL / Commons / Xaman circles | Fast awareness | Pin launch tweet + header banner |
+| **10 seeded Mainnet mints** | Traction metric | Friends / operators with real wallets |
+
+### Tier B — high value (weeks 1–4)
+
+| Channel | Why | Action |
+|---------|-----|--------|
+| **r/Ripple, r/XRP, r/crypto** (careful: no spam)** | XRPL users who fear phishing | One thoughtful post + demo link |
+| **XRPL Dev Discord / Telegram** | Builders | Ask for Comparator feedback |
+| **Dev.to / Hashnode article** | SEO + shareable long-form | “Why XRPL needs sensory address 2FA” |
+| **Xaman / Gem / Crossmark DMs or Discord** | Integration path | Integrator DM from SOCIAL_KIT |
+| **Spanish LATAM Discords / Telegram** (crypto MX, AR, CO) | Your language advantage | Narrativa ES from SOCIAL_KIT |
+| **Bithomp / xrpscan communities** | Explorer users | Extension CTA |
+
+### Tier C — stretch (after 20+ mints)
+
+| Channel | Why |
+|---------|-----|
+| **Aquarium / XRPL Commons office hours** | Mentors + incubation narrative |
+| **YouTube Short / TikTok** (cut from MP4) | Reach beyond crypto Twitter |
+| **Product Hunt / Show HN** | One-day spike; prepare assets first |
+| **University / hackathon alumni groups** | Security & UX students |
+| **LinkedIn** (fintech / payments) | Institutional framing of phishing risk |
+| **GitHub Discussions + Topics** (`xrpl`, `identicon`) | Discoverability for integrators |
+
+### Avoid / low priority early
+
+- Paid ads before organic proof (waste until 50 mints).
+- Generic “NFT drop” Discords (wrong audience; you’re utility Soulbound, not flip).
+- Spamming every XRPL reply with links (gets muted).
+
+---
+
 ## Phase 1 — Days 1–30 (awareness → first 50 mints)
 
 ### Channels
 1. **XRPL Discord / Commons** — “mint your sensory keychain in 60s” thread + demo video.
-2. **Twitter/X** — daily tip: phishing lookalike → mosaic diverge (use Comparator GIF).
+2. **Twitter/X** — tip posts: phishing lookalike → mosaic diverge (Comparator screenshot).
 3. **Bithomp / explorer users** — extension install CTA.
 4. **Friends & operators** — 10 seeded mints with real wallets (not only operator account).
+5. **LATAM ES communities** — narrativa corta from SOCIAL_KIT.
 
 ### Offer
 - Free visual use; mint costs ~owner reserve (recoverable via burn).
@@ -46,7 +90,8 @@ Track mints via Bithomp / explorer filters on taxon `1001` + self-issued pattern
 | Asset | Use |
 |-------|-----|
 | `assets/demo-make-waves.mp4` | Submission + social |
-| Comparator phishing clip | Twitter |
+| `assets/banners/*` | Headers / OG / Discord / square posts |
+| [SOCIAL_KIT.md](SOCIAL_KIT.md) | Ready-to-paste copy EN/ES |
 | `/verify` screenshot | Trust proof |
 | [USER_GUIDE.md](USER_GUIDE.md) | Support |
 
@@ -99,5 +144,7 @@ Track mints via Bithomp / explorer filters on taxon `1001` + self-issued pattern
 | Version sync 3.9.0 | ✅ |
 | Hackathon form submitted | ⬜ You |
 | First 10 external mints | ⬜ You |
+| Social kit + banners in repo | ✅ |
+| Demo audio (rhythmic bass) | ✅ |
 
-*Last updated: 2026-07-09*
+*Last updated: 2026-07-09 · v3.9.1*

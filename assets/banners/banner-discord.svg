@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="540" viewBox="0 0 960 540">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#070b14"/>
+      <stop offset="100%" stop-color="#0f2744"/>
+    </linearGradient>
+  </defs>
+  <rect width="960" height="540" fill="url(#bg)"/>
+  <text x="56" y="120" fill="#38bdf8" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="22" letter-spacing="3" font-weight="600">XRPL · MAKE WAVES</text>
+  <text x="56" y="200" fill="#ffffff" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="48" font-weight="700">Cryptographic Mosaic</text>
+  <text x="56" y="260" fill="#94a3b8" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="24">Stop lookalike-address phishing</text>
+  <text x="56" y="310" fill="#cbd5e1" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="20">See it · Hear it · Anchor it on-chain (taxon 1001)</text>
+  <g opacity="0.5">
+    <rect x="620" y="160" width="72" height="72" rx="8" fill="#155e75"/>
+    <rect x="704" y="160" width="72" height="72" rx="8" fill="#22d3ee"/>
+    <rect x="788" y="160" width="72" height="72" rx="8" fill="#0e7490"/>
+    <rect x="620" y="244" width="72" height="72" rx="8" fill="#0ea5e9"/>
+    <rect x="704" y="244" width="72" height="72" rx="8" fill="#67e8f9"/>
+    <rect x="788" y="244" width="72" height="72" rx="8" fill="#164e63"/>
+    <rect x="620" y="328" width="72" height="72" rx="8" fill="#083344"/>
+    <rect x="704" y="328" width="72" height="72" rx="8" fill="#2dd4bf"/>
+    <rect x="788" y="328" width="72" height="72" rx="8" fill="#155e75"/>
+  </g>
+  <text x="56" y="460" fill="#38bdf8" font-family="Consolas, monospace" font-size="18">mosaico-criptografico.vercel.app</text>
+</svg>

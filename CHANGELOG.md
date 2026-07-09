@@ -4,6 +4,18 @@ All notable changes to the **Cryptographic Mosaic** project are documented in th
 
 ---
 
+## [3.9.1] - 2026-07-09
+
+### Added
+* **SOCIAL_KIT.md** — EN/ES narratives, ready-to-paste posts (X, Discord, LinkedIn, Reddit, wallet DMs).
+* **assets/banners/** — OG, X header, Discord, and square SVG banners for campaign launch.
+* **ADOPTION_PLAN.md** — ranked diffusion channels (Tier A/B/C).
+
+### Changed
+* **Demo video audio** — replaced sine drone with rhythmic bass groove; removed piercing high acoustic cues.
+
+---
+
 ## [3.9.0] - 2026-07-09
 
 ### Added

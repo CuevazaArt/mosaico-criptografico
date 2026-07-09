@@ -120,7 +120,9 @@ npm run dev           # static UI only (no Xaman signing)
 | [XAMAN_WEBHOOK.md](XAMAN_WEBHOOK.md) | Xaman reviewers | Why webhooks are intentionally not used |
 | [XAMAN_TRUST_ISSUE.md](XAMAN_TRUST_ISSUE.md) | **Users + operators** | Xaman scam false-positive — **RESOLVED** (historical notes) |
 | [OPERATOR_ACTIONS.md](OPERATOR_ACTIONS.md) | **Project operator** | Domain / Bithomp / XRPL Labs checklist (closed) |
-| [ADOPTION_PLAN.md](ADOPTION_PLAN.md) | **Growth** | 30/60/90-day adoption campaign for Make Waves |
+| [ADOPTION_PLAN.md](ADOPTION_PLAN.md) | **Growth** | 30/60/90-day adoption campaign + where to diffuse |
+| [SOCIAL_KIT.md](SOCIAL_KIT.md) | **Social / outreach** | Narratives EN/ES, ready-to-paste posts, banner map |
+| [assets/banners/](assets/banners/) | **Design** | OG / X header / Discord / square SVG banners |
 | [NARRATIVE.md](NARRATIVE.md) | End-users + devs | Simple keychain analogy + technical pipeline |
 | [MANUAL.md](MANUAL.md) | End-users | 3-step verification protocol |
 | [SECURITY.md](SECURITY.md) | Security reviewers | Entropy model, attack resistance, credential policy |

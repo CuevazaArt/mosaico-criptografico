@@ -124,26 +124,60 @@ function writeSrt(cues, durationSec) {
   console.log(`[demo] Saved ${path.relative(rootDir, SRT_OUT)}`);
 }
 
+/**
+ * Rich rhythmic bass bed (~100 BPM): 8-step pattern, warm sub + body.
+ * No high ticks / mid plucks — those sounded piercing.
+ */
 function generateMusicBed(durationSec) {
   const dur = Math.ceil(durationSec + 2);
-  const fadeOut = Math.max(0, dur - 3);
+  const fadeOut = Math.max(0, dur - 3.5);
+  // 8 steps × 0.3s ≈ 100 BPM. Degrees: root, ghost, fifth, root, minor3, ghost, fourth, fifth.
+  // Freqs (Hz): 55, 0, 82.5, 55, 65.4, 0, 73.4, 82.5  — A1-centered minor groove.
+  // step = floor(t/0.3)%8 ; pitch selected via nested eq()
+  const pitchExpr =
+    `(55` +
+    `+27.5*eq(mod(floor(t/0.3)\\,8)\\,2)` +
+    `+10.4*eq(mod(floor(t/0.3)\\,8)\\,4)` +
+    `+18.4*eq(mod(floor(t/0.3)\\,8)\\,6)` +
+    `+27.5*eq(mod(floor(t/0.3)\\,8)\\,7)` +
+    `)`;
+  // Mute ghost steps 1 and 5
+  const gateExpr =
+    `(1-eq(mod(floor(t/0.3)\\,8)\\,1))*(1-eq(mod(floor(t/0.3)\\,8)\\,5))`;
+  // Soft envelope per step (longer sustain on downbeats 0,2,4,7)
+  const envExpr =
+    `exp(-(8+6*eq(mod(floor(t/0.3)\\,8)\\,0)+4*eq(mod(floor(t/0.3)\\,8)\\,2))*mod(t\\,0.3))`;
+
+  // Fundamental sub
+  const subBass =
+    `aevalsrc=exprs='0.95*sin(2*PI*${pitchExpr}*t)*${envExpr}*${gateExpr}':d=${dur}:s=44100:c=mono`;
+  // Soft 2nd harmonic for warmth (not bright)
+  const body =
+    `aevalsrc=exprs='0.28*sin(2*PI*2*${pitchExpr}*t)*${envExpr}*${gateExpr}':d=${dur}:s=44100:c=mono`;
+  // Syncopated ghost thump on off-grid (step+0.15) — very soft, low only
+  const syncop =
+    `aevalsrc=exprs='0.32*sin(2*PI*48*t)*exp(-28*mod(t+0.15\\,0.6))*eq(mod(floor((t+0.15)/0.6)\\,2)\\,1)':d=${dur}:s=44100:c=mono`;
+
   const ok = runFfmpeg([
     '-y',
-    '-f', 'lavfi', '-i', `sine=frequency=196:duration=${dur}:sample_rate=44100`,
-    '-f', 'lavfi', '-i', `sine=frequency=262:duration=${dur}:sample_rate=44100`,
-    '-f', 'lavfi', '-i', `sine=frequency=330:duration=${dur}:sample_rate=44100`,
-    '-f', 'lavfi', '-i', `sine=frequency=392:duration=${dur}:sample_rate=44100`,
+    '-f', 'lavfi', '-i', subBass,
+    '-f', 'lavfi', '-i', body,
+    '-f', 'lavfi', '-i', syncop,
     '-filter_complex',
-    `[0:a][1:a][2:a][3:a]amix=inputs=4:duration=longest:dropout_transition=0,` +
-    `volume=0.42,lowpass=f=1600,highpass=f=160,` +
-    `pan=stereo|c0=0.5*c0+0.5*c1|c1=0.5*c0+0.5*c1,` +
-    `afade=t=in:st=0:d=2.5,afade=t=out:st=${fadeOut}:d=3`,
+    `[0:a][1:a][2:a]amix=inputs=3:duration=longest:dropout_transition=0:weights=1.4 0.55 0.4,` +
+    `lowpass=f=280,highpass=f=28,` +
+    `pan=stereo|c0=c0|c1=c0,` +
+    `afade=t=in:st=0:d=0.6,afade=t=out:st=${fadeOut}:d=3.2`,
     MUSIC_OUT
   ], 'music bed');
   if (ok) console.log(`[demo] Saved ${path.relative(rootDir, MUSIC_OUT)}`);
   return ok;
 }
 
+/**
+ * Soft low "blip" cues instead of piercing high sines.
+ * Caps frequency and applies heavy lowpass so they sit under the bass.
+ */
 function generateAcousticCues(audioEvents, durationSec) {
   if (!audioEvents?.length) {
     if (fs.existsSync(ACOUSTIC_OUT)) fs.unlinkSync(ACOUSTIC_OUT);
@@ -158,10 +192,17 @@ function generateAcousticCues(audioEvents, durationSec) {
   for (const evt of audioEvents) {
     const freqs = getMnemonicFrequencies(evt.address);
     for (let step = 0; step < 4; step++) {
-      const freq = Math.round(freqs[step] * 10) / 10;
-      const delayMs = Math.round((evt.sec + step * 0.16) * 1000);
-      inputs.push('-f', 'lavfi', '-i', `sine=frequency=${freq}:duration=0.18:sample_rate=44100`);
-      filterParts.push(`[${inputIdx}:a]adelay=${delayMs}|${delayMs},volume=0.85[a${inputIdx}]`);
+      // Drop into bass/mid register (never piercing highs)
+      let freq = freqs[step];
+      while (freq > 220) freq /= 2;
+      freq = Math.max(90, Math.min(200, freq));
+      freq = Math.round(freq * 10) / 10;
+      const delayMs = Math.round((evt.sec + step * 0.22) * 1000);
+      inputs.push('-f', 'lavfi', '-i', `sine=frequency=${freq}:duration=0.28:sample_rate=44100`);
+      filterParts.push(
+        `[${inputIdx}:a]adelay=${delayMs}|${delayMs},afade=t=in:st=0:d=0.02,afade=t=out:st=0.12:d=0.16,` +
+        `lowpass=f=320,volume=0.45[a${inputIdx}]`
+      );
       mixLabels.push(`[a${inputIdx}]`);
       inputIdx++;
     }
@@ -169,7 +210,7 @@ function generateAcousticCues(audioEvents, durationSec) {
 
   const dur = Math.ceil(durationSec + 1);
   const filter = `${filterParts.join(';')};${mixLabels.join('')}amix=inputs=${inputIdx}:duration=longest:dropout_transition=0,` +
-    `pan=stereo|c0=c0|c1=c0,afade=t=out:st=${dur - 0.5}:d=0.5`;
+    `lowpass=f=300,pan=stereo|c0=c0|c1=c0,afade=t=out:st=${dur - 0.5}:d=0.5`;
 
   const ok = runFfmpeg(['-y', ...inputs, '-filter_complex', filter, ACOUSTIC_OUT], 'acoustic cues');
   if (ok) console.log(`[demo] Saved ${path.relative(rootDir, ACOUSTIC_OUT)}`);
@@ -195,12 +236,12 @@ function muxFinal(webmPath, durationSec) {
   if (!extraInputs.length) {
     filter += `;anullsrc=channel_layout=stereo:sample_rate=44100:d=${durationSec}[a]`;
   } else if (extraInputs.length === 1) {
-    filter += `;[1:a]volume=${hasMusic ? 0.72 : 0.9},pan=stereo|c0=c0|c1=c1,` +
-      `loudnorm=I=-18:TP=-1.5:LRA=9:linear=true[a]`;
+    filter += `;[1:a]volume=${hasMusic ? 1.2 : 1.5},pan=stereo|c0=c0|c1=c1,` +
+      `loudnorm=I=-14:TP=-1.0:LRA=11:linear=true[a]`;
   } else {
-    filter += `;[1:a]volume=0.65,pan=stereo|c0=c0|c1=c1[m];[2:a]volume=1.0,pan=stereo|c0=c0|c1=c1[c];` +
-      `[m][c]amix=inputs=2:duration=first:dropout_transition=0,pan=stereo|c0=c0|c1=c1,` +
-      `loudnorm=I=-18:TP=-1.5:LRA=9:linear=true[a]`;
+    filter += `;[1:a]volume=1.45,pan=stereo|c0=c0|c1=c1[m];[2:a]volume=0.55,pan=stereo|c0=c0|c1=c1[c];` +
+      `[m][c]amix=inputs=2:duration=first:dropout_transition=0:weights=1 0.35,pan=stereo|c0=c0|c1=c1,` +
+      `loudnorm=I=-14:TP=-1.0:LRA=11:linear=true[a]`;
   }
 
   const args = [

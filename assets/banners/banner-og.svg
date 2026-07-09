@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#070b14"/>
+      <stop offset="45%" stop-color="#0f2744"/>
+      <stop offset="100%" stop-color="#071018"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#38bdf8"/>
+      <stop offset="100%" stop-color="#2dd4bf"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <!-- mosaic hint grid -->
+  <g opacity="0.35">
+    <rect x="820" y="120" width="88" height="88" rx="10" fill="#1e3a5f"/>
+    <rect x="920" y="120" width="88" height="88" rx="10" fill="#0ea5e9"/>
+    <rect x="1020" y="120" width="88" height="88" rx="10" fill="#164e63"/>
+    <rect x="820" y="220" width="88" height="88" rx="10" fill="#155e75"/>
+    <rect x="920" y="220" width="88" height="88" rx="10" fill="#22d3ee"/>
+    <rect x="1020" y="220" width="88" height="88" rx="10" fill="#0e7490"/>
+    <rect x="820" y="320" width="88" height="88" rx="10" fill="#083344"/>
+    <rect x="920" y="320" width="88" height="88" rx="10" fill="#67e8f9"/>
+    <rect x="1020" y="320" width="88" height="88" rx="10" fill="#164e63"/>
+    <!-- center anchor -->
+    <polygon points="964,248 980,264 964,280 948,264" fill="#f8fafc" opacity="0.9"/>
+  </g>
+  <text x="72" y="160" fill="#38bdf8" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="28" letter-spacing="4" font-weight="600">MAKE WAVES · XRPL</text>
+  <text x="72" y="250" fill="#ffffff" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="64" font-weight="700">Cryptographic Mosaic</text>
+  <text x="72" y="320" fill="#94a3b8" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="28">See &amp; hear every XRPL address  stop lookalike phishing</text>
+  <rect x="72" y="380" width="420" height="4" rx="2" fill="url(#accent)"/>
+  <text x="72" y="450" fill="#e2e8f0" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="24">Soulbound keychain · taxon 1001 · Mainnet</text>
+  <text x="72" y="540" fill="#38bdf8" font-family="Consolas, monospace" font-size="22">mosaico-criptografico.vercel.app</text>
+</svg>
